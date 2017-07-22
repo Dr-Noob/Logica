@@ -1,0 +1,5 @@
+*.yy.c
+*.tab.h
+*.tab.c
+tableaux
+Comp/
