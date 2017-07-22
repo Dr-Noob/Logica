@@ -11,10 +11,13 @@
 struct FormulaRep;
 typedef struct FormulaRep *Formula;
 
+struct TableauxRep;
+typedef struct TableauxRep *Tableaux;
+
 Formula CrearFormula(char atomo);
 Formula Unir(Formula f1,int operador,Formula f2);
 Formula Concatenar(Formula f1,Formula f2);
+void ResolverTableaux(Formula oracion);
 void show(Formula f);
 
 #endif
-

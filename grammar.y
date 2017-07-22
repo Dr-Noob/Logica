@@ -39,10 +39,11 @@ extern int yylineno;
 
 %%
 
-oracion : e 
-		{ 
-			printf("Terminado\n");
+oracion : e
+		{
+			printf(GREEN "La oracion se ha reconocido correctamente\n" RESET);
 			show($1);
+			ResolverTableaux($1);
 		};
 
 e: z COMA e
@@ -112,6 +113,3 @@ g: LPAREN e RPAREN
 void yyerror(char* s) {
 	printf(RED "ERROR: Error sintactico en el caracter %s" RESET "\n",s);
 }
-
-
-
