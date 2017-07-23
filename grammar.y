@@ -42,11 +42,10 @@ extern int yylineno;
 oracion : e
 		{
 			printf(GREEN "La oracion se ha reconocido correctamente\n" RESET);
-			show($1);
 			ResolverTableaux($1);
 		};
 
-e: z COMA e
+e: e COMA z
 		{
 			$$=Concatenar($1,$3);
 		};
@@ -55,7 +54,7 @@ e: z COMA e
 			$$=$1;
 		};
 
-z: i DIMP z
+z: z DIMP i
 		{
 			$$ = Unir($1,COD_DIMP,$3);
 		}
@@ -68,7 +67,7 @@ i: c
 		{
 			$$=$1;
 		}
-	| c IMP i
+	| i IMP c
 		{
 			$$ = Unir($1,COD_IMP,$3);
 		};
@@ -77,7 +76,7 @@ c: d
 		{
 			$$=$1;
 		}
-	| d OR c
+	| c OR d
 		{
 			$$ = Unir($1,COD_OR,$3);
 		};
@@ -86,14 +85,21 @@ d: n
 		{
 			$$=$1;
 		}
-	| n AND d
+	| d AND n
 		{
 			$$ = Unir($1,COD_AND,$3);
 		};
 
 n: NOT n
 		{
-			$$= Unir($2,COD_NOT,NULL);
+			printf("No hago nada\n");
+			/* Sirve para negar toda una Formula
+			~(p v (q v r))
+			^
+			|
+			Atomo a = CrearAtomo($2,NEGADO);
+			$$= CrearFormula(a);
+			*/
 		}
 	| g
 		{
@@ -105,7 +111,8 @@ g: LPAREN e RPAREN
 		}
 	| ATOM
 		{
-			$$=CrearFormula($1);
+			Atomo a = CrearAtomo($1,SIN_NEGAR);
+			$$=CrearFormula(a);
 		};
 
 %%
