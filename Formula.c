@@ -4,16 +4,37 @@
 #include <string.h>
 
 struct AtomoRep {
-  char id;
-  int not;
+  char id; //Identificador
+  int not; //NEGADO-> el atomo va negado, SIN_NEGAR-> no va negado
 };
+
+/*
+//TODO: Dividir formula en clausulas, las cuales conforman una oracion:
+struct FormulaRep {
+  Atomo a;
+  ...
+};
+
+struct ClausuaRep {
+  Formula f1; //Formula1
+  Formula f2; //Formula2
+  int COD_OP;	//Codigo operador
+};
+
+struct OracionRep {
+  Clausula c;
+  struct ClausuaRep *sig;
+};
+
+//TODO: ^^^^
+*/
 
 struct FormulaRep {
   Atomo a1;	//Atomo1
   Atomo a2;	//Atomo2
   Formula formula; //Formula anidada
   int COD_OP;	//Codigo operador
-  struct FormulaRep *sig;
+  struct FormulaRep *sig; //Siguiente formula
 };
 
 struct TableauxRep {
@@ -73,23 +94,45 @@ Formula CopiarFormula(Formula original) {
   return copia;
 }
 
+Formula CrearFormulaParentesis(Formula original) {
+  Formula f = malloc(sizeof(struct FormulaRep));
+  if(original->formula == NULL)f->formula = CopiarFormula(original);
+  else return original;
+  f->a1 = NULL;
+  f->a2 = NULL;
+	f->COD_OP = COD_INVALIDO;
+  f->sig = original->sig;
+	return f;
+}
+
 Formula Unir(Formula f1,int operador,Formula f2) {
-  //TODO: Facil de mejorar
-	f1->COD_OP = operador;
-	if(f1->a2 == NULL) { //atomo operador atomo[p v q]
+  f1->COD_OP = operador;
+  f2->COD_OP = operador;
+
+  if(f1->formula == NULL && f2->formula != NULL) { //atomo operador formula[r v (p v q)]
+    f2->a1 = NULL;
+    f2->a2 = CrearAtomo(f1->a1->id,f1->a1->not);
+    return f2;
+  }
+  //Por legibilidad no se simplifica
+	if(f1->a2 == NULL && f1->formula == NULL) { //atomo operador atomo[p v q]Sabemos que f2 siempe es un atomo
     f1->a2 = CrearAtomo(f2->a1->id,f2->a1->not);
   }
   else {  //formula operador atomo[(p v q) v r]
+    //TODO: Si se devuelve f1, f2 no se usa y puede liberarse. La copia ni debe hacerse si su formula es nulo
     Formula copia = CopiarFormula(f1);
     f1->a1 = NULL;
     f1->a2 = CrearAtomo(f2->a1->id,f2->a1->not);
-    f1->formula = copia;
+    if(f1->formula == NULL)f1->formula = copia;
   }
 	return f1;
 }
 
+//Dejar f2 al final de f1
 Formula Concatenar(Formula f1,Formula f2) {
-	f1->sig = f2;
+  Formula aux = f1;
+  while(aux->sig != NULL)aux = aux->sig;
+	aux->sig = f2;
 	return f1;
 }
 
@@ -181,27 +224,40 @@ void showTableaux(Tableaux t) {
   if(t->td != NULL)showTableaux(t->td);
 }
 
+int SoloTieneUnAtomo(Formula f) { //1 false, 0 true
+  if(f->formula != NULL)return 1;
+  if(f->a2 == NULL)return 0;
+  else return 1;
+}
+
 void Resolver(Tableaux t) {
+  //TODO:Hacer negacion
+  int busqueda = 0;
   show(t->f);
   printf("\n");
   t->ti = CrearTableaux(CopiarFormula(t->f));
   t->td = CrearTableaux(CopiarFormula(t->f));
   Formula oracion = t->f;
-  while(oracion->sig != NULL && ((oracion->a1 == NULL) || (oracion->a2 == NULL)))oracion = oracion->sig;
-  if((oracion->a1 == NULL && oracion->formula == NULL) || oracion->a2 == NULL) { //Añadir a list
+  //Busqueda del siguiente
+  while(oracion->sig != NULL && SoloTieneUnAtomo(oracion) == 0) {
+    busqueda++;
+    oracion = oracion->sig;
+  }
+  //Si es nodo, no seguir
+  if(oracion == NULL || SoloTieneUnAtomo(oracion) == 0) { //Añadir a list
     return;
   }
+  //Si no lo es, ramificar
   else {
     switch(oracion->COD_OP) {
       Formula aux;
-      Formula* puntero;
       Atomo a1;
       Atomo a2;
 
       case COD_DIMP:
         //TODO: t->td no se usa (free?)
         aux = t->ti->f;
-        while(aux->sig != NULL && (aux->a1->id != oracion->a1->id || (aux->a2 != NULL && aux->a2->id != oracion->a2->id) || aux->COD_OP != oracion->COD_OP))aux = aux->sig;
+        while(oracion->sig != NULL && oracion->formula == NULL && oracion->a2 != NULL)aux = aux->sig;
         aux->COD_OP = COD_IMP;
         Formula dimp = malloc(sizeof(struct FormulaRep));
         a1 = CrearAtomo(aux->a1->id,aux->a1->not);
@@ -244,9 +300,9 @@ void Resolver(Tableaux t) {
         break;
       case COD_OR:
         aux = t->ti->f;
-        while(aux->sig != NULL && aux->formula == NULL && (aux->a1->id != oracion->a1->id || (aux->a2 != NULL && aux->a2->id != oracion->a2->id) || aux->COD_OP != oracion->COD_OP))aux = aux->sig;
+        for(int i=0;i<busqueda;i++)aux = aux->sig;
         if(aux->formula != NULL) {
-          if(aux->sig == NULL)printf("¿Que deberia hacer?\n");
+          //if(aux->sig == NULL)printf("¿Que deberia hacer?\n");
           if(aux->formula->formula == NULL) {
             aux->a1 = CrearAtomo(aux->formula->a1->id,aux->formula->a1->not);
             aux->a2 = CrearAtomo(aux->formula->a2->id,aux->formula->a2->not);
@@ -254,12 +310,13 @@ void Resolver(Tableaux t) {
             aux->formula = NULL;
           }
           else {
-            printf("Formulas andidadas\n");
+            //printf("Formulas andidadas\n");
             aux->a2 = aux->formula->a2;
             aux->formula = aux->formula->formula;
           }
           Resolver(t->ti);
           aux = t->td->f;
+          for(int i=0;i<busqueda;i++)aux = aux->sig;
           aux->a1 = aux->a2;
           aux->a2 = NULL;
           aux->formula = NULL;
@@ -271,7 +328,7 @@ void Resolver(Tableaux t) {
           aux->COD_OP = COD_INVALIDO;
           Resolver(t->ti);
           aux = t->td->f;
-          while(aux->sig != NULL && (aux->a1->id != oracion->a1->id || (aux->a2 != NULL && aux->a2->id != oracion->a2->id) || aux->COD_OP != oracion->COD_OP))aux = aux->sig;
+          for(int i=0;i<busqueda;i++)aux = aux->sig;
           aux->a1 = aux->a2;
           aux->a2 = NULL;
           aux->COD_OP = COD_INVALIDO;

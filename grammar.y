@@ -107,7 +107,7 @@ n: NOT n
 		};
 g: LPAREN e RPAREN
 		{
-			printf("No hago nada\n");
+			$$=CrearFormulaParentesis($2);
 		}
 	| ATOM
 		{
