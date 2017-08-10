@@ -92,14 +92,7 @@ d: n
 
 n: NOT n
 		{
-			printf("No hago nada\n");
-			/* Sirve para negar toda una Formula
-			~(p v (q v r))
-			^
-			|
-			Atomo a = CrearAtomo($2,NEGADO);
-			$$= CrearFormula(a);
-			*/
+			$$= NegarFormula($2);
 		}
 	| g
 		{
