@@ -291,7 +291,7 @@ void show(Formula f) {
     if(aux->f2 != NULL)show(aux->f2); //Existe formula derecha
     else if(aux->a2 != NULL)printAtomo(aux->a2); //No existe formula derecha
   }
-  else { //No existe ni formula derecha ni izquierda
+  else { //No existe formula izquierda
     if(aux->a1 == NULL)printf("ERROR: a1 es nulo\n");
     printAtomo(aux->a1);
     printCOD(aux->COD_OP);
@@ -312,11 +312,12 @@ void show(Formula f) {
       if(aux->f2 != NULL)show(aux->f2); //Existe formula derecha
       else if(aux->a2 != NULL)printAtomo(aux->a2); //No existe formula derecha
     }
-    else { //No existe ni formula derecha ni izquierda
+    else { //No existe formula izquierda
       if(aux->a1 == NULL)printf("ERROR: a1 es nulo\n");
       printAtomo(aux->a1);
       printCOD(aux->COD_OP);
-      if(aux->a2 != NULL)printAtomo(aux->a2);
+      if(aux->f2 != NULL)show(aux->f2); //Existe formula derecha
+      else if(aux->a2 != NULL)printAtomo(aux->a2); // No existe formula derecha
     }
     printf("]");
   }
@@ -331,18 +332,27 @@ void showTableaux(Tableaux t) {
 
 int SoloTieneUnAtomo(Formula f) { //1 true, 0 false
   if(f->f1 == NULL) {
-    if(f->a2 == NULL)return 1;
+    if(f->a1 != NULL && f->a2 != NULL)return 0;
+    if(f->f2 == NULL)return 1;
     else return 0;
   }
   return 0;
+}
+
+Formula ExtraerIzquierda(Formula f) {
+  if(f->f1 == NULL)return CrearFormula(f->a1);
+  return CopiarFormula(f->f1);
+}
+
+Formula ExtraerDerecha(Formula f) {
+  if(f->f2 == NULL)return CrearFormula(f->a2);
+  return CopiarFormula(f->f2);
 }
 
 void Resolver(Tableaux t) {
   int busqueda = 0;
   show(t->f);
   printf("\n");
-  t->ti = CrearTableaux(CopiarFormula(t->f));
-  //t->td = CrearTableaux(CopiarFormula(t->f)); Solo si se bifurca
   Formula oracion = t->f;
 
   //Busqueda del siguiente
@@ -351,74 +361,53 @@ void Resolver(Tableaux t) {
     oracion = oracion->sig;
   }
   //Si es nodo, no seguir
-  if(oracion == NULL || SoloTieneUnAtomo(oracion)) { //Añadir a list
+  if(oracion->sig == NULL && SoloTieneUnAtomo(oracion)) { //Añadir a list
     return;
   }
   //Si no lo es, ramificar
   else {
     switch(oracion->COD_OP) {
       Formula aux;
-      Atomo a1;
-      Atomo a2;
+      Formula nueva;
 
       case COD_DIMP:
-        //TODO: t->td no se usa (free?)
-        aux = t->ti->f;
-        //while(oracion->sig != NULL && oracion->formula == NULL && oracion->a2 != NULL)aux = aux->sig;
-        aux->COD_OP = COD_IMP;
-        Formula dimp = malloc(sizeof(struct FormulaRep));
-        a1 = CrearAtomo(aux->a1->id,aux->a1->not);
-        a2 = CrearAtomo(aux->a2->id,aux->a2->not);
-        dimp->a1 = a2;
-        dimp->a2 = a1;
-        dimp->COD_OP = COD_IMP;
-        dimp->sig = aux->sig;
-        aux->sig = dimp;
-        Resolver(t->ti);
         break;
+
       case COD_IMP:
-        //TODO: Cuando se iguala a NULL,habra que borrar lo otro
-        aux = t->ti->f;
-        while(aux->sig != NULL && (aux->a1->id != oracion->a1->id || (aux->a2 != NULL && aux->a2->id != oracion->a2->id) || aux->COD_OP != oracion->COD_OP))aux = aux->sig;
-        aux->a2 = NULL;
-        aux->a1->not = NEGADO;
-        aux->COD_OP = COD_INVALIDO;
-        Resolver(t->ti);
-        aux = t->td->f;
-        while(aux->sig != NULL && (aux->a1->id != oracion->a1->id || (aux->a2 != NULL && aux->a2->id != oracion->a2->id) || aux->COD_OP != oracion->COD_OP))aux = aux->sig;
-        aux->a1 = aux->a2;
-        aux->a2 = NULL;
-        aux->COD_OP = COD_INVALIDO;
-        Resolver(t->td);
         break;
+
       case COD_AND:
-        aux = t->ti->f;
-        while(aux->sig != NULL && (aux->a1->id != oracion->a1->id || (aux->a2 != NULL && aux->a2->id != oracion->a2->id) || aux->COD_OP != oracion->COD_OP))aux = aux->sig;
-        aux->COD_OP = COD_INVALIDO;
-        Formula and = malloc(sizeof(struct FormulaRep));
-        a2 = CrearAtomo(aux->a2->id,aux->a2->not);
-        and->a1 = a2;
-        aux->a2 = NULL;
-        and->a2 = NULL;
-        and->COD_OP = COD_INVALIDO;
-        and->sig = aux->sig;
-        aux->sig = and;
-        Resolver(t->ti);
         break;
+
       case COD_OR:
-        aux = t->ti->f;
-        for(int i=0;i<busqueda;i++)aux = aux->sig;
-        aux->f2 = NULL;
-        aux->a2 = NULL;
-        aux->COD_OP = COD_INVALIDO;
+        t->ti = CrearTableaux(CopiarFormula(t->f));
+        if(busqueda == 0) {
+          nueva = ExtraerIzquierda(t->ti->f);
+          nueva->sig = t->ti->f->sig;
+          t->ti->f = nueva;
+        }
+        else {
+          aux = t->ti->f;
+          for(int i=0;i<busqueda-1;i++)aux = aux->sig;
+          nueva = ExtraerIzquierda(aux->sig);
+          nueva->sig = aux->sig->sig;
+          aux->sig = nueva;
+        }
         Resolver(t->ti);
 
         t->td = CrearTableaux(CopiarFormula(t->f));
-        aux = t->td->f;
-        for(int i=0;i<busqueda;i++)aux = aux->sig;
-        aux->f2 = CopiarFormula(aux->f1);
-        aux->a2 = aux->a1;
-        aux->COD_OP = COD_INVALIDO;
+        if(busqueda == 0) {
+          nueva = ExtraerDerecha(t->td->f);
+          nueva->sig = t->td->f->sig;
+          t->td->f = nueva;
+        }
+        else {
+          aux = t->td->f;
+          for(int i=0;i<busqueda-1;i++)aux = aux->sig;
+          nueva = ExtraerDerecha(aux->sig);
+          nueva->sig = aux->sig->sig;
+          aux->sig = nueva;
+        }
         Resolver(t->td);
 
         break;
@@ -427,10 +416,6 @@ void Resolver(Tableaux t) {
 }
 
 void ResolverTableaux(Formula oracion) {
-  printf("Me llega: \n");
-  show(oracion);
-  printf("\n");
-  return;
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
 }

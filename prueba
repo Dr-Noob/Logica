@@ -1,1 +1,1 @@
-p or (p or q) or (r or a)
+p or q,q or p or r,p or (p or q) or r
