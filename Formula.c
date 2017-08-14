@@ -20,8 +20,8 @@ struct FormulaRep {
 
 struct TableauxRep {
   Formula f;
-  Tableaux ti;
-  Tableaux td;
+  Tableaux ti; //Tableaux izquierdo
+  Tableaux td; //Tableaux derecho
 };
 
 Formula CrearFormula(Atomo a) {
@@ -47,8 +47,21 @@ Atomo CopiarAtomo(Atomo original) {
     return CrearAtomo(original->id, original->not);
 }
 
+int SoloTieneUnAtomo(Formula f) { //1 true, 0 false
+  if(f->f1 == NULL) {
+    if(f->a1 != NULL && f->a2 != NULL)return 0;
+    if(f->f2 == NULL)return 1;
+    else return 0;
+  }
+  return 0;
+}
+
 Formula NegarFormula(Formula f) {
-  f->not = NEGADO;
+  if(SoloTieneUnAtomo(f)){
+    if(f->a1 == NULL)f->a2->not = NEGADO;
+    else f->a1->not = NEGADO;
+  }
+  else f->not = NEGADO;
   return f;
 }
 
@@ -127,10 +140,12 @@ Formula Unir(Formula formula1,int operador,Formula formula2) {
     return NULL;
   }
 
+  /*
   show(formula1);
   printf("\n");
   show(formula2);
   printf("\n");
+  */
 
   if(formula1->f1 == NULL) { //formula1 no tiene la primera formula
     if(formula1->f2 == NULL) { //formula1 no tiene ni la primera ni la segunda formula
@@ -330,15 +345,6 @@ void showTableaux(Tableaux t) {
   if(t->td != NULL)showTableaux(t->td);
 }
 
-int SoloTieneUnAtomo(Formula f) { //1 true, 0 false
-  if(f->f1 == NULL) {
-    if(f->a1 != NULL && f->a2 != NULL)return 0;
-    if(f->f2 == NULL)return 1;
-    else return 0;
-  }
-  return 0;
-}
-
 Formula ExtraerIzquierda(Formula f) {
   if(f->f1 == NULL)return CrearFormula(f->a1);
   return CopiarFormula(f->f1);
@@ -347,6 +353,12 @@ Formula ExtraerIzquierda(Formula f) {
 Formula ExtraerDerecha(Formula f) {
   if(f->f2 == NULL)return CrearFormula(f->a2);
   return CopiarFormula(f->f2);
+}
+
+Formula BuscarOracion(int busqueda, Formula aux, Tableaux t) {
+  aux = t->f;
+  for(int i=0;i<busqueda-1;i++)aux = aux->sig;
+  return aux;
 }
 
 void Resolver(Tableaux t) {
@@ -368,45 +380,119 @@ void Resolver(Tableaux t) {
   else {
     switch(oracion->COD_OP) {
       Formula aux;
-      Formula nueva;
+      Formula izquierda;
+      Formula derecha;
 
       case COD_DIMP:
-        break;
-
-      case COD_IMP:
-        break;
-
-      case COD_AND:
-        break;
-
-      case COD_OR:
         t->ti = CrearTableaux(CopiarFormula(t->f));
+        Formula tmp1 = malloc(sizeof(struct FormulaRep));
+        Formula tmp2 = malloc(sizeof(struct FormulaRep));
         if(busqueda == 0) {
-          nueva = ExtraerIzquierda(t->ti->f);
-          nueva->sig = t->ti->f->sig;
-          t->ti->f = nueva;
+          izquierda = ExtraerIzquierda(t->ti->f);
+          derecha = ExtraerDerecha(t->ti->f);
+          tmp1 = Unir(izquierda, COD_IMP, derecha);
+          tmp2 = Unir(derecha, COD_IMP, izquierda);
+          tmp2->sig = t->ti->f->sig;
+          tmp1->sig = tmp2;
+          t->ti->f = tmp1;
         }
         else {
-          aux = t->ti->f;
-          for(int i=0;i<busqueda-1;i++)aux = aux->sig;
-          nueva = ExtraerIzquierda(aux->sig);
-          nueva->sig = aux->sig->sig;
-          aux->sig = nueva;
+          aux = BuscarOracion(busqueda,aux,t->ti);
+          izquierda = ExtraerIzquierda(aux->sig);
+          derecha = ExtraerDerecha(aux->sig);
+          tmp1 = Unir(izquierda, COD_DIMP, derecha);
+          tmp2 = Unir(derecha, COD_DIMP, izquierda);
+          tmp2->sig = t->ti->f->sig;
+          tmp1->sig = tmp2;
+          t->ti->f = tmp1;
+        }
+        Resolver(t->ti);
+
+        break;
+
+
+      case COD_AND:
+        t->ti = CrearTableaux(CopiarFormula(t->f));
+        if(busqueda == 0) {
+          izquierda = ExtraerIzquierda(t->ti->f);
+          derecha = ExtraerDerecha(t->ti->f);
+          derecha->sig = t->ti->f->sig;
+          izquierda->sig = derecha;
+          t->ti->f = derecha;
+        }
+        else {
+          aux = BuscarOracion(busqueda,aux,t->ti);
+          izquierda = ExtraerIzquierda(aux->sig);
+          derecha = ExtraerDerecha(aux->sig);
+          derecha->sig = aux->sig->sig;
+          izquierda->sig = derecha;
+          aux->sig = izquierda;
+        }
+        Resolver(t->ti);
+
+        break;
+
+
+      case COD_IMP:
+        t->ti = CrearTableaux(CopiarFormula(t->f));
+        if(busqueda == 0) {
+          izquierda = ExtraerIzquierda(t->ti->f);
+          izquierda = NegarFormula(izquierda);
+          izquierda->sig = t->ti->f->sig;
+          t->ti->f = izquierda;
+        }
+        else {
+          aux = BuscarOracion(busqueda,aux,t->ti);
+          izquierda = ExtraerIzquierda(aux->sig);
+          izquierda = NegarFormula(izquierda);
+          izquierda->sig = aux->sig->sig;
+          aux->sig = izquierda;
         }
         Resolver(t->ti);
 
         t->td = CrearTableaux(CopiarFormula(t->f));
         if(busqueda == 0) {
-          nueva = ExtraerDerecha(t->td->f);
-          nueva->sig = t->td->f->sig;
-          t->td->f = nueva;
+          derecha = ExtraerDerecha(t->td->f);
+          derecha->sig = t->td->f->sig;
+          t->td->f = derecha;
         }
         else {
-          aux = t->td->f;
-          for(int i=0;i<busqueda-1;i++)aux = aux->sig;
-          nueva = ExtraerDerecha(aux->sig);
-          nueva->sig = aux->sig->sig;
-          aux->sig = nueva;
+          aux = BuscarOracion(busqueda,aux,t->td);
+          derecha = ExtraerDerecha(aux->sig);
+          derecha->sig = aux->sig->sig;
+          aux->sig = derecha;
+        }
+        Resolver(t->td);
+
+        break;
+
+
+      case COD_OR:
+        t->ti = CrearTableaux(CopiarFormula(t->f));
+        if(busqueda == 0) {
+          izquierda = ExtraerIzquierda(t->ti->f);
+          izquierda->sig = t->ti->f->sig;
+          t->ti->f = izquierda;
+        }
+        else {
+          aux = BuscarOracion(busqueda,aux,t->ti);
+          izquierda = ExtraerIzquierda(aux->sig);
+          izquierda->sig = aux->sig->sig;
+          aux->sig = izquierda;
+        }
+        Resolver(t->ti);
+
+        t->td = CrearTableaux(CopiarFormula(t->f));
+        if(busqueda == 0) {
+          derecha = ExtraerDerecha(t->td->f);
+          derecha->sig = t->td->f->sig;
+          t->td->f = derecha;
+        }
+        else {
+          aux = BuscarOracion(busqueda,aux,t->td);
+          derecha = ExtraerDerecha(aux->sig);
+          derecha->sig = aux->sig->sig;
+          aux->sig = derecha;
         }
         Resolver(t->td);
 
