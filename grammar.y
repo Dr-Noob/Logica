@@ -111,5 +111,5 @@ g: LPAREN e RPAREN
 %%
 
 void yyerror(char* s) {
-	printf(RED "ERROR: Error sintactico en el caracter %s" RESET "\n",s);
+	printf(RED "ERROR: Error sintactico" RESET "\n",s);
 }

@@ -58,10 +58,19 @@ int SoloTieneUnAtomo(Formula f) { //1 true, 0 false
 
 Formula NegarFormula(Formula f) {
   if(SoloTieneUnAtomo(f)){
-    if(f->a1 == NULL)f->a2->not = NEGADO;
-    else f->a1->not = NEGADO;
+    if(f->a1 == NULL) { //Negar a2
+      if (f->a2->not == NEGADO)f->a2->not = SIN_NEGAR;
+      else f->a2->not = NEGADO;
+    }
+    else { //Negar a1
+      if(f->a1->not == NEGADO)f->a1->not = SIN_NEGAR;
+      else f->a1->not = NEGADO;
+    }
   }
-  else f->not = NEGADO;
+  else { //Negar la formula
+    if(f->not == NEGADO)f->not = SIN_NEGAR;
+    else f->not = NEGADO;
+  }
   return f;
 }
 
@@ -361,6 +370,10 @@ Formula BuscarOracion(int busqueda, Formula aux, Tableaux t) {
   return aux;
 }
 
+//Funciones para resolver alfa formulas
+
+//FIN_Funciones para resolver alfa formulas
+
 void Resolver(Tableaux t) {
   int busqueda = 0;
   show(t->f);
@@ -372,10 +385,12 @@ void Resolver(Tableaux t) {
     busqueda++;
     oracion = oracion->sig;
   }
+
   //Si es nodo, no seguir
   if(oracion->sig == NULL && SoloTieneUnAtomo(oracion)) { //Añadir a list
     return;
   }
+
   //Si no lo es, ramificar
   else {
     switch(oracion->COD_OP) {
@@ -384,117 +399,244 @@ void Resolver(Tableaux t) {
       Formula derecha;
 
       case COD_DIMP:
-        t->ti = CrearTableaux(CopiarFormula(t->f));
-        Formula tmp1 = malloc(sizeof(struct FormulaRep));
-        Formula tmp2 = malloc(sizeof(struct FormulaRep));
-        if(busqueda == 0) {
-          izquierda = ExtraerIzquierda(t->ti->f);
-          derecha = ExtraerDerecha(t->ti->f);
-          tmp1 = Unir(izquierda, COD_IMP, derecha);
-          tmp2 = Unir(derecha, COD_IMP, izquierda);
-          tmp2->sig = t->ti->f->sig;
-          tmp1->sig = tmp2;
-          t->ti->f = tmp1;
+        if(oracion->not == NEGADO) { //La formula entera va negada
+          t->ti = CrearTableaux(CopiarFormula(t->f));
+          Formula tmp1 = malloc(sizeof(struct FormulaRep));
+          Formula tmp2 = malloc(sizeof(struct FormulaRep));
+
+          if(busqueda == 0) {
+            izquierda = ExtraerIzquierda(t->ti->f);
+            derecha = ExtraerDerecha(t->ti->f);
+            tmp1 = Unir(izquierda, COD_IMP, derecha);
+            tmp1->sig = t->ti->f->sig;
+            t->ti->f = tmp1;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->ti);
+            izquierda = ExtraerIzquierda(aux->sig);
+            derecha = ExtraerDerecha(aux->sig);
+            tmp1 = Unir(izquierda, COD_DIMP, derecha);;
+            tmp1->sig = t->ti->f->sig;
+            t->ti->f = tmp1;
+          }
+          t->ti->f->not = NEGADO;
+          Resolver(t->ti);
+
+          t->td = CrearTableaux(CopiarFormula(t->f));
+
+          if(busqueda == 0) {
+            izquierda = ExtraerIzquierda(t->td->f);
+            derecha = ExtraerDerecha(t->td->f);
+            tmp2 = Unir(derecha, COD_IMP, izquierda);
+            tmp2->sig = t->td->f->sig;
+            t->td->f = tmp2;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->td);
+            izquierda = ExtraerIzquierda(aux->sig);
+            derecha = ExtraerDerecha(aux->sig);
+            tmp2 = Unir(derecha, COD_DIMP, izquierda);
+            tmp2->sig = t->td->f->sig;
+            t->td->f = tmp2;
+          }
+          t->td->f->not = NEGADO;
+          Resolver(t->td);
         }
-        else {
-          aux = BuscarOracion(busqueda,aux,t->ti);
-          izquierda = ExtraerIzquierda(aux->sig);
-          derecha = ExtraerDerecha(aux->sig);
-          tmp1 = Unir(izquierda, COD_DIMP, derecha);
-          tmp2 = Unir(derecha, COD_DIMP, izquierda);
-          tmp2->sig = t->ti->f->sig;
-          tmp1->sig = tmp2;
-          t->ti->f = tmp1;
+
+        else { //La formula no va negada
+          t->ti = CrearTableaux(CopiarFormula(t->f));
+          Formula tmp1 = malloc(sizeof(struct FormulaRep));
+          Formula tmp2 = malloc(sizeof(struct FormulaRep));
+
+          if(busqueda == 0) {
+            izquierda = ExtraerIzquierda(t->ti->f);
+            derecha = ExtraerDerecha(t->ti->f);
+            tmp1 = Unir(izquierda, COD_IMP, derecha);
+            tmp2 = Unir(derecha, COD_IMP, izquierda);
+            tmp2->sig = t->ti->f->sig;
+            tmp1->sig = tmp2;
+            t->ti->f = tmp1;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->ti);
+            izquierda = ExtraerIzquierda(aux->sig);
+            derecha = ExtraerDerecha(aux->sig);
+            tmp1 = Unir(izquierda, COD_DIMP, derecha);
+            tmp2 = Unir(derecha, COD_DIMP, izquierda);
+            tmp2->sig = t->ti->f->sig;
+            tmp1->sig = tmp2;
+            t->ti->f = tmp1;
+          }
+          Resolver(t->ti);
         }
-        Resolver(t->ti);
 
         break;
 
 
       case COD_AND:
-        t->ti = CrearTableaux(CopiarFormula(t->f));
-        if(busqueda == 0) {
-          izquierda = ExtraerIzquierda(t->ti->f);
-          derecha = ExtraerDerecha(t->ti->f);
-          derecha->sig = t->ti->f->sig;
-          izquierda->sig = derecha;
-          t->ti->f = derecha;
+        if(oracion->not == NEGADO) { //La formula entera va negada
+          t->ti = CrearTableaux(CopiarFormula(t->f));
+          if(busqueda == 0) {
+            izquierda = NegarFormula(ExtraerIzquierda(t->ti->f)); //Unica diferencia con el OR
+            izquierda->sig = t->ti->f->sig;
+            t->ti->f = izquierda;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->ti);
+            izquierda = NegarFormula(ExtraerIzquierda(aux->sig)); //Unica diferencia con el OR
+            izquierda->sig = aux->sig->sig;
+            aux->sig = izquierda;
+          }
+          Resolver(t->ti);
+
+          t->td = CrearTableaux(CopiarFormula(t->f));
+          if(busqueda == 0) {
+            derecha = NegarFormula(ExtraerDerecha(t->td->f)); //Unica diferencia con el OR
+            derecha->sig = t->td->f->sig;
+            t->td->f = derecha;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->td);
+            derecha = NegarFormula(ExtraerDerecha(aux->sig)); //Unica diferencia con el OR
+            derecha->sig = aux->sig->sig;
+            aux->sig = derecha;
+          }
+          Resolver(t->td);
         }
-        else {
-          aux = BuscarOracion(busqueda,aux,t->ti);
-          izquierda = ExtraerIzquierda(aux->sig);
-          derecha = ExtraerDerecha(aux->sig);
-          derecha->sig = aux->sig->sig;
-          izquierda->sig = derecha;
-          aux->sig = izquierda;
+
+        else { //La formula no va negada
+          t->ti = CrearTableaux(CopiarFormula(t->f));
+          if(busqueda == 0) {
+            izquierda = ExtraerIzquierda(t->ti->f);
+            derecha = ExtraerDerecha(t->ti->f);
+            derecha->sig = t->ti->f->sig;
+            izquierda->sig = derecha;
+            t->ti->f = izquierda;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->ti);
+            izquierda = ExtraerIzquierda(aux->sig);
+            derecha = ExtraerDerecha(aux->sig);
+            derecha->sig = aux->sig->sig;
+            izquierda->sig = derecha;
+            aux->sig = izquierda;
+          }
+          Resolver(t->ti);
         }
-        Resolver(t->ti);
 
         break;
 
 
       case COD_IMP:
-        t->ti = CrearTableaux(CopiarFormula(t->f));
-        if(busqueda == 0) {
-          izquierda = ExtraerIzquierda(t->ti->f);
-          izquierda = NegarFormula(izquierda);
-          izquierda->sig = t->ti->f->sig;
-          t->ti->f = izquierda;
-        }
-        else {
-          aux = BuscarOracion(busqueda,aux,t->ti);
-          izquierda = ExtraerIzquierda(aux->sig);
-          izquierda = NegarFormula(izquierda);
-          izquierda->sig = aux->sig->sig;
-          aux->sig = izquierda;
-        }
-        Resolver(t->ti);
+        if(oracion->not == NEGADO) { //La formula entera va negada
+          t->ti = CrearTableaux(CopiarFormula(t->f));
+          if(busqueda == 0) {
+            izquierda = ExtraerIzquierda(t->ti->f);
+            derecha = NegarFormula(ExtraerDerecha(t->ti->f)); //La unica diferencia respecto al AND
+            derecha->sig = t->ti->f->sig;
+            izquierda->sig = derecha;
+            t->ti->f = izquierda;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->ti);
+            izquierda = ExtraerIzquierda(aux->sig);
+            derecha = NegarFormula(ExtraerDerecha(aux->sig)); //La unica diferencia respecto al AND
+            derecha->sig = aux->sig->sig;
+            izquierda->sig = derecha;
+            aux->sig = izquierda;
+          }
+          Resolver(t->ti);
 
-        t->td = CrearTableaux(CopiarFormula(t->f));
-        if(busqueda == 0) {
-          derecha = ExtraerDerecha(t->td->f);
-          derecha->sig = t->td->f->sig;
-          t->td->f = derecha;
+          break;
         }
-        else {
-          aux = BuscarOracion(busqueda,aux,t->td);
-          derecha = ExtraerDerecha(aux->sig);
-          derecha->sig = aux->sig->sig;
-          aux->sig = derecha;
+
+        else { //La formula no va negada
+          t->ti = CrearTableaux(CopiarFormula(t->f));
+          if(busqueda == 0) {
+            izquierda = ExtraerIzquierda(t->ti->f);
+            izquierda = NegarFormula(izquierda);
+            izquierda->sig = t->ti->f->sig;
+            t->ti->f = izquierda;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->ti);
+            izquierda = ExtraerIzquierda(aux->sig);
+            izquierda = NegarFormula(izquierda);
+            izquierda->sig = aux->sig->sig;
+            aux->sig = izquierda;
+          }
+          Resolver(t->ti);
+
+          t->td = CrearTableaux(CopiarFormula(t->f));
+          if(busqueda == 0) {
+            derecha = ExtraerDerecha(t->td->f);
+            derecha->sig = t->td->f->sig;
+            t->td->f = derecha;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->td);
+            derecha = ExtraerDerecha(aux->sig);
+            derecha->sig = aux->sig->sig;
+            aux->sig = derecha;
+          }
+          Resolver(t->td);
         }
-        Resolver(t->td);
 
         break;
 
 
       case COD_OR:
-        t->ti = CrearTableaux(CopiarFormula(t->f));
-        if(busqueda == 0) {
-          izquierda = ExtraerIzquierda(t->ti->f);
-          izquierda->sig = t->ti->f->sig;
-          t->ti->f = izquierda;
-        }
-        else {
-          aux = BuscarOracion(busqueda,aux,t->ti);
-          izquierda = ExtraerIzquierda(aux->sig);
-          izquierda->sig = aux->sig->sig;
-          aux->sig = izquierda;
-        }
-        Resolver(t->ti);
+        if(oracion->not == NEGADO) { //La formula entera va negada
+          t->ti = CrearTableaux(CopiarFormula(t->f));
+          if(busqueda == 0) {
+            izquierda = NegarFormula(ExtraerIzquierda(t->ti->f)); //La unica diferencia respecto al AND
+            derecha = NegarFormula(ExtraerDerecha(t->ti->f)); //La unica diferencia respecto al AND
+            derecha->sig = t->ti->f->sig;
+            izquierda->sig = derecha;
+            t->ti->f = izquierda;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->ti);
+            izquierda = NegarFormula(ExtraerIzquierda(aux->sig)); //La unica diferencia respecto al AND
+            derecha = NegarFormula(ExtraerDerecha(aux->sig)); //La unica diferencia respecto al AND
+            derecha->sig = aux->sig->sig;
+            izquierda->sig = derecha;
+            aux->sig = izquierda;
+          }
+          Resolver(t->ti);
 
-        t->td = CrearTableaux(CopiarFormula(t->f));
-        if(busqueda == 0) {
-          derecha = ExtraerDerecha(t->td->f);
-          derecha->sig = t->td->f->sig;
-          t->td->f = derecha;
+          break;
         }
-        else {
-          aux = BuscarOracion(busqueda,aux,t->td);
-          derecha = ExtraerDerecha(aux->sig);
-          derecha->sig = aux->sig->sig;
-          aux->sig = derecha;
+
+        else { //La formula no va negada
+          t->ti = CrearTableaux(CopiarFormula(t->f));
+          if(busqueda == 0) {
+            izquierda = ExtraerIzquierda(t->ti->f);
+            izquierda->sig = t->ti->f->sig;
+            t->ti->f = izquierda;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->ti);
+            izquierda = ExtraerIzquierda(aux->sig);
+            izquierda->sig = aux->sig->sig;
+            aux->sig = izquierda;
+          }
+          Resolver(t->ti);
+
+          t->td = CrearTableaux(CopiarFormula(t->f));
+          if(busqueda == 0) {
+            derecha = ExtraerDerecha(t->td->f);
+            derecha->sig = t->td->f->sig;
+            t->td->f = derecha;
+          }
+          else {
+            aux = BuscarOracion(busqueda,aux,t->td);
+            derecha = ExtraerDerecha(aux->sig);
+            derecha->sig = aux->sig->sig;
+            aux->sig = derecha;
+          }
+          Resolver(t->td);
         }
-        Resolver(t->td);
 
         break;
     }

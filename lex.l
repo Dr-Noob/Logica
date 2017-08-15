@@ -16,9 +16,9 @@ letra  [a-z]
 {letra}														yylval.a = yytext[0]; return ATOM;
 T																	return TRUE;
 F																	return FALSE;
-"("																	return LPAREN;
-")"																	return RPAREN;
-","																	return COMA;
+"("																return LPAREN;
+")"																return RPAREN;
+","																return COMA;
 	/*Operadores*/
 and																return AND;
 or																return OR;
