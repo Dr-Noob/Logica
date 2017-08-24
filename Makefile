@@ -1,5 +1,5 @@
-tableaux : main.c lex.yy.c grammar.tab.c Formula.c Formula.h
-	gcc main.c lex.yy.c grammar.tab.c Formula.c -lfl -fstack-protector-all -o tableaux -O3
+tableaux : main.c lex.yy.c grammar.tab.c Formula.c Formula.h Tree.c Tree.h
+	gcc main.c lex.yy.c grammar.tab.c Formula.c Tree.c -lfl -fstack-protector-all -o tableaux -O3
 
 lex.yy.c : lex.l
 	flex -o lex.yy.c lex.l

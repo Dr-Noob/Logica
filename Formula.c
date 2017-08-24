@@ -1,4 +1,5 @@
 #include "Formula.h"
+#include "Tree.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -348,10 +349,93 @@ void show(Formula f) {
 
 }
 
+char* showAtomo_ascii(char* buf, Atomo a) {
+  if(a->not == NEGADO)sprintf(buf+strlen(buf),"~");
+  sprintf(buf+strlen(buf),"%c",a->id);
+  return buf;
+}
+
+char* showCOD_ascii(char* buf, int COD_OP) {
+  switch(COD_OP) {
+    case COD_DIMP:
+      sprintf(buf+strlen(buf)," <-> ");
+      break;
+    case COD_IMP:
+      sprintf(buf+strlen(buf)," -> ");
+      break;
+    case COD_AND:
+      sprintf(buf+strlen(buf)," ^ ");
+      break;
+    case COD_OR:
+      sprintf(buf+strlen(buf)," v ");
+      break;
+  }
+  return buf;
+}
+
+char* show_ascii(char* buf, Formula f) {
+  Formula aux = f;
+
+  if(aux->not == NEGADO)sprintf(buf+strlen(buf),"~");
+  sprintf(buf+strlen(buf),"(");
+  if(aux->f1 != NULL) { //Existe formula izquierda
+    show_ascii(buf,aux->f1);
+    showCOD_ascii(buf,aux->COD_OP);
+    if(aux->f2 != NULL)show_ascii(buf,aux->f2); //Existe formula derecha
+    else if(aux->a2 != NULL)showAtomo_ascii(buf,aux->a2); //No existe formula derecha
+  }
+  else { //No existe formula izquierda
+    if(aux->a1 == NULL)printf("ERROR: a1 es nulo\n");
+    showAtomo_ascii(buf,aux->a1);
+    showCOD_ascii(buf,aux->COD_OP);
+    if(aux->f2 != NULL)show_ascii(buf,aux->f2); //Existe formula derecha
+    else if(aux->a2 != NULL)showAtomo_ascii(buf,aux->a2); //No existe formula derecha
+  }
+  sprintf(buf+strlen(buf),")");
+
+  while(aux->sig != NULL){
+		aux = aux->sig;
+
+    if(aux->not == NEGADO)sprintf(buf+strlen(buf),"~");
+    sprintf(buf+strlen(buf),"(");
+    if(aux->f1 != NULL) { //Existe formula izquierda
+      show_ascii(buf,aux->f1);
+      showCOD_ascii(buf,aux->COD_OP);
+      if(aux->f2 != NULL)show_ascii(buf,aux->f2); //Existe formula derecha
+      else if(aux->a2 != NULL)showAtomo_ascii(buf,aux->a2); //No existe formula derecha
+    }
+    else { //No existe formula izquierda
+      if(aux->a1 == NULL)printf("ERROR: a1 es nulo\n");
+      showAtomo_ascii(buf,aux->a1);
+      showCOD_ascii(buf,aux->COD_OP);
+      if(aux->f2 != NULL)show_ascii(buf,aux->f2); //Existe formula derecha
+      else if(aux->a2 != NULL)showAtomo_ascii(buf,aux->a2); //No existe formula derecha
+    }
+    sprintf(buf+strlen(buf),")");
+  }
+
+  return buf;
+}
+
 void showTableaux(Tableaux t) {
   show(t->f);
+  printf("\n");
   if(t->ti != NULL)showTableaux(t->ti);
   if(t->td != NULL)showTableaux(t->td);
+}
+
+Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
+  char *buffer = malloc(sizeof(char)*MAX_CHAR);
+  tree = malloc (sizeof (Tree));
+  tree->element = show_ascii(buffer,t->f);
+  if(t->ti != NULL)tree->left = CrearArbolDesdeTableaux(tree->left,t->ti);
+  if(t->td != NULL)tree->right = CrearArbolDesdeTableaux(tree->right,t->td);
+  return tree;
+}
+
+void showTableauxTree(Tableaux t) {
+  Tree *arbol = CrearArbolDesdeTableaux(arbol,t);
+  print_ascii_tree(arbol);
 }
 
 Formula ExtraerIzquierda(Formula f) {
@@ -394,8 +478,8 @@ void dobleImpNegado(Tableaux t,int busqueda);
 
 void Resolver(Tableaux t) {
   int busqueda = 0;
-  show(t->f);
-  printf("\n");
+  //show(t->f);
+  //printf("\n");
   Formula oracion = t->f;
 
   //Busqueda del siguiente
@@ -408,7 +492,7 @@ void Resolver(Tableaux t) {
   if(oracion->sig == NULL && SoloTieneUnAtomo(oracion)) { //Añadir a list
     return;
   }
-  
+
   //Si no lo es, ramificar
   else {
     switch(oracion->COD_OP) {
@@ -696,4 +780,6 @@ void dobleImpNegado(Tableaux t,int busqueda) {
 void ResolverTableaux(Formula oracion) {
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
+  showTableaux(t);
+  showTableauxTree(t);
 }
