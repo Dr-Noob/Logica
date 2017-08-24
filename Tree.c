@@ -50,6 +50,7 @@ asciinode * build_ascii_tree_recursive(Tree * t) {
   if (t == NULL) return NULL;
 
   node = malloc(sizeof(asciinode));
+  node->color = t->color;
   node->left = build_ascii_tree_recursive(t->left);
   node->right = build_ascii_tree_recursive(t->right);
 
@@ -156,7 +157,11 @@ void print_level(asciinode *node, int x, int level) {
   if (level == 0) {
 	  for (i=0; i<(x-print_next-((node->lablen-isleft)/2)); i++)printf(" ");
 	  print_next += i;
-	  printf("%s", node->label);
+    if(node->color == COLOR_DEFAULT)printf("%s", node->label);
+    else {
+      if(node->color == COLOR_RED)printf(RED "%s" RESET, node->label);
+      else printf(GREEN "%s" RESET, node->label);
+    }
 	  print_next += node->lablen;
   }
 

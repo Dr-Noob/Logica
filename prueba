@@ -1,1 +1,1 @@
-p or q,q or p or r,p or (p or q) or r
+p imp q,q imp p and r,p imp (p imp q) imp r

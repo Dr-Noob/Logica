@@ -23,6 +23,7 @@ struct TableauxRep {
   Formula f;
   Tableaux ti; //Tableaux izquierdo
   Tableaux td; //Tableaux derecho
+  int etiqueta; //VACIO, CERRADO, ABIERTO
 };
 
 Formula CrearFormula(Atomo a) {
@@ -48,13 +49,18 @@ Atomo CopiarAtomo(Atomo original) {
     return CrearAtomo(original->id, original->not);
 }
 
-int SoloTieneUnAtomo(Formula f) {
-  if(f->f1 == NULL) {
-    if(f->a1 != NULL && f->a2 != NULL)return 0;
-    if(f->f2 == NULL)return 1;
-    else return 0;
+//Devuelve el unico atomo que  contiene(si tiene mas de uno, devuelve NULL)
+Atomo ExtraerAtomo(Formula f) {
+  if(f->f1 == NULL && f->f2 == NULL) {
+    if(f->a1 == NULL)return f->a2;
+    else if(f->a2 == NULL)return f->a1;
+    else return NULL;
   }
-  return 0;
+  return NULL;
+}
+
+int SoloTieneUnAtomo(Formula f) {
+  return(f->f1 == NULL && (f->a1 != NULL ^ f->a2 != NULL) && f->f2 == NULL);
 }
 
 Formula NegarFormula(Formula f) {
@@ -243,6 +249,7 @@ Tableaux CrearTableaux(Formula inicial) {
   t->f = inicial;
   t->ti = NULL;
   t->td = NULL;
+  t->etiqueta = VACIO;
   return t;
 }
 
@@ -400,6 +407,10 @@ Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
   char *buffer = malloc(sizeof(char)*MAX_CHAR);
   tree = malloc (sizeof (Tree));
   tree->element = show_ascii(buffer,t->f);
+  if(t->etiqueta != VACIO) {
+    if(t->etiqueta == CERRADO)tree->color = COLOR_RED;
+    else tree->color = COLOR_GREEN;
+  }
   if(t->ti != NULL)tree->left = CrearArbolDesdeTableaux(tree->left,t->ti);
   if(t->td != NULL)tree->right = CrearArbolDesdeTableaux(tree->right,t->td);
   return tree;
@@ -428,6 +439,35 @@ Formula BuscarOracion(int busqueda, Formula aux, Tableaux t) {
   aux = t->f;
   for(int i=0;i<busqueda-1;i++)aux = aux->sig;
   return aux;
+}
+
+//True si en 'f' existe el negado de 'a', false si no existe
+int ContieneSuNegado(Atomo a, Formula f) {
+  Formula aux = f;
+  Atomo tmp;
+  while(aux->sig != NULL) {
+    tmp = ExtraerAtomo(f);
+    if(tmp != NULL && tmp->id == a->id && tmp->not != a->not)return BOOLEAN_TRUE;
+    aux = aux->sig;
+  }
+  tmp = ExtraerAtomo(f);
+  if(tmp != NULL && tmp->id == a->id && tmp->not != a->not)return BOOLEAN_TRUE;
+  else return BOOLEAN_FALSE;
+}
+
+//True si existe un atomo y su negado, False si no
+int ContieneContradiccion(Formula f) {
+  Formula aux = f;
+  Atomo tmp;
+  while(aux->sig != NULL) {
+    tmp = ExtraerAtomo(aux);
+    //Si no es nulo, extraer devolvio el unico atomo
+    if(tmp != NULL && ContieneSuNegado(tmp,f))return BOOLEAN_TRUE;
+    aux = aux->sig;
+  }
+  tmp = ExtraerAtomo(aux);
+  if(tmp != NULL && ContieneSuNegado(tmp,f))return BOOLEAN_TRUE;
+  else return BOOLEAN_FALSE;
 }
 
 //Funciones para resolver alfa formulas
@@ -463,9 +503,17 @@ void Resolver(Tableaux t) {
     oracion = oracion->sig;
   }
 
-  //Si ya esta todo resuelto en esta rama, terminar
-  if(oracion->sig == NULL && SoloTieneUnAtomo(oracion)) return;
-
+  //Si ya esta todo resuelto en esta rama o hay una contradiccion, terminar
+  //y marcar el tableaux como corresponda
+  if(oracion->sig == NULL && SoloTieneUnAtomo(oracion)) {
+    if (ContieneContradiccion(t->f))t->etiqueta = CERRADO;
+    else t->etiqueta = ABIERTO;
+    return;
+  }
+  if (ContieneContradiccion(t->f)) {
+    t->etiqueta = CERRADO;
+    return;
+  }
   //Si no lo esta, ramificar
   else {
     switch(oracion->COD_OP) {

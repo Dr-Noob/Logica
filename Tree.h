@@ -5,6 +5,14 @@
 #define MAX_CHAR 200
 #define INFINITY (1<<20)
 
+#define COLOR_DEFAULT   0
+#define COLOR_GREEN     1
+#define COLOR_RED       2
+
+#define RED "\x1b[31;1m"
+#define GREEN "\x1b[32;1m"
+#define RESET "\x1b[0m"
+
 typedef struct Tree Tree;
 typedef struct asciinode_struct asciinode;
 
@@ -12,6 +20,7 @@ struct Tree {
   Tree * left;
   Tree * right;
   char* element;
+  int color;
 };
 
 struct asciinode_struct {
@@ -25,6 +34,7 @@ struct asciinode_struct {
   //-1=I am left, 0=I am root, 1=right
   int parent_dir;
   char label[MAX_CHAR];
+  int color;
 };
 
 void print_ascii_tree(Tree * t);

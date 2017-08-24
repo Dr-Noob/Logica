@@ -1,14 +1,21 @@
 #ifndef __Formula__
 #define __Formula__
 
-#define COD_INVALIDO  0
-#define COD_DIMP      1
-#define COD_IMP       2
-#define COD_AND       3
-#define COD_OR        4
+#define BOOLEAN_FALSE         0
+#define BOOLEAN_TRUE          1
 
-#define NEGADO        5
-#define SIN_NEGAR     6
+#define VACIO         2
+#define CERRADO       3
+#define ABIERTO       4
+
+#define COD_INVALIDO  5
+#define COD_DIMP      6
+#define COD_IMP       7
+#define COD_AND       8
+#define COD_OR        9
+
+#define NEGADO        10
+#define SIN_NEGAR     11
 
 struct AtomoRep;
 typedef struct AtomoRep *Atomo;
