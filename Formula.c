@@ -416,6 +416,21 @@ Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
   return tree;
 }
 
+int TableauxCerrado(Tableaux t) {
+  int tmp;
+  if(t->etiqueta == ABIERTO)return BOOLEAN_FALSE;
+
+  if(t->ti != NULL) {
+    tmp = TableauxCerrado(t->ti);
+    if(tmp == BOOLEAN_FALSE)return BOOLEAN_FALSE;
+  }
+  if(t->td != NULL) {
+    tmp = TableauxCerrado(t->td);
+    if(tmp == BOOLEAN_FALSE)return BOOLEAN_FALSE;
+  }
+  return BOOLEAN_TRUE;
+}
+
 //Imprime el Tableaux en forma de arbol
 void showTableauxTree(Tableaux t) {
   Tree *arbol = CrearArbolDesdeTableaux(arbol,t);
@@ -801,6 +816,9 @@ void dobleImpNegado(Tableaux t,int busqueda) {
 void ResolverTableaux(Formula oracion) {
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
-  showTableaux(t);
+  printf("Solucion: \n\n\n");
   showTableauxTree(t);
+  printf("\n\n\n");
+  if(TableauxCerrado(t))printf(RED "El tableaux esta cerrado\n" RESET "La expresion inicial es insatisfacible\n");
+  else printf(GREEN "El tableaux esta abierto\n" RESET "La expresion inicial es satisfacible\n"); 
 }
