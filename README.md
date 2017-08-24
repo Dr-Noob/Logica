@@ -16,7 +16,7 @@ El objetivo de este proyecto es resolver un tableaux semántico de lógica propo
     
 ### Prerequisitos
 
-Para compilar el proyecto es necesario tener instalado tanto Bison como Flex(y un compilador de C). Esta pequeña guía la haré mediante Linux.
+Para compilar el proyecto es necesario tener instalado tanto Bison como Flex(y un compilador de C). Esta pequeña guía la haré usando Linux.
 
 ### Sintaxis para escribir expresiones
 
@@ -24,16 +24,16 @@ En la tabla se detalla cómo escribir los operadores
 
 | Operador          | Sintaxis  |
 |:-----------------:|:---------:|
-| AND               | 'and'     |
-| OR                | 'or'      |
-| NOT               | 'not'    |
-| Implicación       | 'imp'     |
-| Doble Implicación | 'dimp'    |
-| Separador         | ','       |
+| AND               | `and`     |
+| OR                | `or`      |
+| NOT               | `not`     |
+| Implicación       | `imp`     |
+| Doble Implicación | `dimp`    |
+| Separador         | `,`       |
 
 Los atomos pueden especificarse mediante cualquier letra, siempre y cuando sea solo una. El separador permite separar la expresión en distintas fórmulas.
 
-### Haciendo unos tests
+### Haciendo pruebas
 
 El proyecto incluye un makefile, así que es suficiente con ejecutar
 ```
@@ -176,3 +176,15 @@ Solucion:
 El tableaux esta abierto
 La expresion inicial es satisfacible
 ```
+
+## Compilado con
+
+* [Flex](https://www.gnu.org/software/flex/) - Analizador léxico
+* [Bison](https://www.gnu.org/software/bison/) - Analizador sintáctico
+* [GCC](https://www.gnu.org/software/gcc/) - Compilador C
+
+###### viva gnu D:
+
+## Notas
+
+* Para dibujar el árbol(fichero Tree.c)me he apoyado de código que encontré en [esta web](http://web.archive.org/web/20071224095835/http://www.openasthra.com/wp-content/uploads/2007/12/binary_trees1.c)
