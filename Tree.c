@@ -6,41 +6,15 @@
 int lprofile[MAX_HEIGHT];
 int rprofile[MAX_HEIGHT];
 
+//CODIGO EXTRAIDO DE
+//http://web.archive.org/web/20071224095835/http://www.openasthra.com/wp-content/uploads/2007/12/binary_trees1.c
+
 //adjust gap between left and right nodes
 int gap = 3;
 
 //used for printing next node in the same level,
 //this is the x coordinate of the next char printed
 int print_next;
-
-Tree* CrearArbol() {
-    Tree * root = malloc (sizeof (Tree));
-    root->element = NULL;
-    root->left = malloc(sizeof (Tree));
-    root->right = malloc(sizeof (Tree));
-    return root;
-}
-
-Tree* ArbolIzquierdo(Tree *root) {
-    return root->left;
-}
-
-Tree* ArbolDerecho(Tree *root) {
-    return root->right;
-}
-
-void AsignarCadena(Tree *root, char *cadena) {
-  root->element = malloc(sizeof(strlen(cadena))+1);
-  strcpy(root->element,cadena);
-}
-
-void AsignarIzquierda(Tree *root, Tree *toTheLeft) {
-  root->left = toTheLeft;
-}
-
-void AsignarDerecha(Tree *root, Tree *toTheRight) {
-  root->right = toTheRight;
-}
 
 void freeTree(Tree *t) {
   if (t != NULL) {
@@ -233,24 +207,3 @@ void print_ascii_tree(Tree * t) {
   if (proot->height >= MAX_HEIGHT)printf("(This tree is taller than %d, and may be drawn incorrectly.)\n", MAX_HEIGHT);
   free_ascii_tree(proot);
 }
-
-//http://web.archive.org/web/20071224095835/http://www.openasthra.com/wp-content/uploads/2007/12/binary_trees1.c
-
-/*
-EXAMPLE
-int main() {
-  Tree * root = (Tree *) malloc (sizeof (Tree));
-  root->element = "(p->q,m ^ s)";
-  root->left = (Tree *) malloc (sizeof (Tree));
-  root->left->element = "~p,m ^ s";
-  root->right = (Tree *) malloc (sizeof (Tree));
-  root->right->element = "q,m ^ s";
-  root->left->left = (Tree *) malloc (sizeof (Tree));
-  root->left->left->element = "~p,m,s";
-  root->right->left = (Tree *) malloc (sizeof (Tree));
-  root->right->left->element ="q,m,s";
-  print_ascii_tree(root);
-  free(root);
-  return EXIT_SUCCESS;
-}
-*/

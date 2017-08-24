@@ -20,7 +20,6 @@ struct TableauxRep;
 typedef struct TableauxRep *Tableaux;
 
 Formula CrearFormula(Atomo a);
-Formula CrearFormulaParentesis(Formula original);
 Atomo CrearAtomo(char _id,int _not);
 Formula NegarFormula(Formula f);
 Formula Unir(Formula f1,int operador,Formula f2);

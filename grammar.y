@@ -100,7 +100,7 @@ n: NOT n
 		};
 g: LPAREN e RPAREN
 		{
-			$$=CrearFormulaParentesis($2);
+			$$=$2;
 		}
 	| ATOM
 		{

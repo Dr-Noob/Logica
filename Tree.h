@@ -28,11 +28,5 @@ struct asciinode_struct {
 };
 
 void print_ascii_tree(Tree * t);
-Tree* CrearArbol();
-Tree* ArbolIzquierdo(Tree *root);
-Tree* ArbolDerecho(Tree *root);
-void AsignarCadena(Tree *root, char* cadena);
-void AsignarIzquierda(Tree *root, Tree *toTheLeft);
-void AsignarDerecha(Tree *root, Tree *toTheRight);
 
 #endif

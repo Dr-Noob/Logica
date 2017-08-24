@@ -48,7 +48,7 @@ Atomo CopiarAtomo(Atomo original) {
     return CrearAtomo(original->id, original->not);
 }
 
-int SoloTieneUnAtomo(Formula f) { //1 true, 0 false
+int SoloTieneUnAtomo(Formula f) {
   if(f->f1 == NULL) {
     if(f->a1 != NULL && f->a2 != NULL)return 0;
     if(f->f2 == NULL)return 1;
@@ -112,36 +112,6 @@ Formula CopiarFormula(Formula original) {
   return copia;
 }
 
-Formula CrearFormulaParentesis(Formula original) {
-  /*
-  Formula f = malloc(sizeof(struct FormulaRep));
-  Formula anidada = malloc(sizeof(struct FormulaRep));
-
-  if(original->a1 == NULL) { //A la izquierda hay una formula
-    anidada->f1 = CopiarFormula(original->f1);
-    if(original->a2 == NULL) { // A la derecha hay una formula
-      anidada->f2 = CopiarFormula(original->f2);
-    }
-    else { // A la derecha no hay una formula
-      anidada->a2 = CopiarAtomo(original->a2);
-    }
-  }
-  else { //Ni la izquierda ni a la derecha hay formulas
-    anidada->a1 = CopiarAtomo(original->a1);
-    anidada->a2 = CopiarAtomo(original->a2);
-  }
-
-  f->f1 = anidada;
-  f->sig = original->sig;
-  //Liberar original
-	return f;
-  */
-  return original;
-  Formula f = malloc(sizeof(struct FormulaRep));
-  f->f1 = original;
-  return f;
-}
-
 Formula Unir(Formula formula1,int operador,Formula formula2) {
   Formula f = malloc(sizeof(struct FormulaRep));
 
@@ -149,13 +119,6 @@ Formula Unir(Formula formula1,int operador,Formula formula2) {
     printf("ERROR: Formula nula\n");
     return NULL;
   }
-
-  /*
-  show(formula1);
-  printf("\n");
-  show(formula2);
-  printf("\n");
-  */
 
   if(formula1->f1 == NULL) { //formula1 no tiene la primera formula
     if(formula1->f2 == NULL) { //formula1 no tiene ni la primera ni la segunda formula
@@ -267,7 +230,7 @@ Formula Unir(Formula formula1,int operador,Formula formula2) {
 	return f;
 }
 
-//Dejar f2 al final de f1
+//Concatena las dos formulas
 Formula Concatenar(Formula f1,Formula f2) {
   Formula aux = f1;
   while(aux->sig != NULL)aux = aux->sig;
@@ -282,6 +245,8 @@ Tableaux CrearTableaux(Formula inicial) {
   t->td = NULL;
   return t;
 }
+
+//Funciones IMPRIMIR
 
 void printCOD(int COD_OP) {
   switch(COD_OP) {
@@ -348,6 +313,9 @@ void show(Formula f) {
   }
 
 }
+
+//Funciones ascii para devolver un char* en vez de imprimir directamente
+//Usadas por el ascii_tree
 
 char* showAtomo_ascii(char* buf, Atomo a) {
   if(a->not == NEGADO)sprintf(buf+strlen(buf),"~");
@@ -417,6 +385,7 @@ char* show_ascii(char* buf, Formula f) {
   return buf;
 }
 
+//Imprime un tableaux
 void showTableaux(Tableaux t) {
   show(t->f);
   printf("\n");
@@ -424,6 +393,9 @@ void showTableaux(Tableaux t) {
   if(t->td != NULL)showTableaux(t->td);
 }
 
+//FIN Funciones IMPRIMIR
+
+//Funcion recursiva que devuelve el 'tree' correspondiende al tableaux 't'
 Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
   char *buffer = malloc(sizeof(char)*MAX_CHAR);
   tree = malloc (sizeof (Tree));
@@ -433,21 +405,25 @@ Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
   return tree;
 }
 
+//Imprime el Tableaux en forma de arbol
 void showTableauxTree(Tableaux t) {
   Tree *arbol = CrearArbolDesdeTableaux(arbol,t);
   print_ascii_tree(arbol);
 }
 
+//Devuelve la formula o atomo que haya en la izquierda de 'f'
 Formula ExtraerIzquierda(Formula f) {
   if(f->f1 == NULL)return CrearFormula(f->a1);
   return CopiarFormula(f->f1);
 }
 
+//Devuelve la formula o atomo que haya en la derecha de 'f'
 Formula ExtraerDerecha(Formula f) {
   if(f->f2 == NULL)return CrearFormula(f->a2);
   return CopiarFormula(f->f2);
 }
 
+//Busca la oracion 'aux' en el tableaux 't' que esta a 'busqueda' iteraciones de distancia
 Formula BuscarOracion(int busqueda, Formula aux, Tableaux t) {
   aux = t->f;
   for(int i=0;i<busqueda-1;i++)aux = aux->sig;
@@ -476,24 +452,21 @@ void imp(Tableaux t,int busqueda);
 void dobleImpNegado(Tableaux t,int busqueda);
 //FIN_Funciones para resolver beta formulas
 
+//Resuelve el tableaux 't'
 void Resolver(Tableaux t) {
   int busqueda = 0;
-  //show(t->f);
-  //printf("\n");
   Formula oracion = t->f;
 
-  //Busqueda del siguiente
+  //Busqueda de lo siguiente que sea necesario resolver
   while(oracion->sig != NULL && SoloTieneUnAtomo(oracion)) {
     busqueda++;
     oracion = oracion->sig;
   }
 
-  //Si es nodo, no seguir
-  if(oracion->sig == NULL && SoloTieneUnAtomo(oracion)) { //Añadir a list
-    return;
-  }
+  //Si ya esta todo resuelto en esta rama, terminar
+  if(oracion->sig == NULL && SoloTieneUnAtomo(oracion)) return;
 
-  //Si no lo es, ramificar
+  //Si no lo esta, ramificar
   else {
     switch(oracion->COD_OP) {
       case COD_DIMP:
