@@ -63,6 +63,10 @@ int SoloTieneUnAtomo(Formula f) {
   return(f->f1 == NULL && (f->a1 != NULL ^ f->a2 != NULL) && f->f2 == NULL);
 }
 
+int EsAlfaFormula(Formula f) {
+  return ((f->COD_OP == COD_AND) || (f->COD_OP == COD_OR && f->not == NEGADO) || (f->COD_OP == COD_IMP && f->not == NEGADO) || (f->COD_OP == COD_DIMP));
+}
+
 Formula NegarFormula(Formula f) {
   if(SoloTieneUnAtomo(f)){
     if(f->a1 == NULL) { //Negar a2
@@ -512,14 +516,24 @@ void Resolver(Tableaux t) {
   int busqueda = 0;
   Formula oracion = t->f;
 
-  //Busqueda de lo siguiente que sea necesario resolver
-  while(oracion->sig != NULL && SoloTieneUnAtomo(oracion)) {
+  //Busqueda de lo siguiente que sea necesario resolver, intentado que sea alfa formula
+  while(oracion->sig != NULL && (SoloTieneUnAtomo(oracion) || !EsAlfaFormula(oracion))) {
     busqueda++;
     oracion = oracion->sig;
   }
 
+  //No hemos encontrado una alfa formula para resolver; buscar una beta formula
+  if(!EsAlfaFormula(oracion)) {
+    oracion = t->f;
+    busqueda = 0;
+    while(oracion->sig != NULL && SoloTieneUnAtomo(oracion)) {
+      busqueda++;
+      oracion = oracion->sig;
+    }
+  }
+
   //Si ya esta todo resuelto en esta rama o hay una contradiccion, terminar
-  //y marcar el tableaux como corresponda
+  //y marcar el tableaux como corresponda(ABIERTO o CERRADO)
   if(oracion->sig == NULL && SoloTieneUnAtomo(oracion)) {
     if (ContieneContradiccion(t->f))t->etiqueta = CERRADO;
     else t->etiqueta = ABIERTO;
@@ -820,5 +834,5 @@ void ResolverTableaux(Formula oracion) {
   showTableauxTree(t);
   printf("\n\n\n");
   if(TableauxCerrado(t))printf(RED "El tableaux esta cerrado\n" RESET "La expresion inicial es insatisfacible\n");
-  else printf(GREEN "El tableaux esta abierto\n" RESET "La expresion inicial es satisfacible\n"); 
+  else printf(GREEN "El tableaux esta abierto\n" RESET "La expresion inicial es satisfacible\n");
 }
