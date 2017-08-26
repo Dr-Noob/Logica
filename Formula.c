@@ -465,11 +465,11 @@ int ContieneSuNegado(Atomo a, Formula f) {
   Formula aux = f;
   Atomo tmp;
   while(aux->sig != NULL) {
-    tmp = ExtraerAtomo(f);
+    tmp = ExtraerAtomo(aux);
     if(tmp != NULL && tmp->id == a->id && tmp->not != a->not)return BOOLEAN_TRUE;
     aux = aux->sig;
   }
-  tmp = ExtraerAtomo(f);
+  tmp = ExtraerAtomo(aux);
   if(tmp != NULL && tmp->id == a->id && tmp->not != a->not)return BOOLEAN_TRUE;
   else return BOOLEAN_FALSE;
 }
@@ -648,27 +648,20 @@ void dobleImp(Tableaux t,int busqueda) {
   Formula derecha;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
-  Formula tmp1 = malloc(sizeof(struct FormulaRep));
-  Formula tmp2 = malloc(sizeof(struct FormulaRep));
-
   if(busqueda == 0) {
-    izquierda = ExtraerIzquierda(t->ti->f);
-    derecha = ExtraerDerecha(t->ti->f);
-    tmp1 = Unir(izquierda, COD_IMP, derecha);
-    tmp2 = Unir(derecha, COD_IMP, izquierda);
-    tmp2->sig = t->ti->f->sig;
-    tmp1->sig = tmp2;
-    t->ti->f = tmp1;
+    izquierda = Unir(ExtraerIzquierda(t->ti->f), COD_IMP, ExtraerDerecha(t->ti->f));
+    derecha = Unir(ExtraerDerecha(t->ti->f), COD_IMP, ExtraerIzquierda(t->ti->f));
+    derecha->sig = t->ti->f->sig;
+    izquierda->sig = derecha;
+    t->ti->f = izquierda;
   }
   else {
     aux = BuscarOracion(busqueda,aux,t->ti);
-    izquierda = ExtraerIzquierda(aux->sig);
-    derecha = ExtraerDerecha(aux->sig);
-    tmp1 = Unir(izquierda, COD_DIMP, derecha);
-    tmp2 = Unir(derecha, COD_DIMP, izquierda);
-    tmp2->sig = t->ti->f->sig;
-    tmp1->sig = tmp2;
-    t->ti->f = tmp1;
+    izquierda = Unir(ExtraerIzquierda(aux->sig), COD_IMP, ExtraerDerecha(aux->sig));
+    derecha = Unir(ExtraerIzquierda(aux->sig), COD_IMP, ExtraerDerecha(aux->sig));
+    derecha->sig = aux->sig->sig;
+    izquierda->sig = derecha;
+    aux->sig = izquierda;
   }
   Resolver(t->ti);
 }
@@ -784,45 +777,35 @@ void dobleImpNegado(Tableaux t,int busqueda) {
   Formula derecha;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
-  Formula tmp1 = malloc(sizeof(struct FormulaRep));
-  Formula tmp2 = malloc(sizeof(struct FormulaRep));
-
   if(busqueda == 0) {
-    izquierda = ExtraerIzquierda(t->ti->f);
-    derecha = ExtraerDerecha(t->ti->f);
-    tmp1 = Unir(izquierda, COD_IMP, derecha);
-    tmp1->sig = t->ti->f->sig;
-    t->ti->f = tmp1;
+    izquierda = Unir(ExtraerIzquierda(t->ti->f), COD_IMP, ExtraerDerecha(t->ti->f));
+    izquierda->sig = t->ti->f->sig;
+    t->ti->f = izquierda;
+    t->ti->f->not = NEGADO;
   }
   else {
     aux = BuscarOracion(busqueda,aux,t->ti);
-    izquierda = ExtraerIzquierda(aux->sig);
-    derecha = ExtraerDerecha(aux->sig);
-    tmp1 = Unir(izquierda, COD_DIMP, derecha);;
-    tmp1->sig = t->ti->f->sig;
-    t->ti->f = tmp1;
+    izquierda = Unir(ExtraerIzquierda(aux->sig), COD_IMP, ExtraerDerecha(aux->sig));
+    izquierda->sig = aux->sig->sig;
+    izquierda->not = NEGADO;
+    aux->sig = izquierda;
   }
-  t->ti->f->not = NEGADO;
   Resolver(t->ti);
 
   t->td = CrearTableaux(CopiarFormula(t->f));
-
   if(busqueda == 0) {
-    izquierda = ExtraerIzquierda(t->td->f);
-    derecha = ExtraerDerecha(t->td->f);
-    tmp2 = Unir(derecha, COD_IMP, izquierda);
-    tmp2->sig = t->td->f->sig;
-    t->td->f = tmp2;
+    izquierda = Unir(ExtraerDerecha(t->td->f), COD_IMP, ExtraerIzquierda(t->td->f));
+    izquierda->sig = t->td->f->sig;
+    t->td->f = izquierda;
+    t->td->f->not = NEGADO;
   }
   else {
     aux = BuscarOracion(busqueda,aux,t->td);
-    izquierda = ExtraerIzquierda(aux->sig);
-    derecha = ExtraerDerecha(aux->sig);
-    tmp2 = Unir(derecha, COD_DIMP, izquierda);
-    tmp2->sig = t->td->f->sig;
-    t->td->f = tmp2;
+    izquierda = Unir(ExtraerDerecha(aux->sig), COD_IMP, ExtraerIzquierda(aux->sig));
+    izquierda->sig = aux->sig->sig;
+    izquierda->not = NEGADO;
+    aux->sig = izquierda;
   }
-  t->td->f->not = NEGADO;
   Resolver(t->td);
 }
 //FIN_Funciones para resolver beta formulas
