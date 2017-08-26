@@ -658,7 +658,7 @@ void dobleImp(Tableaux t,int busqueda) {
   else {
     aux = BuscarOracion(busqueda,aux,t->ti);
     izquierda = Unir(ExtraerIzquierda(aux->sig), COD_IMP, ExtraerDerecha(aux->sig));
-    derecha = Unir(ExtraerIzquierda(aux->sig), COD_IMP, ExtraerDerecha(aux->sig));
+    derecha = Unir(ExtraerDerecha(aux->sig), COD_IMP, ExtraerIzquierda(aux->sig));
     derecha->sig = aux->sig->sig;
     izquierda->sig = derecha;
     aux->sig = izquierda;
