@@ -10,6 +10,6 @@ grammar.tab.c : grammar.y
 clean :
 	@rm -f lex.yy.c grammar.tab.h grammar.tab.c
 run:
-	echo 'Parar si un caracter no se ha reconocido' && ./tableaux prueba
+	./tableaux prueba
 fast:
 	make && make run

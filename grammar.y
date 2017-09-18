@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "Formula.h"
+
 #define RED "\x1b[31;1m"
 #define GREEN "\x1b[32;1m"
 #define RESET "\x1b[0m"
@@ -21,7 +22,7 @@ extern int yylineno;
 }
 
 
-%token TRUE FALSE LPAREN RPAREN AND OR NOT IMP DIMP COMA
+%token LPAREN RPAREN AND OR NOT IMP DIMP COMA END_OF_FILE
 %token <a> ATOM
 
 %type <formula> e
@@ -32,17 +33,13 @@ extern int yylineno;
 %type <formula> n
 %type <formula> g
 
-
-%left NOT
-%left AND OR
-%left IMP DIMP
-
 %%
 
-oracion : e
+oracion : e END_OF_FILE
 		{
 			printf(GREEN "La expresion se ha reconocido correctamente\n" RESET);
 			ResolverTableaux($1);
+			return 0;
 		};
 
 e: e COMA z
@@ -111,5 +108,5 @@ g: LPAREN e RPAREN
 %%
 
 void yyerror(char* s) {
-	printf(RED "ERROR: Error sintactico" RESET "\n",s);
+	printf(RED "ERROR: Error sintactico. Por favor, revisa la formula\n" RESET);
 }

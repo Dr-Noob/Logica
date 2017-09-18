@@ -14,8 +14,6 @@ letra  [a-z]
 [ \n\t]+													;
 
 {letra}														yylval.a = yytext[0]; return ATOM;
-T																	return TRUE;
-F																	return FALSE;
 "("																return LPAREN;
 ")"																return RPAREN;
 ","																return COMA;
@@ -26,6 +24,10 @@ not																return NOT;
 imp																return IMP;
 dimp															return DIMP;
 
+	/* EOF */
+<<EOF>>														return END_OF_FILE;
+
 	/*Error*/
-[^a-zA-Z0-9_"/;,+\-*=(){}\n><&|!]+			fprintf(stderr, "\x1b[1;31m""ERROR:""\x1b[0m""\x1b[31m"" \"%s\" Token not recognised""\x1b[0m""\n", yytext);
+[^a-z,()]+												{ fprintf(stderr, "\x1b[1;31m""ERROR: \"%s\" Caracter/es no reconocido/s""\x1b[0m""\n", yytext); yyterminate(); }
+
 %%
