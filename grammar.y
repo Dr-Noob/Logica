@@ -37,7 +37,7 @@ extern int yylineno;
 
 oracion : e END_OF_FILE
 		{
-			printf(GREEN "La expresion se ha reconocido correctamente\n" RESET);
+			//printf(GREEN "La expresion se ha reconocido correctamente\n" RESET);
 			ResolverTableaux($1);
 			return 0;
 		};

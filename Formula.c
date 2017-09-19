@@ -338,7 +338,7 @@ char* showAtomo_ascii(char* buf, Atomo a) {
 char* showCOD_ascii(char* buf, int COD_OP) {
   switch(COD_OP) {
     case COD_DIMP:
-      sprintf(buf+strlen(buf)," <-> ");
+      sprintf(buf+strlen(buf)," &lt;-&gt; ");
       break;
     case COD_IMP:
       sprintf(buf+strlen(buf)," -> ");
@@ -421,23 +421,63 @@ Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
   return tree;
 }
 
-SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t) {
-	int incX = 40;
-	int incY = 10;
-	int x = 1000;
-	int y = 10;
-	return CrearSVGDesdeTableauxRecursivo(s,t,x,y,incX,incY);
+int nCaracteres(char* cadena) {
+  int count = 0;
+  for(int m=0; cadena[m]; m++) {
+    if(cadena[m] != ' ')count ++;
+  }
+  return count;
 }
 
-SVG *CrearSVGDesdeTableauxRecursivo(SVG *s, Tableaux t, int x, int y, int incX, int incY) {
+SVG *CrearSVGDesdeTableauxRecursivo(SVG *s, Tableaux t, int x, int y, int incY) {
 	char *buffer = malloc(sizeof(char)*MAX_CHAR);
-	s = CrearSVG(show_ascii(buffer,t->f),x,y);
+	s = malloc(sizeof(SVG));
+  s->formula = show_ascii(buffer,t->f);
+  int incX = (nCaracteres(s->formula)/2)*23;
+  s->x = x;
+  s->y = y;
 	if(t->ti != NULL && t->td != NULL) {
-		if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,x-incX,y+incY,incX,incY);
-		if(t->td != NULL)s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,x+incX,y+incY,incX,incY);
+		s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,x-incX,y+incY,incY);
+		s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,x+incX+35,y+incY,incY);
 	}
-	if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,x,y+incY,incX,incY);
+	else if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,x,y+incY,incY);
 	return s;
+}
+
+int *MinXSVGRecursivo(SVG *s,int *min) {
+    if(*min > s->x)*min = s->x;
+    if(s->hi != NULL)MinXSVGRecursivo(s->hi,min);
+    if(s->hd != NULL)MinXSVGRecursivo(s->hd,min);
+    return min;
+}
+
+int *MinXSVG(SVG *s) {
+  int *min = malloc(sizeof(int));
+  *min = 2000;
+  return MinXSVGRecursivo(s,min);
+}
+
+SVG *AjustarSVGMargenRecursivo(SVG *s,int *min) {
+  s->x -= *min;
+  if(s->hi != NULL)AjustarSVGMargenRecursivo(s->hi,min);
+  if(s->hd != NULL)AjustarSVGMargenRecursivo(s->hd,min);
+  return s;
+}
+
+SVG *AjustarSVGMargen(SVG *s) {
+  int* min = MinXSVG(s);
+  s = AjustarSVGMargenRecursivo(s,min);
+  free(min);
+  return s;
+}
+
+SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t) {
+	int incY = 140;
+	int xi = 1000;
+	int yi = 20;
+	s = CrearSVGDesdeTableauxRecursivo(s,t,xi,yi,incY);
+  s = AjustarSVGMargen(s);
+  return s;
 }
 
 int TableauxCerrado(Tableaux t) {
@@ -838,9 +878,13 @@ void dobleImpNegado(Tableaux t,int busqueda) {
 void ResolverTableaux(Formula oracion) {
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
+  /*
   printf("Solucion: \n\n\n");
   showTableauxTree(t);
   printf("\n\n\n");
   if(TableauxCerrado(t))printf(RED "El tableaux esta cerrado\n" RESET "La expresion inicial es insatisfacible\n");
   else printf(GREEN "El tableaux esta abierto\n" RESET "La expresion inicial es satisfacible\n");
+  */
+  //showTableauxTree(t);
+  showTableauxSVG(t);
 }

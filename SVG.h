@@ -1,16 +1,17 @@
 #ifndef __SVG__
 #define __SVG__
 
-struct SVGRep {
+typedef struct SVG SVG;
+
+struct SVG {
 	int x;
 	int y;
 	char* formula;
-	struct SVG* hi;
-	struct SVG* hd;
+	SVG* hi;
+	SVG* hd;
 };
 
-typedef struct SVGRep* SVG;
-
-void print_svg(SVG s);
+SVG *CrearSVG(int _x,int _y,char* _formula);
+void print_svg(SVG *s);
 
 #endif
