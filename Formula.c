@@ -1,5 +1,6 @@
 #include "Formula.h"
 #include "Tree.h"
+#include "SVG.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -420,6 +421,25 @@ Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
   return tree;
 }
 
+SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t) {
+	int incX = 40;
+	int incY = 10;
+	int x = 1000;
+	int y = 10;
+	return CrearSVGDesdeTableauxRecursivo(s,t,x,y,incX,incY);
+}
+
+SVG *CrearSVGDesdeTableauxRecursivo(SVG *s, Tableaux t, int x, int y, int incX, int incY) {
+	char *buffer = malloc(sizeof(char)*MAX_CHAR);
+	s = CrearSVG(show_ascii(buffer,t->f),x,y);
+	if(t->ti != NULL && t->td != NULL) {
+		if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,x-incX,y+incY,incX,incY);
+		if(t->td != NULL)s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,x+incX,y+incY,incX,incY);
+	}
+	if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,x,y+incY,incX,incY);
+	return s;
+}
+
 int TableauxCerrado(Tableaux t) {
   int tmp;
   if(t->etiqueta == ABIERTO)return BOOLEAN_FALSE;
@@ -439,6 +459,11 @@ int TableauxCerrado(Tableaux t) {
 void showTableauxTree(Tableaux t) {
   Tree *arbol = CrearArbolDesdeTableaux(arbol,t);
   print_ascii_tree(arbol);
+}
+
+void showTableauxSVG(Tableaux t) {
+	SVG *s = CrearSVGDesdeTableaux(s,t);
+	print_svg(s);
 }
 
 //Devuelve la formula o atomo que haya en la izquierda de 'f'

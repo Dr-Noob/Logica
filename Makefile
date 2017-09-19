@@ -1,4 +1,4 @@
-tableaux : main.c lex.yy.c grammar.tab.c Formula.c Formula.h Tree.c Tree.h
+tableaux : main.c lex.yy.c grammar.tab.c Formula.c Formula.h Tree.c Tree.h SVG.c SVG.h
 	gcc main.c lex.yy.c grammar.tab.c Formula.c Tree.c -lfl -fstack-protector-all -o tableaux -O3
 
 lex.yy.c : lex.l
