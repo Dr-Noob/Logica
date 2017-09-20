@@ -2,19 +2,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="2000" height="2000">
 <rect width="2000" height="2000" fill="white">
 </rect>
-<text x="900" y="100" style="fill:black;">(a &#8744; (c &#8743; b))(a &#8596; b)</text>
-<text x="400" y="240" style="fill:black;">(a &#8744; (c &#8743; b))(a &#8594; b)(b &#8594; a)</text>
-<text x="200" y="380" style="fill:black;">(a)(a &#8594; b)(b &#8594; a)</text>
-<text x="100" y="520" style="fill:black;">(a)(~a)(b &#8594; a)</text>
-<text x="300" y="520" style="fill:black;">(a)(b)(b &#8594; a)</text>
-<text x="200" y="660" style="fill:black;">(a)(b)(~b)</text>
-<text x="300" y="660" style="fill:black;">(a)(b)(a)</text>
-<text x="800" y="380" style="fill:black;">(c &#8743; b)(a &#8594; b)(b &#8594; a)</text>
-<text x="600" y="520" style="fill:black;">(c)(b)(a &#8594; b)(b &#8594; a)</text>
-<text x="500" y="660" style="fill:black;">(c)(b)(~a)(b &#8594; a)</text>
-<text x="400" y="800" style="fill:black;">(c)(b)(~a)(~b)</text>
-<text x="500" y="800" style="fill:black;">(c)(b)(~a)(a)</text>
-<text x="700" y="660" style="fill:black;">(c)(b)(b)(b &#8594; a)</text>
-<text x="600" y="800" style="fill:black;">(c)(b)(b)(~b)</text>
-<text x="700" y="800" style="fill:black;">(c)(b)(b)(a)</text>
+<text x="362" y="20" style="fill:black;font-family:courier">(a &#8744; (c &#8743; b))(a &#8596; b)</text>
+<text x="362" y="160" style="fill:black;font-family:courier">(a &#8744; (c &#8743; b))(a &#8594; b)(b &#8594; a)</text>
+<text x="175" y="300" style="fill:black;font-family:courier">(a)(a &#8594; b)(b &#8594; a)</text>
+<text x="100" y="440" style="fill:black;font-family:courier">(a)(&#172;a)(b &#8594; a)</text>
+<line x1="247" y1="300" x2="166" y2="440" style="stroke:black;stroke-width:2" />
+<text x="250" y="440" style="fill:black;font-family:courier">(a)(b)(b &#8594; a)</text>
+<text x="200" y="580" style="fill:black;font-family:courier">(a)(b)(&#172;b)</text>
+<line x1="298" y1="440" x2="242" y2="580" style="stroke:black;stroke-width:2" />
+<text x="300" y="580" style="fill:black;font-family:courier">(a)(b)(a)</text>
+<line x1="298" y1="440" x2="324" y2="580" style="stroke:black;stroke-width:2" />
+<line x1="247" y1="300" x2="298" y2="440" style="stroke:black;stroke-width:2" />
+<line x1="488" y1="160" x2="247" y2="300" style="stroke:black;stroke-width:2" />
+<text x="550" y="300" style="fill:black;font-family:courier">(c &#8743; b)(a &#8594; b)(b &#8594; a)</text>
+<text x="550" y="440" style="fill:black;font-family:courier">(c)(b)(a &#8594; b)(b &#8594; a)</text>
+<text x="450" y="580" style="fill:black;font-family:courier">(c)(b)(&#172;a)(b &#8594; a)</text>
+<text x="400" y="720" style="fill:black;font-family:courier">(c)(b)(&#172;a)(&#172;b)</text>
+<line x1="528" y1="580" x2="472" y2="720" style="stroke:black;stroke-width:2" />
+<text x="500" y="720" style="fill:black;font-family:courier">(c)(b)(&#172;a)(a)</text>
+<line x1="528" y1="580" x2="554" y2="720" style="stroke:black;stroke-width:2" />
+<line x1="634" y1="440" x2="528" y2="580" style="stroke:black;stroke-width:2" />
+<text x="650" y="580" style="fill:black;font-family:courier">(c)(b)(b)(b &#8594; a)</text>
+<text x="600" y="720" style="fill:black;font-family:courier">(c)(b)(b)(&#172;b)</text>
+<line x1="710" y1="580" x2="654" y2="720" style="stroke:black;stroke-width:2" />
+<text x="700" y="720" style="fill:black;font-family:courier">(c)(b)(b)(a)</text>
+<line x1="710" y1="580" x2="736" y2="720" style="stroke:black;stroke-width:2" />
+<line x1="634" y1="440" x2="710" y2="580" style="stroke:black;stroke-width:2" />
+<line x1="646" y1="300" x2="634" y2="440" style="stroke:black;stroke-width:2" />
+<line x1="488" y1="160" x2="646" y2="300" style="stroke:black;stroke-width:2" />
+<line x1="458" y1="20" x2="488" y2="160" style="stroke:black;stroke-width:2" />
 </svg>

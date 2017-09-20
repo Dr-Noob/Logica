@@ -330,7 +330,7 @@ void show(Formula f) {
 //Usadas por el ascii_tree
 
 char* showAtomo_ascii(char* buf, Atomo a) {
-  if(a->not == NEGADO)sprintf(buf+strlen(buf),"~");
+  if(a->not == NEGADO)sprintf(buf+strlen(buf),"&#172;");
   sprintf(buf+strlen(buf),"%c",a->id);
   return buf;
 }
@@ -358,7 +358,7 @@ char* showCOD_ascii(char* buf, int COD_OP) {
 char* show_ascii(char* buf, Formula f) {
   Formula aux = f;
 
-  if(aux->not == NEGADO)sprintf(buf+strlen(buf),"~");
+  if(aux->not == NEGADO)sprintf(buf+strlen(buf),"&#172;");
   sprintf(buf+strlen(buf),"(");
   if(aux->f1 != NULL) { //Existe formula izquierda
     show_ascii(buf,aux->f1);
@@ -378,7 +378,7 @@ char* show_ascii(char* buf, Formula f) {
   while(aux->sig != NULL){
 		aux = aux->sig;
 
-    if(aux->not == NEGADO)sprintf(buf+strlen(buf),"~");
+    if(aux->not == NEGADO)sprintf(buf+strlen(buf),"&#172;");
     sprintf(buf+strlen(buf),"(");
     if(aux->f1 != NULL) { //Existe formula izquierda
       show_ascii(buf,aux->f1);
@@ -431,19 +431,24 @@ int nCaracteres(char* cadena) {
   return count;
 }
 
-int offset = 0;
-int xi = 100;
-int yi = 100;
+int offset = 100;
 
 SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int incX,int incY,int nivel) {
 	s = malloc(sizeof(SVG_data));
 	if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,incX,incY,nivel+1);
+	if(t->td != NULL)s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,incX,incY,nivel+1);
 	char *buffer = malloc(sizeof(char)*MAX_CHAR);
   s->formula = show_ascii(buffer,t->f);
-	s->y = nivel*incY + yi;
-	s->x = offset + xi;
-	offset += s->hi->x + (s->hd->x - s->hi->x)/2;
-	if(t->td != NULL)s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,incX,incY,nivel+1);
+  s->centro = (nCaracteres(buffer)/2)*6;
+  s->y = nivel*incY+20; 
+  
+	if(t->ti == NULL) {
+		s->x = offset;
+		offset += incX;
+	}
+	else if (t->td != NULL) s->x = s->hi->x + (s->hd->x - s->hi->x)/2;
+	else s->x = s->hi->x;
+	
 	return s;
 }
 

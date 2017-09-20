@@ -14,6 +14,7 @@ struct SVG {
 struct SVG_data {
 	int x;
 	int y;
+	float centro;
 	char* formula;
 	SVG_data* hi;
 	SVG_data* hd;
