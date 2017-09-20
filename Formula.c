@@ -5,6 +5,12 @@
 #include <stdio.h>
 #include <string.h>
 
+static const char* SIMBOLO_AND = " &#8743; ";
+static const char* SIMBOLO_OR = " &#8744; ";
+static const char* SIMBOLO_IMP = " &#8594; ";
+static const char* SIMBOLO_DIMP = " &#8596; ";
+static const char* SIMBOLO_NOT = "&#172;";
+
 struct AtomoRep {
   char id; //Identificador
   int not; //NEGADO-> el atomo va negado, SIN_NEGAR-> no va negado
@@ -330,7 +336,7 @@ void show(Formula f) {
 //Usadas por el ascii_tree
 
 char* showAtomo_ascii(char* buf, Atomo a) {
-  if(a->not == NEGADO)sprintf(buf+strlen(buf),"&#172;");
+  if(a->not == NEGADO)sprintf(buf+strlen(buf),SIMBOLO_NOT);
   sprintf(buf+strlen(buf),"%c",a->id);
   return buf;
 }
@@ -340,16 +346,16 @@ char* showAtomo_ascii(char* buf, Atomo a) {
 char* showCOD_ascii(char* buf, int COD_OP) {
   switch(COD_OP) {
     case COD_DIMP:
-      sprintf(buf+strlen(buf)," &#8596; ");
+      sprintf(buf+strlen(buf),SIMBOLO_DIMP);
       break;
     case COD_IMP:
-      sprintf(buf+strlen(buf)," &#8594; ");
+      sprintf(buf+strlen(buf),SIMBOLO_IMP);
       break;
     case COD_AND:
-      sprintf(buf+strlen(buf)," &#8743; ");
+      sprintf(buf+strlen(buf),SIMBOLO_AND);
       break;
     case COD_OR:
-      sprintf(buf+strlen(buf)," &#8744; ");
+      sprintf(buf+strlen(buf),SIMBOLO_OR);
       break;
   }
   return buf;
@@ -358,7 +364,7 @@ char* showCOD_ascii(char* buf, int COD_OP) {
 char* show_ascii(char* buf, Formula f) {
   Formula aux = f;
 
-  if(aux->not == NEGADO)sprintf(buf+strlen(buf),"&#172;");
+  if(aux->not == NEGADO)sprintf(buf+strlen(buf),SIMBOLO_NOT);
   sprintf(buf+strlen(buf),"(");
   if(aux->f1 != NULL) { //Existe formula izquierda
     show_ascii(buf,aux->f1);
@@ -378,7 +384,7 @@ char* show_ascii(char* buf, Formula f) {
   while(aux->sig != NULL){
 		aux = aux->sig;
 
-    if(aux->not == NEGADO)sprintf(buf+strlen(buf),"&#172;");
+    if(aux->not == NEGADO)sprintf(buf+strlen(buf),SIMBOLO_NOT);
     sprintf(buf+strlen(buf),"(");
     if(aux->f1 != NULL) { //Existe formula izquierda
       show_ascii(buf,aux->f1);
@@ -423,32 +429,41 @@ Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
   return tree;
 }
 
+// &#8594;
 int nCaracteres(char* cadena) {
   int count = 0;
   for(int m=0; cadena[m]; m++) {
-    if(cadena[m] != ' ')count ++;
+    if(cadena[m] == '&')while(cadena[m] != ';')m++;
+    count ++;
   }
   return count;
 }
 
-int offset = 100;
+int offset = 50;
+int yi = 50;
 
 SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int incX,int incY,int nivel) {
 	s = malloc(sizeof(SVG_data));
 	if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,incX,incY,nivel+1);
 	if(t->td != NULL)s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,incX,incY,nivel+1);
+  if(t->ti != NULL && t->td != NULL) { //Ajustar hi y hd
+    while(s->hi->xmax + 20 > s->hd->x)s->hd->x++;
+  }
 	char *buffer = malloc(sizeof(char)*MAX_CHAR);
   s->formula = show_ascii(buffer,t->f);
-  s->centro = (nCaracteres(buffer)/2)*6;
-  s->y = nivel*incY+20; 
-  
+  int caracteres = nCaracteres(buffer);
+  s->centro = (caracteres/2)*PIXELES_POR_CARACTER;
+  s->y = nivel*incY+yi;
+
 	if(t->ti == NULL) {
 		s->x = offset;
 		offset += incX;
 	}
 	else if (t->td != NULL) s->x = s->hi->x + (s->hd->x - s->hi->x)/2;
 	else s->x = s->hi->x;
-	
+
+  s->xmax = s->x+caracteres*PIXELES_POR_CARACTER;
+
 	return s;
 }
 

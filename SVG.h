@@ -4,6 +4,8 @@
 typedef struct SVG_data SVG_data;
 typedef struct SVG SVG;
 
+#define ALTURA_CARACTER 15
+#define PIXELES_POR_CARACTER 7
 
 struct SVG {
 	SVG_data* data;
@@ -14,6 +16,7 @@ struct SVG {
 struct SVG_data {
 	int x;
 	int y;
+	int xmax;
 	float centro;
 	char* formula;
 	SVG_data* hi;
