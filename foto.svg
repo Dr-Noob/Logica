@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="2000" height="2000">
+<rect width="2000" height="2000" fill="white">
+</rect>
+<text x="900" y="100" style="fill:black;">(a &#8744; (c &#8743; b))(a &#8596; b)</text>
+<text x="400" y="240" style="fill:black;">(a &#8744; (c &#8743; b))(a &#8594; b)(b &#8594; a)</text>
+<text x="200" y="380" style="fill:black;">(a)(a &#8594; b)(b &#8594; a)</text>
+<text x="100" y="520" style="fill:black;">(a)(~a)(b &#8594; a)</text>
+<text x="300" y="520" style="fill:black;">(a)(b)(b &#8594; a)</text>
+<text x="200" y="660" style="fill:black;">(a)(b)(~b)</text>
+<text x="300" y="660" style="fill:black;">(a)(b)(a)</text>
+<text x="800" y="380" style="fill:black;">(c &#8743; b)(a &#8594; b)(b &#8594; a)</text>
+<text x="600" y="520" style="fill:black;">(c)(b)(a &#8594; b)(b &#8594; a)</text>
+<text x="500" y="660" style="fill:black;">(c)(b)(~a)(b &#8594; a)</text>
+<text x="400" y="800" style="fill:black;">(c)(b)(~a)(~b)</text>
+<text x="500" y="800" style="fill:black;">(c)(b)(~a)(a)</text>
+<text x="700" y="660" style="fill:black;">(c)(b)(b)(b &#8594; a)</text>
+<text x="600" y="800" style="fill:black;">(c)(b)(b)(~b)</text>
+<text x="700" y="800" style="fill:black;">(c)(b)(b)(a)</text>
+</svg>

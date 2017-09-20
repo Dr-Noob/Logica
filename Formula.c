@@ -335,19 +335,21 @@ char* showAtomo_ascii(char* buf, Atomo a) {
   return buf;
 }
 
+//https://www.w3schools.com/charsets/ref_utf_dingbats.asp
+//https://www.w3schools.com/charsets/ref_html_entities_r.asp
 char* showCOD_ascii(char* buf, int COD_OP) {
   switch(COD_OP) {
     case COD_DIMP:
-      sprintf(buf+strlen(buf)," &lt;-&gt; ");
+      sprintf(buf+strlen(buf)," &#8596; ");
       break;
     case COD_IMP:
-      sprintf(buf+strlen(buf)," -> ");
+      sprintf(buf+strlen(buf)," &#8594; ");
       break;
     case COD_AND:
-      sprintf(buf+strlen(buf)," ^ ");
+      sprintf(buf+strlen(buf)," &#8743; ");
       break;
     case COD_OR:
-      sprintf(buf+strlen(buf)," v ");
+      sprintf(buf+strlen(buf)," &#8744; ");
       break;
   }
   return buf;
@@ -429,35 +431,67 @@ int nCaracteres(char* cadena) {
   return count;
 }
 
-SVG *CrearSVGDesdeTableauxRecursivo(SVG *s, Tableaux t, int x, int y, int incY) {
+int offset = 0;
+int xi = 100;
+int yi = 100;
+
+SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int incX,int incY,int nivel) {
+	s = malloc(sizeof(SVG_data));
+	if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,incX,incY,nivel+1);
 	char *buffer = malloc(sizeof(char)*MAX_CHAR);
-	s = malloc(sizeof(SVG));
   s->formula = show_ascii(buffer,t->f);
-  int incX = (nCaracteres(s->formula)/2)*23;
-  s->x = x;
-  s->y = y;
-	if(t->ti != NULL && t->td != NULL) {
-		s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,x-incX,y+incY,incY);
-		s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,x+incX+35,y+incY,incY);
-	}
-	else if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,x,y+incY,incY);
+	s->y = nivel*incY + yi;
+	s->x = offset + xi;
+	offset += s->hi->x + (s->hd->x - s->hi->x)/2;
+	if(t->td != NULL)s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,incX,incY,nivel+1);
 	return s;
 }
 
-int *MinXSVGRecursivo(SVG *s,int *min) {
+
+//Minimo y maximo
+
+int *MinXSVGRecursivo(SVG_data *s,int *min) {
     if(*min > s->x)*min = s->x;
     if(s->hi != NULL)MinXSVGRecursivo(s->hi,min);
     if(s->hd != NULL)MinXSVGRecursivo(s->hd,min);
     return min;
 }
 
-int *MinXSVG(SVG *s) {
+int *MinXSVG(SVG_data *s) {
   int *min = malloc(sizeof(int));
   *min = 2000;
   return MinXSVGRecursivo(s,min);
 }
 
-SVG *AjustarSVGMargenRecursivo(SVG *s,int *min) {
+int *MaxXSVGRecursivo(SVG_data *s,int *max) {
+    if(*max < s->x)*max = s->x;
+    if(s->hi != NULL)MaxXSVGRecursivo(s->hi,max);
+    if(s->hd != NULL)MaxXSVGRecursivo(s->hd,max);
+    return max;
+}
+
+int *MaxXSVG(SVG_data *s) {
+  int *max = malloc(sizeof(int));
+  *max = 0;
+  return MaxXSVGRecursivo(s,max);
+}
+
+int *MaxYSVGRecursivo(SVG_data *s,int *max) {
+    if(*max < s->y)*max = s->y;
+    if(s->hi != NULL)MaxYSVGRecursivo(s->hi,max);
+    if(s->hd != NULL)MaxYSVGRecursivo(s->hd,max);
+    return max;
+}
+
+int *MaxYSVG(SVG_data *s) {
+  int *max = malloc(sizeof(int));
+  *max = 0;
+  return MaxYSVGRecursivo(s,max);
+}
+
+//Minimo y maximo
+
+SVG_data *AjustarSVGMargenRecursivo(SVG_data *s,int *min) {
   s->x -= *min;
   if(s->hi != NULL)AjustarSVGMargenRecursivo(s->hi,min);
   if(s->hd != NULL)AjustarSVGMargenRecursivo(s->hd,min);
@@ -465,18 +499,29 @@ SVG *AjustarSVGMargenRecursivo(SVG *s,int *min) {
 }
 
 SVG *AjustarSVGMargen(SVG *s) {
-  int* min = MinXSVG(s);
-  s = AjustarSVGMargenRecursivo(s,min);
-  free(min);
+  int* xmin = MinXSVG(s->data);
+  int* xmax = MaxXSVG(s->data);
+  *xmax -= *xmin - 100;
+  int* ymax = MaxYSVG(s->data);
+  *ymax += 100;
+  s->data = AjustarSVGMargenRecursivo(s->data,xmin);
+  s->xmax = *xmax;
+  s->ymax = *ymax;
+  free(xmin);
+  free(xmax);
+  free(ymax);
   return s;
 }
 
 SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t) {
 	int incY = 140;
-	int xi = 1000;
-	int yi = 20;
-	s = CrearSVGDesdeTableauxRecursivo(s,t,xi,yi,incY);
-  s = AjustarSVGMargen(s);
+	int incX = 100;
+	int nivel = 0;
+	s = malloc(sizeof(struct SVG));
+	s->xmax = 2000;
+	s->ymax = 2000;
+	s->data = CrearSVGDesdeTableauxRecursivo(s->data,t,incX,incY,nivel);
+  //s = AjustarSVGMargen(s);
   return s;
 }
 
