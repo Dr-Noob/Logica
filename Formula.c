@@ -11,6 +11,7 @@ static const char* SIMBOLO_IMP = " &#8594; ";
 static const char* SIMBOLO_DIMP = " &#8596; ";
 static const char* SIMBOLO_NOT = "&#172;";
 static const char* NOMBRE_ARCHIVO = "sol.svg";
+#define MAX_NIVELES 50
 
 struct AtomoRep {
   char id; //Identificador
@@ -32,6 +33,13 @@ struct TableauxRep {
   Tableaux ti; //Tableaux izquierdo
   Tableaux td; //Tableaux derecho
   int etiqueta; //VACIO, CERRADO, ABIERTO
+};
+
+struct NodoRep {
+	int x;
+	int xmax;
+	SVG_data* svg;
+	Nodo* sig;
 };
 
 Formula CrearFormula(Atomo a) {
@@ -337,7 +345,7 @@ void show(Formula f) {
 //Usadas por el ascii_tree
 
 char* showAtomo_ascii(char* buf, Atomo a) {
-  if(a->not == NEGADO)sprintf(buf+strlen(buf),SIMBOLO_NOT);
+  if(a->not == NEGADO)sprintf(buf+strlen(buf),"%s",SIMBOLO_NOT);
   sprintf(buf+strlen(buf),"%c",a->id);
   return buf;
 }
@@ -347,16 +355,16 @@ char* showAtomo_ascii(char* buf, Atomo a) {
 char* showCOD_ascii(char* buf, int COD_OP) {
   switch(COD_OP) {
     case COD_DIMP:
-      sprintf(buf+strlen(buf),SIMBOLO_DIMP);
+      sprintf(buf+strlen(buf),"%s",SIMBOLO_DIMP);
       break;
     case COD_IMP:
-      sprintf(buf+strlen(buf),SIMBOLO_IMP);
+      sprintf(buf+strlen(buf),"%s",SIMBOLO_IMP);
       break;
     case COD_AND:
-      sprintf(buf+strlen(buf),SIMBOLO_AND);
+      sprintf(buf+strlen(buf),"%s",SIMBOLO_AND);
       break;
     case COD_OR:
-      sprintf(buf+strlen(buf),SIMBOLO_OR);
+      sprintf(buf+strlen(buf),"%s",SIMBOLO_OR);
       break;
   }
   return buf;
@@ -365,7 +373,7 @@ char* showCOD_ascii(char* buf, int COD_OP) {
 char* show_ascii(char* buf, Formula f) {
   Formula aux = f;
 
-  if(aux->not == NEGADO)sprintf(buf+strlen(buf),SIMBOLO_NOT);
+  if(aux->not == NEGADO)sprintf(buf+strlen(buf),"%s",SIMBOLO_NOT);
   sprintf(buf+strlen(buf),"(");
   if(aux->f1 != NULL) { //Existe formula izquierda
     show_ascii(buf,aux->f1);
@@ -385,7 +393,7 @@ char* show_ascii(char* buf, Formula f) {
   while(aux->sig != NULL){
 		aux = aux->sig;
 
-    if(aux->not == NEGADO)sprintf(buf+strlen(buf),SIMBOLO_NOT);
+    if(aux->not == NEGADO)sprintf(buf+strlen(buf),"%s",SIMBOLO_NOT);
     sprintf(buf+strlen(buf),"(");
     if(aux->f1 != NULL) { //Existe formula izquierda
       show_ascii(buf,aux->f1);
@@ -430,11 +438,17 @@ Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
   return tree;
 }
 
-// &#8594;
+void AjustarHijos(SVG_data *s,int incX,int incY,int nivel,Nodo nodos[MAX_NIVELES]) {
+	if(s->hi != NULL)AjustarHijos(s->hi,incX,incY,nivel,nodos);
+	if(s->hd != NULL)AjustarHijos(s->hi,incX,incY,nivel,nodos);
+	
+	//Insertar(nodos,nivel,s);
+}
+
 int nCaracteres(char* cadena) {
   int count = 0;
   for(int m=0; cadena[m]; m++) {
-    if(cadena[m] == '&')while(cadena[m] != ';')m++;
+    if(cadena[m] == '&')while(cadena[m] != ';')m++;//Contar como un caracter los simbolos
     count ++;
   }
   return count;
@@ -443,12 +457,13 @@ int nCaracteres(char* cadena) {
 int offset = 50;
 int yi = 50;
 
-SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int incX,int incY,int nivel) {
+SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int incX,int incY,int nivel,Nodo nodos[MAX_NIVELES]) {
 	s = malloc(sizeof(SVG_data));
-	if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,incX,incY,nivel+1);
-	if(t->td != NULL)s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,incX,incY,nivel+1);
-  if(t->ti != NULL && t->td != NULL) { //Ajustar hi y hd
+	if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,incX,incY,nivel+1,nodos);
+	if(t->td != NULL)s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,incX,incY,nivel+1,nodos);
+  if(t->ti != NULL && t->td != NULL) { //Ajustar hijos
     while(s->hi->xmax + 20 > s->hd->x)s->hd->x++;
+    //AjustarHijos(s,incX,incY,nivel,nodos);
   }
 	char *buffer = malloc(sizeof(char)*MAX_CHAR);
   s->formula = show_ascii(buffer,t->f);
@@ -546,7 +561,8 @@ SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t) {
 	s = malloc(sizeof(struct SVG));
 	s->xmax = 2000;
 	s->ymax = 2000;
-	s->data = CrearSVGDesdeTableauxRecursivo(s->data,t,incX,incY,nivel);
+	Nodo nodos[MAX_NIVELES];
+	s->data = CrearSVGDesdeTableauxRecursivo(s->data,t,incX,incY,nivel,nodos);
   //s = AjustarSVGMargen(s);
   return s;
 }
@@ -957,7 +973,7 @@ void ResolverTableaux(Formula oracion) {
   else printf(GREEN "El tableaux esta abierto\n" RESET "La expresion inicial es satisfacible\n");
   */
   //showTableauxTree(t);
-  FILE *fich = fopen(NOMBRE_ARCHIVO,"ab+");
+  FILE *fich = fopen(NOMBRE_ARCHIVO,"w+");
   if (fich==NULL) {
 		printf(RED "ERROR: El archivo %s no ha podido abrirse\n" RESET, NOMBRE_ARCHIVO);
 		printf(RED "No se genera el SVG" RESET);

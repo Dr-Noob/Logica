@@ -26,6 +26,9 @@ typedef struct FormulaRep *Formula;
 struct TableauxRep;
 typedef struct TableauxRep *Tableaux;
 
+struct NodoRep;
+typedef struct NodoRep *Nodo;
+
 Formula CrearFormula(Atomo a);
 Atomo CrearAtomo(char _id,int _not);
 Formula NegarFormula(Formula f);
