@@ -1,6 +1,11 @@
 #ifndef __Formula__
 #define __Formula__
 
+#include "Tree.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 #define BOOLEAN_FALSE         0
 #define BOOLEAN_TRUE          1
 
@@ -26,8 +31,12 @@ typedef struct FormulaRep *Formula;
 struct TableauxRep;
 typedef struct TableauxRep *Tableaux;
 
-struct NodoRep;
-typedef struct NodoRep *Nodo;
+struct TableauxRep {
+  Formula f;
+  Tableaux ti; //Tableaux izquierdo
+  Tableaux td; //Tableaux derecho
+  int etiqueta; //VACIO, CERRADO, ABIERTO
+};
 
 Formula CrearFormula(Atomo a);
 Atomo CrearAtomo(char _id,int _not);
@@ -35,6 +44,7 @@ Formula NegarFormula(Formula f);
 Formula Unir(Formula f1,int operador,Formula f2);
 Formula Concatenar(Formula f1,Formula f2);
 void ResolverTableaux(Formula oracion);
+char* show_ascii(char* buf, Formula f);
 void show(Formula f);
 
 #endif

@@ -1,17 +1,5 @@
 #include "Formula.h"
-#include "Tree.h"
 #include "SVG.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-static const char* SIMBOLO_AND = " &#8743; ";
-static const char* SIMBOLO_OR = " &#8744; ";
-static const char* SIMBOLO_IMP = " &#8594; ";
-static const char* SIMBOLO_DIMP = " &#8596; ";
-static const char* SIMBOLO_NOT = "&#172;";
-static const char* NOMBRE_ARCHIVO = "sol.svg";
-#define MAX_NIVELES 50
 
 struct AtomoRep {
   char id; //Identificador
@@ -26,20 +14,6 @@ struct FormulaRep {
   int COD_OP;	//Codigo operador
   int not; //NEGADO-> el atomo va negado, SIN_NEGAR-> no va negado
   struct FormulaRep *sig; //Siguiente formula
-};
-
-struct TableauxRep {
-  Formula f;
-  Tableaux ti; //Tableaux izquierdo
-  Tableaux td; //Tableaux derecho
-  int etiqueta; //VACIO, CERRADO, ABIERTO
-};
-
-struct NodoRep {
-	int x;
-	int xmax;
-	SVG_data* svg;
-	Nodo* sig;
 };
 
 Formula CrearFormula(Atomo a) {
@@ -438,135 +412,6 @@ Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
   return tree;
 }
 
-void AjustarHijos(SVG_data *s,int incX,int incY,int nivel,Nodo nodos[MAX_NIVELES]) {
-	if(s->hi != NULL)AjustarHijos(s->hi,incX,incY,nivel,nodos);
-	if(s->hd != NULL)AjustarHijos(s->hi,incX,incY,nivel,nodos);
-	
-	//Insertar(nodos,nivel,s);
-}
-
-int nCaracteres(char* cadena) {
-  int count = 0;
-  for(int m=0; cadena[m]; m++) {
-    if(cadena[m] == '&')while(cadena[m] != ';')m++;//Contar como un caracter los simbolos
-    count ++;
-  }
-  return count;
-}
-
-int offset = 50;
-int yi = 50;
-
-SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int incX,int incY,int nivel,Nodo nodos[MAX_NIVELES]) {
-	s = malloc(sizeof(SVG_data));
-	if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,incX,incY,nivel+1,nodos);
-	if(t->td != NULL)s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,incX,incY,nivel+1,nodos);
-  if(t->ti != NULL && t->td != NULL) { //Ajustar hijos
-    while(s->hi->xmax + 20 > s->hd->x)s->hd->x++;
-    //AjustarHijos(s,incX,incY,nivel,nodos);
-  }
-	char *buffer = malloc(sizeof(char)*MAX_CHAR);
-  s->formula = show_ascii(buffer,t->f);
-  int caracteres = nCaracteres(buffer);
-  s->centro = (caracteres/2)*PIXELES_POR_CARACTER;
-  s->y = nivel*incY+yi;
-  
-	if(t->etiqueta != VACIO) {	//COLOR
-    if(t->etiqueta == CERRADO)s->color = COLOR_RED;
-    else s->color = COLOR_GREEN;
-  }
-  
-	if(t->ti == NULL) {
-		s->x = offset;
-		offset += incX;
-	}
-	else if (t->td != NULL) s->x = s->hi->x + (s->hd->x - s->hi->x)/2;
-	else s->x = s->hi->x+(s->hi->centro-s->centro);
-
-  s->xmax = s->x+caracteres*PIXELES_POR_CARACTER;
-
-	return s;
-}
-
-
-//Minimo y maximo
-
-int *MinXSVGRecursivo(SVG_data *s,int *min) {
-    if(*min > s->x)*min = s->x;
-    if(s->hi != NULL)MinXSVGRecursivo(s->hi,min);
-    if(s->hd != NULL)MinXSVGRecursivo(s->hd,min);
-    return min;
-}
-
-int *MinXSVG(SVG_data *s) {
-  int *min = malloc(sizeof(int));
-  *min = 2000;
-  return MinXSVGRecursivo(s,min);
-}
-
-int *MaxXSVGRecursivo(SVG_data *s,int *max) {
-    if(*max < s->x)*max = s->x;
-    if(s->hi != NULL)MaxXSVGRecursivo(s->hi,max);
-    if(s->hd != NULL)MaxXSVGRecursivo(s->hd,max);
-    return max;
-}
-
-int *MaxXSVG(SVG_data *s) {
-  int *max = malloc(sizeof(int));
-  *max = 0;
-  return MaxXSVGRecursivo(s,max);
-}
-
-int *MaxYSVGRecursivo(SVG_data *s,int *max) {
-    if(*max < s->y)*max = s->y;
-    if(s->hi != NULL)MaxYSVGRecursivo(s->hi,max);
-    if(s->hd != NULL)MaxYSVGRecursivo(s->hd,max);
-    return max;
-}
-
-int *MaxYSVG(SVG_data *s) {
-  int *max = malloc(sizeof(int));
-  *max = 0;
-  return MaxYSVGRecursivo(s,max);
-}
-
-//Minimo y maximo
-
-SVG_data *AjustarSVGMargenRecursivo(SVG_data *s,int *min) {
-  s->x -= *min;
-  if(s->hi != NULL)AjustarSVGMargenRecursivo(s->hi,min);
-  if(s->hd != NULL)AjustarSVGMargenRecursivo(s->hd,min);
-  return s;
-}
-
-SVG *AjustarSVGMargen(SVG *s) {
-  int* xmin = MinXSVG(s->data);
-  int* xmax = MaxXSVG(s->data);
-  *xmax -= *xmin - 100;
-  int* ymax = MaxYSVG(s->data);
-  *ymax += 100;
-  s->data = AjustarSVGMargenRecursivo(s->data,xmin);
-  s->xmax = *xmax;
-  s->ymax = *ymax;
-  free(xmin);
-  free(xmax);
-  free(ymax);
-  return s;
-}
-
-SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t) {
-	int incY = 140;
-	int incX = 100;
-	int nivel = 0;
-	s = malloc(sizeof(struct SVG));
-	s->xmax = 2000;
-	s->ymax = 2000;
-	Nodo nodos[MAX_NIVELES];
-	s->data = CrearSVGDesdeTableauxRecursivo(s->data,t,incX,incY,nivel,nodos);
-  //s = AjustarSVGMargen(s);
-  return s;
-}
-
 int TableauxCerrado(Tableaux t) {
   int tmp;
   if(t->etiqueta == ABIERTO)return BOOLEAN_FALSE;
@@ -586,11 +431,6 @@ int TableauxCerrado(Tableaux t) {
 void showTableauxTree(Tableaux t) {
   Tree *arbol = CrearArbolDesdeTableaux(arbol,t);
   print_ascii_tree(arbol);
-}
-
-void showTableauxSVG(Tableaux t, FILE *fich) {
-	SVG *s = CrearSVGDesdeTableaux(s,t);
-	print_svg(s,fich);
 }
 
 //Devuelve la formula o atomo que haya en la izquierda de 'f'
@@ -965,14 +805,11 @@ void dobleImpNegado(Tableaux t,int busqueda) {
 void ResolverTableaux(Formula oracion) {
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
-  /*
   printf("Solucion: \n\n\n");
-  showTableauxTree(t);
+  //showTableauxTree(t);
   printf("\n\n\n");
   if(TableauxCerrado(t))printf(RED "El tableaux esta cerrado\n" RESET "La expresion inicial es insatisfacible\n");
   else printf(GREEN "El tableaux esta abierto\n" RESET "La expresion inicial es satisfacible\n");
-  */
-  //showTableauxTree(t);
   FILE *fich = fopen(NOMBRE_ARCHIVO,"w+");
   if (fich==NULL) {
 		printf(RED "ERROR: El archivo %s no ha podido abrirse\n" RESET, NOMBRE_ARCHIVO);
