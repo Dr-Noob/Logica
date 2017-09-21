@@ -1,1 +1,1 @@
-a imp b imp c,r or a,b and r
+a imp b imp c,r or a,b and r,a and d,not(not r or m)

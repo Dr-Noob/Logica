@@ -1,6 +1,29 @@
 #include "SVG.h"
 
+struct PuntoRep {
+	int x;
+	int y;
+};
+
+typedef struct PuntoRep *Punto;
+
 int offset = XI;
+
+Punto MaxMinRecursivo(SVG_data *s, Punto p) {
+		if(s->hi != NULL)MaxMinRecursivo(s->hi,p);
+		if(s->hd != NULL)MaxMinRecursivo(s->hd,p);
+
+		if((int)s->xmax > p->x)p->x = (int)s->xmax;
+		if(s->y > p->y)p->y = s->y;
+		return p;
+}
+
+Punto MaxMin(SVG_data *s) {
+		Punto p = malloc(sizeof(Punto));
+		p->x = 0;
+		p->y = 0;
+		return MaxMinRecursivo(s,p);
+}
 
 // Funciones para imprimir
 
@@ -35,14 +58,17 @@ void print_svg_recursivo(SVG_data *s,FILE *fich) {
 }
 
 void print_svg(SVG *s, FILE *fich) {
+	Punto p = MaxMin(s->data);
 	fprintf(fich,"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n");
-	fprintf(fich,"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"%d\" height=\"%d\">\n",2000,2000);
-	fprintf(fich,"<rect width=\"%d\" height=\"%d\" fill=\"white\">\n</rect>\n",2000,2000);
+	fprintf(fich,"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"%d\" height=\"%d\">\n",p->x + XI,p->y + (int)PIXELES_POR_CARACTER + YI);
+	fprintf(fich,"<rect width=\"%d\" height=\"%d\" fill=\"white\">\n</rect>\n",p->x + XI,p->y + (int)PIXELES_POR_CARACTER + YI);
 	print_svg_recursivo(s->data,fich);
 	fprintf(fich,"</svg>\n");
 }
 
 // FIN Funciones para imprimir
+
+// Funciones para ajustar los hijos
 
 void Insertar(SVG_data *s,int nivel,Nodo nodos[MAX_NIVELES]) {
 	Nodo n = nodos[nivel];
@@ -126,9 +152,10 @@ void AjustarHijos(SVG_data *s,int nivel,Nodo nodos[MAX_NIVELES]) {
 	}
 	Rellenar(s->hi,nivel,nodos);
 	Rellenar(s->hd,nivel,nodos);
-	print_nodos(nodos);
 	ComprobarColisiones(s,nivel,nodos);
 }
+
+//FIN Funciones para ajustar los hijos
 
 int nCaracteres(char* cadena) {
   int count = 0;
