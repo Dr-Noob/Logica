@@ -11,7 +11,6 @@ typedef struct SVG SVG;
 typedef struct NodoRep *Nodo;
 
 #define ALTURA_CARACTER 15
-#define PIXELES_POR_CARACTER 7
 #define MAX_NIVELES 50
 #define INCY 140 //Incremento y
 #define INCX 100 //Incremento x
@@ -26,6 +25,7 @@ static const char* SIMBOLO_OR = " &#8744; ";
 static const char* SIMBOLO_IMP = " &#8594; ";
 static const char* SIMBOLO_DIMP = " &#8596; ";
 static const char* SIMBOLO_NOT = "&#172;";
+static const float PIXELES_POR_CARACTER = 7.2025;
 
 struct SVG {
 	SVG_data* data;
@@ -36,7 +36,7 @@ struct SVG {
 struct SVG_data {
 	int x;
 	int y;
-	int xmax;
+	float xmax;
 	int color;
 	float centro;
 	char* formula;
@@ -45,10 +45,8 @@ struct SVG_data {
 };
 
 struct NodoRep {
-	int x;
-	int xmax;
 	SVG_data* svg;
-	Nodo* sig;
+	Nodo sig;
 };
 
 void showTableauxSVG(Tableaux t, FILE *fich);
