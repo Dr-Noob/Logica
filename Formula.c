@@ -10,6 +10,7 @@ static const char* SIMBOLO_OR = " &#8744; ";
 static const char* SIMBOLO_IMP = " &#8594; ";
 static const char* SIMBOLO_DIMP = " &#8596; ";
 static const char* SIMBOLO_NOT = "&#172;";
+static const char* NOMBRE_ARCHIVO = "sol.svg";
 
 struct AtomoRep {
   char id; //Identificador
@@ -454,13 +455,18 @@ SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int incX,int inc
   int caracteres = nCaracteres(buffer);
   s->centro = (caracteres/2)*PIXELES_POR_CARACTER;
   s->y = nivel*incY+yi;
-
+  
+	if(t->etiqueta != VACIO) {	//COLOR
+    if(t->etiqueta == CERRADO)s->color = COLOR_RED;
+    else s->color = COLOR_GREEN;
+  }
+  
 	if(t->ti == NULL) {
 		s->x = offset;
 		offset += incX;
 	}
 	else if (t->td != NULL) s->x = s->hi->x + (s->hd->x - s->hi->x)/2;
-	else s->x = s->hi->x;
+	else s->x = s->hi->x+(s->hi->centro-s->centro);
 
   s->xmax = s->x+caracteres*PIXELES_POR_CARACTER;
 
@@ -566,9 +572,9 @@ void showTableauxTree(Tableaux t) {
   print_ascii_tree(arbol);
 }
 
-void showTableauxSVG(Tableaux t) {
+void showTableauxSVG(Tableaux t, FILE *fich) {
 	SVG *s = CrearSVGDesdeTableaux(s,t);
-	print_svg(s);
+	print_svg(s,fich);
 }
 
 //Devuelve la formula o atomo que haya en la izquierda de 'f'
@@ -951,5 +957,11 @@ void ResolverTableaux(Formula oracion) {
   else printf(GREEN "El tableaux esta abierto\n" RESET "La expresion inicial es satisfacible\n");
   */
   //showTableauxTree(t);
-  showTableauxSVG(t);
+  FILE *fich = fopen(NOMBRE_ARCHIVO,"ab+");
+  if (fich==NULL) {
+		printf(RED "ERROR: El archivo %s no ha podido abrirse\n" RESET, NOMBRE_ARCHIVO);
+		printf(RED "No se genera el SVG" RESET);
+	} else {
+		showTableauxSVG(t,fich);
+	}
 }

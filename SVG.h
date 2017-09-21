@@ -1,6 +1,11 @@
 #ifndef __SVG__
 #define __SVG__
 
+#include "Tree.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 typedef struct SVG_data SVG_data;
 typedef struct SVG SVG;
 
@@ -17,12 +22,13 @@ struct SVG_data {
 	int x;
 	int y;
 	int xmax;
+	int color;
 	float centro;
 	char* formula;
 	SVG_data* hi;
 	SVG_data* hd;
 };
 
-void print_svg(SVG *s);
+void print_svg(SVG *s, FILE *fich);
 
 #endif

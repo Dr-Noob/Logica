@@ -14,7 +14,7 @@ extern int yylex();
 int main( int argc, char* argv[] ) {
 	int yyret = 0;
 	if (argc != 2) {
-		printf(RED "ERROR: Tableaux necesita un argumento(el archivo)\n" RESET);
+		printf(RED "ERROR: Tableaux necesita al menos un argumento(el archivo donde se encuentra la formula)\n" RESET);
 		return 1;
 	}
 	char* nombre = argv[1];
