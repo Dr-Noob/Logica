@@ -18,6 +18,7 @@ struct FormulaRep {
 
 Formula CrearFormula(Atomo a) {
 	Formula f = malloc(sizeof(struct FormulaRep));
+  memset(f,0,sizeof(struct FormulaRep));
 	f->a1 = a;
   f->a2 = NULL;
   f->f1 = NULL;
@@ -26,6 +27,28 @@ Formula CrearFormula(Atomo a) {
   f->not = SIN_NEGAR;
   f->sig = NULL;
 	return f;
+}
+
+void LiberarAtomo(Atomo a) {
+  printf("Liberar %x\n",a);
+  free(a);
+}
+
+void LiberarFormula(Formula f) {
+  if(f->sig != NULL)LiberarFormula(f->sig);
+  if(f->f1 != NULL)LiberarFormula(f->f1);
+  if(f->f2 != NULL)LiberarFormula(f->f2);
+  if(f->a1 != NULL)LiberarAtomo(f->a1);
+  if(f->a2 != NULL)LiberarAtomo(f->a2);
+  printf("Liberar %x\n",f);
+  free(f);
+}
+
+void LiberarTableaux(Tableaux t) {
+  if(t->ti != NULL)LiberarTableaux(t->ti);
+  if(t->td != NULL)LiberarTableaux(t->td);
+  LiberarFormula(t->f);
+  free(t);
 }
 
 Atomo CrearAtomo(char _id,int _not) {
@@ -78,12 +101,14 @@ Formula NegarFormula(Formula f) {
 Formula CopiarFormula(Formula original) {
   Formula copia=NULL;
   Formula anterior=NULL;
+  Formula temp = NULL;
   Atomo a1;
   Atomo a2;
 
   while(original != NULL) {
     //Copiar
-    Formula temp = malloc(sizeof(struct FormulaRep));
+    temp = malloc(sizeof(struct FormulaRep));
+    memset(temp,0,sizeof(struct FormulaRep));
     if(original->a1 != NULL) {
       a1 = CrearAtomo(original->a1->id,original->a1->not);
       temp->a1=a1;
@@ -108,12 +133,16 @@ Formula CopiarFormula(Formula original) {
     }
     original=original->sig;
   }
-
+  //LiberarFormula(temp);
+  show(temp);
+  printf("\n");
+  printf("%x\n",temp);
   return copia;
 }
 
 Formula Unir(Formula formula1,int operador,Formula formula2) {
   Formula f = malloc(sizeof(struct FormulaRep));
+  memset(f,0,sizeof(struct FormulaRep));
 
   if(formula1 == NULL || formula2 == NULL) {
     printf("ERROR: Formula nula\n");
@@ -128,6 +157,7 @@ Formula Unir(Formula formula1,int operador,Formula formula2) {
       }
       else { //formula1 tiene los dos atomos
         Formula aux = malloc(sizeof(struct FormulaRep));
+        memset(aux,0,sizeof(struct FormulaRep));
         aux->a1 = CopiarAtomo(formula1->a1);
         aux->a2 = CopiarAtomo(formula1->a2);
         aux->not = NEGADO;
@@ -142,6 +172,7 @@ Formula Unir(Formula formula1,int operador,Formula formula2) {
       }
       else { //formula1 tiene un atomo(el a1)
         Formula aux = malloc(sizeof(struct FormulaRep));
+        memset(aux,0,sizeof(struct FormulaRep));
         aux->f2 = CopiarFormula(formula1->f2);
         aux->a1 = CopiarAtomo(formula1->a1);
         if(formula1->not == NEGADO)aux->a1->not = NEGADO;
@@ -158,6 +189,7 @@ Formula Unir(Formula formula1,int operador,Formula formula2) {
       }
       else { //formula1 tiene un atomo(el a2)
         Formula aux = malloc(sizeof(struct FormulaRep));
+        memset(aux,0,sizeof(struct FormulaRep));
         aux->f1 = CopiarFormula(formula1->f1);
         aux->a2 = CopiarAtomo(formula1->a2);
         if(formula1->not == NEGADO)aux->a2->not = NEGADO;
@@ -168,6 +200,7 @@ Formula Unir(Formula formula1,int operador,Formula formula2) {
     }
     else { //formula1 tiene las dos formulas
       Formula aux = malloc(sizeof(struct FormulaRep));
+      memset(aux,0,sizeof(struct FormulaRep));
       aux->f1 = CopiarFormula(formula1->f1);
       aux->f2 = CopiarFormula(formula1->f2);
       aux->COD_OP = formula1->COD_OP;
@@ -185,6 +218,7 @@ Formula Unir(Formula formula1,int operador,Formula formula2) {
       }
       else { //formula2 tiene los dos atomos
         Formula aux = malloc(sizeof(struct FormulaRep));
+        memset(aux,0,sizeof(struct FormulaRep));
         aux->a1 = CopiarAtomo(formula2->a1);
         aux->a2 = CopiarAtomo(formula2->a2);
         aux->COD_OP = formula2->COD_OP;
@@ -198,6 +232,7 @@ Formula Unir(Formula formula1,int operador,Formula formula2) {
       }
       else { //formula2 tiene un atomo(el a1)
         Formula aux = malloc(sizeof(struct FormulaRep));
+        memset(aux,0,sizeof(struct FormulaRep));
         aux->f2 = CopiarFormula(formula2->f2);
         aux->a1 = CopiarAtomo(formula2->a1);
         if(formula2->not == NEGADO)aux->a1->not = NEGADO;
@@ -214,6 +249,7 @@ Formula Unir(Formula formula1,int operador,Formula formula2) {
       }
       else { //formula2 tiene un atomo
         Formula aux = malloc(sizeof(struct FormulaRep));
+        memset(aux,0,sizeof(struct FormulaRep));
         aux->f1 = CopiarFormula(formula2->f1);
         aux->a2 = CopiarAtomo(formula2->a2);
         if(formula2->not == NEGADO)aux->a2->not = NEGADO;
@@ -227,6 +263,8 @@ Formula Unir(Formula formula1,int operador,Formula formula2) {
     }
   }
   f->COD_OP = operador;
+  LiberarFormula(formula1);
+  LiberarFormula(formula2);
 	return f;
 }
 
@@ -240,6 +278,7 @@ Formula Concatenar(Formula f1,Formula f2) {
 
 Tableaux CrearTableaux(Formula inicial) {
   Tableaux t = malloc(sizeof(struct TableauxRep));
+  memset(t,0,sizeof(struct TableauxRep));
   t->f = inicial;
   t->ti = NULL;
   t->td = NULL;
@@ -401,7 +440,9 @@ void showTableaux(Tableaux t) {
 //Funcion recursiva que devuelve el 'tree' correspondiende al tableaux 't'
 Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
   char *buffer = malloc(sizeof(char)*MAX_CHAR);
-  tree = malloc (sizeof (Tree));
+  memset(buffer,0,sizeof(char)*MAX_CHAR);
+  tree = malloc (sizeof (struct Tree));
+  memset(tree,0,sizeof (struct Tree));
   tree->element = show_ascii(buffer,t->f);
   if(t->etiqueta != VACIO) {
     if(t->etiqueta == CERRADO)tree->color = COLOR_RED;
@@ -573,6 +614,7 @@ void and(Tableaux t,int busqueda) {
     derecha = ExtraerDerecha(t->ti->f);
     derecha->sig = t->ti->f->sig;
     izquierda->sig = derecha;
+    LiberarFormula(t->ti->f);
     t->ti->f = izquierda;
   }
   else {
@@ -805,8 +847,10 @@ void dobleImpNegado(Tableaux t,int busqueda) {
 void ResolverTableaux(Formula oracion) {
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
-  printf("Solucion: \n\n\n");
+  //LiberarTableaux(t);
+  //printf("Solucion: \n\n\n");
   //showTableauxTree(t);
+  /*
   printf("\n\n\n");
   if(TableauxCerrado(t))printf(RED "El tableaux esta cerrado\n" RESET "La expresion inicial es insatisfacible\n");
   else printf(GREEN "El tableaux esta abierto\n" RESET "La expresion inicial es satisfacible\n");
@@ -817,4 +861,5 @@ void ResolverTableaux(Formula oracion) {
 	} else {
 		showTableauxSVG(t,fich);
 	}
+  */
 }

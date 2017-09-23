@@ -1,0 +1,7 @@
+{
+    flex
+    Memcheck:Leak
+    ...
+    fun:yylex
+    ...
+}
