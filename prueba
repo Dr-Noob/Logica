@@ -1,1 +1,1 @@
-a imp b imp c,r or a,b and r,a and d,not(not r or m)
+a imp b imp c,a or b and c,a dimp m and m,m or b dimp l and s

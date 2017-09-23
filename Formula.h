@@ -2,12 +2,10 @@
 #define __Formula__
 
 #include "Tree.h"
+#include "Bool.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-#define BOOLEAN_FALSE         0
-#define BOOLEAN_TRUE          1
 
 #define VACIO         2
 #define CERRADO       3

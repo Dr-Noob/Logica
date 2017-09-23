@@ -3,5 +3,6 @@
 *.tab.c
 tableaux
 prueba
+config
 sol.svg
 Comp/
