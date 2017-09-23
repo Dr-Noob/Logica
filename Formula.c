@@ -19,7 +19,10 @@ struct FormulaRep {
 Formula CrearFormula(Atomo a) {
 	Formula f = malloc(sizeof(struct FormulaRep));
   memset(f,0,sizeof(struct FormulaRep));
-	f->a1 = a;
+  Atomo copia = malloc(sizeof(struct AtomoRep));
+  copia->id = a->id;
+  copia->not = a->not;
+	f->a1 = copia;
   f->a2 = NULL;
   f->f1 = NULL;
   f->f2 = NULL;
@@ -30,7 +33,6 @@ Formula CrearFormula(Atomo a) {
 }
 
 void LiberarAtomo(Atomo a) {
-  printf("Liberar %x\n",a);
   free(a);
 }
 
@@ -40,7 +42,6 @@ void LiberarFormula(Formula f) {
   if(f->f2 != NULL)LiberarFormula(f->f2);
   if(f->a1 != NULL)LiberarAtomo(f->a1);
   if(f->a2 != NULL)LiberarAtomo(f->a2);
-  printf("Liberar %x\n",f);
   free(f);
 }
 
@@ -133,10 +134,6 @@ Formula CopiarFormula(Formula original) {
     }
     original=original->sig;
   }
-  //LiberarFormula(temp);
-  show(temp);
-  printf("\n");
-  printf("%x\n",temp);
   return copia;
 }
 
@@ -847,7 +844,7 @@ void dobleImpNegado(Tableaux t,int busqueda) {
 void ResolverTableaux(Formula oracion) {
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
-  //LiberarTableaux(t);
+  LiberarTableaux(t);
   //printf("Solucion: \n\n\n");
   //showTableauxTree(t);
   /*

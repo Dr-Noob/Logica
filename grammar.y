@@ -103,6 +103,7 @@ g: LPAREN e RPAREN
 		{
 			Atomo a = CrearAtomo($1,SIN_NEGAR);
 			$$=CrearFormula(a);
+			LiberarAtomo(a);
 		};
 
 %%

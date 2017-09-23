@@ -44,5 +44,6 @@ Formula Concatenar(Formula f1,Formula f2);
 void ResolverTableaux(Formula oracion);
 char* show_ascii(char* buf, Formula f);
 void show(Formula f);
+void LiberarAtomo(Atomo a);
 
 #endif
