@@ -20,6 +20,7 @@ void freeTree(Tree *t) {
   if (t != NULL) {
     freeTree(t->left);
     freeTree(t->right);
+    free(t->element);
     free(t);
   }
 }

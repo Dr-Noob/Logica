@@ -38,5 +38,6 @@ struct asciinode_struct {
 };
 
 void print_ascii_tree(Tree * t);
+void freeTree(Tree *t);
 
 #endif

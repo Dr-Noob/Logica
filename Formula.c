@@ -37,9 +37,17 @@ void LiberarAtomo(Atomo a) {
 }
 
 void LiberarFormula(Formula f) {
-  if(f->sig != NULL)LiberarFormula(f->sig);
   if(f->f1 != NULL)LiberarFormula(f->f1);
   if(f->f2 != NULL)LiberarFormula(f->f2);
+  if(f->a1 != NULL)LiberarAtomo(f->a1);
+  if(f->a2 != NULL)LiberarAtomo(f->a2);
+  free(f);
+}
+
+void LiberarFormulaCompleta(Formula f) {
+  if(f->sig != NULL)LiberarFormulaCompleta(f->sig);
+  if(f->f1 != NULL)LiberarFormulaCompleta(f->f1);
+  if(f->f2 != NULL)LiberarFormulaCompleta(f->f2);
   if(f->a1 != NULL)LiberarAtomo(f->a1);
   if(f->a2 != NULL)LiberarAtomo(f->a2);
   free(f);
@@ -48,7 +56,7 @@ void LiberarFormula(Formula f) {
 void LiberarTableaux(Tableaux t) {
   if(t->ti != NULL)LiberarTableaux(t->ti);
   if(t->td != NULL)LiberarTableaux(t->td);
-  LiberarFormula(t->f);
+  LiberarFormulaCompleta(t->f);
   free(t);
 }
 
@@ -469,6 +477,7 @@ int TableauxCerrado(Tableaux t) {
 void showTableauxTree(Tableaux t) {
   Tree *arbol = CrearArbolDesdeTableaux(arbol,t);
   print_ascii_tree(arbol);
+  freeTree(arbol);
 }
 
 //Devuelve la formula o atomo que haya en la izquierda de 'f'
@@ -620,6 +629,7 @@ void and(Tableaux t,int busqueda) {
     derecha = ExtraerDerecha(aux->sig);
     derecha->sig = aux->sig->sig;
     izquierda->sig = derecha;
+    LiberarFormula(aux->sig);
     aux->sig = izquierda;
   }
   Resolver(t->ti);
@@ -636,6 +646,7 @@ void orNegado(Tableaux t,int busqueda) {
     derecha = NegarFormula(ExtraerDerecha(t->ti->f)); //La unica diferencia respecto al AND
     derecha->sig = t->ti->f->sig;
     izquierda->sig = derecha;
+    LiberarFormula(t->ti->f);
     t->ti->f = izquierda;
   }
   else {
@@ -644,6 +655,7 @@ void orNegado(Tableaux t,int busqueda) {
     derecha = NegarFormula(ExtraerDerecha(aux->sig)); //La unica diferencia respecto al AND
     derecha->sig = aux->sig->sig;
     izquierda->sig = derecha;
+    LiberarFormula(aux->sig);
     aux->sig = izquierda;
   }
   Resolver(t->ti);
@@ -660,6 +672,7 @@ void impNegado(Tableaux t,int busqueda) {
     derecha = NegarFormula(ExtraerDerecha(t->ti->f)); //La unica diferencia respecto al AND
     derecha->sig = t->ti->f->sig;
     izquierda->sig = derecha;
+    LiberarFormula(t->ti->f);
     t->ti->f = izquierda;
   }
   else {
@@ -668,6 +681,7 @@ void impNegado(Tableaux t,int busqueda) {
     derecha = NegarFormula(ExtraerDerecha(aux->sig)); //La unica diferencia respecto al AND
     derecha->sig = aux->sig->sig;
     izquierda->sig = derecha;
+    LiberarFormula(aux->sig);
     aux->sig = izquierda;
   }
   Resolver(t->ti);
@@ -684,6 +698,7 @@ void dobleImp(Tableaux t,int busqueda) {
     derecha = Unir(ExtraerDerecha(t->ti->f), COD_IMP, ExtraerIzquierda(t->ti->f));
     derecha->sig = t->ti->f->sig;
     izquierda->sig = derecha;
+    LiberarFormula(t->ti->f);
     t->ti->f = izquierda;
   }
   else {
@@ -692,6 +707,7 @@ void dobleImp(Tableaux t,int busqueda) {
     derecha = Unir(ExtraerDerecha(aux->sig), COD_IMP, ExtraerIzquierda(aux->sig));
     derecha->sig = aux->sig->sig;
     izquierda->sig = derecha;
+    LiberarFormula(aux->sig);
     aux->sig = izquierda;
   }
   Resolver(t->ti);
@@ -708,12 +724,14 @@ void andNegado(Tableaux t,int busqueda) {
   if(busqueda == 0) {
     izquierda = NegarFormula(ExtraerIzquierda(t->ti->f)); //Unica diferencia con el OR
     izquierda->sig = t->ti->f->sig;
+    LiberarFormula(t->ti->f);
     t->ti->f = izquierda;
   }
   else {
     aux = BuscarOracion(busqueda,aux,t->ti);
     izquierda = NegarFormula(ExtraerIzquierda(aux->sig)); //Unica diferencia con el OR
     izquierda->sig = aux->sig->sig;
+    LiberarFormula(aux->sig);
     aux->sig = izquierda;
   }
   Resolver(t->ti);
@@ -722,16 +740,19 @@ void andNegado(Tableaux t,int busqueda) {
   if(busqueda == 0) {
     derecha = NegarFormula(ExtraerDerecha(t->td->f)); //Unica diferencia con el OR
     derecha->sig = t->td->f->sig;
+    LiberarFormula(t->td->f);
     t->td->f = derecha;
   }
   else {
     aux = BuscarOracion(busqueda,aux,t->td);
     derecha = NegarFormula(ExtraerDerecha(aux->sig)); //Unica diferencia con el OR
     derecha->sig = aux->sig->sig;
+    LiberarFormula(aux->sig);
     aux->sig = derecha;
   }
   Resolver(t->td);
 }
+
 void or(Tableaux t,int busqueda) {
   Formula aux;
   Formula izquierda;
@@ -741,12 +762,14 @@ void or(Tableaux t,int busqueda) {
   if(busqueda == 0) {
     izquierda = ExtraerIzquierda(t->ti->f);
     izquierda->sig = t->ti->f->sig;
+    LiberarFormula(t->ti->f);
     t->ti->f = izquierda;
   }
   else {
     aux = BuscarOracion(busqueda,aux,t->ti);
     izquierda = ExtraerIzquierda(aux->sig);
     izquierda->sig = aux->sig->sig;
+    LiberarFormula(aux->sig);
     aux->sig = izquierda;
   }
   Resolver(t->ti);
@@ -755,12 +778,14 @@ void or(Tableaux t,int busqueda) {
   if(busqueda == 0) {
     derecha = ExtraerDerecha(t->td->f);
     derecha->sig = t->td->f->sig;
+    LiberarFormula(t->td->f);
     t->td->f = derecha;
   }
   else {
     aux = BuscarOracion(busqueda,aux,t->td);
     derecha = ExtraerDerecha(aux->sig);
     derecha->sig = aux->sig->sig;
+    LiberarFormula(aux->sig);
     aux->sig = derecha;
   }
   Resolver(t->td);
@@ -776,6 +801,7 @@ void imp(Tableaux t,int busqueda) {
     izquierda = ExtraerIzquierda(t->ti->f);
     izquierda = NegarFormula(izquierda);
     izquierda->sig = t->ti->f->sig;
+    LiberarFormula(t->ti->f);
     t->ti->f = izquierda;
   }
   else {
@@ -783,6 +809,7 @@ void imp(Tableaux t,int busqueda) {
     izquierda = ExtraerIzquierda(aux->sig);
     izquierda = NegarFormula(izquierda);
     izquierda->sig = aux->sig->sig;
+    LiberarFormula(aux->sig);
     aux->sig = izquierda;
   }
   Resolver(t->ti);
@@ -791,12 +818,14 @@ void imp(Tableaux t,int busqueda) {
   if(busqueda == 0) {
     derecha = ExtraerDerecha(t->td->f);
     derecha->sig = t->td->f->sig;
+    LiberarFormula(t->td->f);
     t->td->f = derecha;
   }
   else {
     aux = BuscarOracion(busqueda,aux,t->td);
     derecha = ExtraerDerecha(aux->sig);
     derecha->sig = aux->sig->sig;
+    LiberarFormula(aux->sig);
     aux->sig = derecha;
   }
   Resolver(t->td);
@@ -811,6 +840,7 @@ void dobleImpNegado(Tableaux t,int busqueda) {
   if(busqueda == 0) {
     izquierda = Unir(ExtraerIzquierda(t->ti->f), COD_IMP, ExtraerDerecha(t->ti->f));
     izquierda->sig = t->ti->f->sig;
+    LiberarFormula(t->ti->f);
     t->ti->f = izquierda;
     t->ti->f->not = NEGADO;
   }
@@ -819,6 +849,7 @@ void dobleImpNegado(Tableaux t,int busqueda) {
     izquierda = Unir(ExtraerIzquierda(aux->sig), COD_IMP, ExtraerDerecha(aux->sig));
     izquierda->sig = aux->sig->sig;
     izquierda->not = NEGADO;
+    LiberarFormula(aux->sig);
     aux->sig = izquierda;
   }
   Resolver(t->ti);
@@ -827,6 +858,7 @@ void dobleImpNegado(Tableaux t,int busqueda) {
   if(busqueda == 0) {
     izquierda = Unir(ExtraerDerecha(t->td->f), COD_IMP, ExtraerIzquierda(t->td->f));
     izquierda->sig = t->td->f->sig;
+    LiberarFormula(t->td->f);
     t->td->f = izquierda;
     t->td->f->not = NEGADO;
   }
@@ -835,6 +867,7 @@ void dobleImpNegado(Tableaux t,int busqueda) {
     izquierda = Unir(ExtraerDerecha(aux->sig), COD_IMP, ExtraerIzquierda(aux->sig));
     izquierda->sig = aux->sig->sig;
     izquierda->not = NEGADO;
+    LiberarFormula(aux->sig);
     aux->sig = izquierda;
   }
   Resolver(t->td);
@@ -844,19 +877,21 @@ void dobleImpNegado(Tableaux t,int busqueda) {
 void ResolverTableaux(Formula oracion) {
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
-  LiberarTableaux(t);
-  //printf("Solucion: \n\n\n");
-  //showTableauxTree(t);
-  /*
+  printf("Solucion: \n\n\n");
+  showTableauxTree(t);
+
   printf("\n\n\n");
   if(TableauxCerrado(t))printf(RED "El tableaux esta cerrado\n" RESET "La expresion inicial es insatisfacible\n");
   else printf(GREEN "El tableaux esta abierto\n" RESET "La expresion inicial es satisfacible\n");
+
   FILE *fich = fopen(NOMBRE_ARCHIVO,"w+");
   if (fich==NULL) {
 		printf(RED "ERROR: El archivo %s no ha podido abrirse\n" RESET, NOMBRE_ARCHIVO);
 		printf(RED "No se genera el SVG" RESET);
 	} else {
 		showTableauxSVG(t,fich);
+    fclose(fich);
 	}
-  */
+
+  LiberarTableaux(t);
 }

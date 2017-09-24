@@ -1,13 +1,52 @@
 #include "SVG.h"
 
+struct SVG {
+	SVG_data* data;
+	int xmax;
+	int ymax;
+};
+
+struct SVG_data {
+	int x;
+	int y;
+	float xmax;
+	int color;
+	float centro;
+	char* formula;
+	SVG_data* hi;
+	SVG_data* hd;
+};
+
+struct NodoRep {
+	SVG_data* svg;
+	Nodo sig;
+};
+
 struct PuntoRep {
 	int x;
 	int y;
 };
 
-typedef struct PuntoRep *Punto;
-
 int offset = XI;
+
+void LiberarSVG_data(SVG_data *s) {
+	if(s->hi != NULL)LiberarSVG_data(s->hi);
+	if(s->hd != NULL)LiberarSVG_data(s->hd);
+	free(s->formula);
+	free(s);
+}
+
+void LiberarSVG(SVG *s) {
+	LiberarSVG_data(s->data);
+	free(s);
+}
+
+void LiberarNodo(Nodo n) {
+	//No liberar el SVG porque no se hace una
+	//copia, sino que es una referencia
+	if(n->sig != NULL)LiberarNodo(n->sig);
+	free(n);
+}
 
 Punto MaxMinRecursivo(SVG_data *s, Punto p) {
 		if(s->hi != NULL)MaxMinRecursivo(s->hi,p);
@@ -20,10 +59,17 @@ Punto MaxMinRecursivo(SVG_data *s, Punto p) {
 
 Punto MaxMin(SVG_data *s) {
 		Punto p = malloc(sizeof(Punto));
+		memset(p,0,sizeof(Punto));
 		p->x = 0;
 		p->y = 0;
-		return MaxMinRecursivo(s,p);
+		p = MaxMinRecursivo(s,p);
+		return p;
 }
+
+void LiberarPunto(Punto p) {
+	free(p);
+}
+
 
 // Funciones para imprimir
 
@@ -64,6 +110,7 @@ void print_svg(SVG *s, FILE *fich) {
 	fprintf(fich,"<rect width=\"%d\" height=\"%d\" fill=\"white\">\n</rect>\n",p->x + XI,p->y + (int)PIXELES_POR_CARACTER + YI);
 	print_svg_recursivo(s->data,fich);
 	fprintf(fich,"</svg>\n");
+	LiberarPunto(p);
 }
 
 // FIN Funciones para imprimir
@@ -76,8 +123,9 @@ void Insertar(SVG_data *s,int nivel,Nodo nodos[MAX_NIVELES]) {
 
 	while(n->sig != NULL)n = n->sig;
 
-	n->sig = malloc(sizeof(Nodo));
+	n->sig = malloc(sizeof(struct NodoRep));
 	n = n->sig;
+	memset(n,0,sizeof(struct NodoRep));
 	n->svg = s;
 	n->sig = NULL;
 }
@@ -103,10 +151,6 @@ void print_nodos(Nodo nodos[MAX_NIVELES]) {
 				printf("%s\n",n->svg->formula);
 			}
 		}
-}
-
-void LiberarNodo(Nodo n) {
-	//TODO: Hacer los free
 }
 
 int HayColisionesEnFila(Nodo n) {
@@ -140,19 +184,17 @@ int ComprobarTodasColisiones(SVG_data *s,int nivel, Nodo nodos[MAX_NIVELES]) {
 
 void AjustarHijos(SVG_data *s,int nivel,Nodo nodos[MAX_NIVELES]);
 
-void ComprobarColisiones(SVG_data *s,int nivel, Nodo nodos[MAX_NIVELES]) {
-	if(ComprobarTodasColisiones(s,nivel,nodos) == BOOLEAN_TRUE) AjustarHijos(s,nivel,nodos); //ajustar hasta que todos lo esten
-}
-
 void AjustarHijos(SVG_data *s,int nivel,Nodo nodos[MAX_NIVELES]) {
 	for(int i=0;i<MAX_NIVELES;i++){
-		LiberarNodo(nodos[i]);
-		nodos[i] = malloc(sizeof(Nodo));
+		nodos[i] = malloc(sizeof(struct NodoRep));
+		memset(nodos[i],0,sizeof(struct NodoRep));
 		nodos[i]->sig = NULL;
 	}
 	Rellenar(s->hi,nivel,nodos);
 	Rellenar(s->hd,nivel,nodos);
-	ComprobarColisiones(s,nivel,nodos);
+	int ret = ComprobarTodasColisiones(s,nivel,nodos);
+	for(int i=0;i<MAX_NIVELES;i++)LiberarNodo(nodos[i]);
+	if(ret == BOOLEAN_TRUE)AjustarHijos(s,nivel,nodos); //ajustar hasta que todos lo esten
 }
 
 //FIN Funciones para ajustar los hijos
@@ -167,13 +209,15 @@ int nCaracteres(char* cadena) {
 }
 
 SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int nivel,Nodo nodos[MAX_NIVELES]) {
-	s = malloc(sizeof(SVG_data));
+	s = malloc(sizeof(struct SVG_data));
+	memset(s,0,sizeof(struct SVG_data));
 	if(t->ti != NULL)s->hi = CrearSVGDesdeTableauxRecursivo(s->hi,t->ti,nivel+1,nodos);
 	if(t->td != NULL)s->hd = CrearSVGDesdeTableauxRecursivo(s->hd,t->td,nivel+1,nodos);
 
   if(t->ti != NULL && t->td != NULL)AjustarHijos(s,nivel,nodos);
 
 	char *buffer = malloc(sizeof(char)*MAX_CHAR);
+	memset(buffer,0,sizeof(sizeof(char)*MAX_CHAR));
 	s->formula = show_ascii(buffer,t->f);
 	int caracteres = nCaracteres(buffer);
 	s->centro = (caracteres/2)*PIXELES_POR_CARACTER;
@@ -202,6 +246,7 @@ SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int nivel,Nodo n
 SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t)  {
 	int nivel = 0;
 	s = malloc(sizeof(struct SVG));
+	memset(s,0,sizeof(struct SVG));
 	Nodo nodos[MAX_NIVELES];
 	s->data = CrearSVGDesdeTableauxRecursivo(s->data,t,nivel,nodos);
   return s;
@@ -209,15 +254,6 @@ SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t)  {
 
 void showTableauxSVG(Tableaux t, FILE *fich) {
 	SVG *s = CrearSVGDesdeTableaux(s,t);
-	/*
-	s = malloc(sizeof(SVG));
-	s->data = malloc(sizeof(SVG_data));
-	s->data->formula = malloc(1000*sizeof(char));
-	s->data->x = 100;
-	s->data->y = 100;
-	strcpy(s->data->formula,"(c)(b)(b)(a)");
-	s->data->xmax = s->data->x+nCaracteres(s->data->formula)*PIXELES_POR_CARACTER;
-	printf("dif %f\n",s->data->xmax-s->data->x);
-	*/
 	print_svg(s,fich);
+	LiberarSVG(s);
 }
