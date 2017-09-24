@@ -292,78 +292,17 @@ Tableaux CrearTableaux(Formula inicial) {
 }
 
 //Funciones IMPRIMIR
-
-void printCOD(int COD_OP) {
-  switch(COD_OP) {
-    case COD_DIMP:
-      printf(" <-> ");
-      break;
-    case COD_IMP:
-      printf(" -> ");
-      break;
-    case COD_AND:
-      printf(" ^ ");
-      break;
-    case COD_OR:
-      printf(" v ");
-      break;
-  }
-}
-
-void printAtomo(Atomo a) {
-  if(a->not == NEGADO)printf("~");
-  printf("%c",a->id);
-}
-
-void show(Formula f) {
-	Formula aux = f;
-
-  if(aux->not == NEGADO)printf("~");
-  printf("[");
-  if(aux->f1 != NULL) { //Existe formula izquierda
-    show(aux->f1);
-    printCOD(aux->COD_OP);
-    if(aux->f2 != NULL)show(aux->f2); //Existe formula derecha
-    else if(aux->a2 != NULL)printAtomo(aux->a2); //No existe formula derecha
-  }
-  else { //No existe formula izquierda
-    if(aux->a1 == NULL)printf("ERROR: a1 es nulo\n");
-    printAtomo(aux->a1);
-    printCOD(aux->COD_OP);
-    if(aux->f2 != NULL)show(aux->f2); //Existe formula derecha
-    else if(aux->a2 != NULL)printAtomo(aux->a2); //No existe formula derecha
-  }
-  printf("]");
-
-
-	while(aux->sig != NULL){
-		aux = aux->sig;
-
-    if(aux->not == NEGADO)printf("~");
-    printf("[");
-    if(aux->f1 != NULL) { //Existe formula izquierda
-      show(aux->f1);
-      printCOD(aux->COD_OP);
-      if(aux->f2 != NULL)show(aux->f2); //Existe formula derecha
-      else if(aux->a2 != NULL)printAtomo(aux->a2); //No existe formula derecha
-    }
-    else { //No existe formula izquierda
-      if(aux->a1 == NULL)printf("ERROR: a1 es nulo\n");
-      printAtomo(aux->a1);
-      printCOD(aux->COD_OP);
-      if(aux->f2 != NULL)show(aux->f2); //Existe formula derecha
-      else if(aux->a2 != NULL)printAtomo(aux->a2); // No existe formula derecha
-    }
-    printf("]");
-  }
-
-}
-
 //Funciones ascii para devolver un char* en vez de imprimir directamente
 //Usadas por el ascii_tree
 
 char* showAtomo_ascii(char* buf, Atomo a) {
-  if(a->not == NEGADO)sprintf(buf+strlen(buf),"%s",SIMBOLO_NOT);
+  if(a->not == NEGADO)sprintf(buf+strlen(buf),"%s",ASCII_SIMBOLO_NOT);
+  sprintf(buf+strlen(buf),"%c",a->id);
+  return buf;
+}
+
+char* showAtomo_svg(char* buf, Atomo a) {
+  if(a->not == NEGADO)sprintf(buf+strlen(buf),"%s",SVG_SIMBOLO_NOT);
   sprintf(buf+strlen(buf),"%c",a->id);
   return buf;
 }
@@ -373,16 +312,34 @@ char* showAtomo_ascii(char* buf, Atomo a) {
 char* showCOD_ascii(char* buf, int COD_OP) {
   switch(COD_OP) {
     case COD_DIMP:
-      sprintf(buf+strlen(buf),"%s",SIMBOLO_DIMP);
+      sprintf(buf+strlen(buf),"%s",ASCII_SIMBOLO_DIMP);
       break;
     case COD_IMP:
-      sprintf(buf+strlen(buf),"%s",SIMBOLO_IMP);
+      sprintf(buf+strlen(buf),"%s",ASCII_SIMBOLO_IMP);
       break;
     case COD_AND:
-      sprintf(buf+strlen(buf),"%s",SIMBOLO_AND);
+      sprintf(buf+strlen(buf),"%s",ASCII_SIMBOLO_AND);
       break;
     case COD_OR:
-      sprintf(buf+strlen(buf),"%s",SIMBOLO_OR);
+      sprintf(buf+strlen(buf),"%s",ASCII_SIMBOLO_OR);
+      break;
+  }
+  return buf;
+}
+
+char* showCOD_svg(char* buf, int COD_OP) {
+  switch(COD_OP) {
+    case COD_DIMP:
+      sprintf(buf+strlen(buf),"%s",SVG_SIMBOLO_DIMP);
+      break;
+    case COD_IMP:
+      sprintf(buf+strlen(buf),"%s",SVG_SIMBOLO_IMP);
+      break;
+    case COD_AND:
+      sprintf(buf+strlen(buf),"%s",SVG_SIMBOLO_AND);
+      break;
+    case COD_OR:
+      sprintf(buf+strlen(buf),"%s",SVG_SIMBOLO_OR);
       break;
   }
   return buf;
@@ -391,7 +348,7 @@ char* showCOD_ascii(char* buf, int COD_OP) {
 char* show_ascii(char* buf, Formula f) {
   Formula aux = f;
 
-  if(aux->not == NEGADO)sprintf(buf+strlen(buf),"%s",SIMBOLO_NOT);
+  if(aux->not == NEGADO)sprintf(buf+strlen(buf),"%s",ASCII_SIMBOLO_NOT);
   sprintf(buf+strlen(buf),"(");
   if(aux->f1 != NULL) { //Existe formula izquierda
     show_ascii(buf,aux->f1);
@@ -411,7 +368,7 @@ char* show_ascii(char* buf, Formula f) {
   while(aux->sig != NULL){
 		aux = aux->sig;
 
-    if(aux->not == NEGADO)sprintf(buf+strlen(buf),"%s",SIMBOLO_NOT);
+    if(aux->not == NEGADO)sprintf(buf+strlen(buf),"%s",ASCII_SIMBOLO_NOT);
     sprintf(buf+strlen(buf),"(");
     if(aux->f1 != NULL) { //Existe formula izquierda
       show_ascii(buf,aux->f1);
@@ -432,12 +389,48 @@ char* show_ascii(char* buf, Formula f) {
   return buf;
 }
 
-//Imprime un tableaux
-void showTableaux(Tableaux t) {
-  show(t->f);
-  printf("\n");
-  if(t->ti != NULL)showTableaux(t->ti);
-  if(t->td != NULL)showTableaux(t->td);
+char* show_svg(char* buf, Formula f) {
+  Formula aux = f;
+
+  if(aux->not == NEGADO)sprintf(buf+strlen(buf),"%s",SVG_SIMBOLO_NOT);
+  sprintf(buf+strlen(buf),"(");
+  if(aux->f1 != NULL) { //Existe formula izquierda
+    show_svg(buf,aux->f1);
+    showCOD_svg(buf,aux->COD_OP);
+    if(aux->f2 != NULL)show_svg(buf,aux->f2); //Existe formula derecha
+    else if(aux->a2 != NULL)showAtomo_svg(buf,aux->a2); //No existe formula derecha
+  }
+  else { //No existe formula izquierda
+    if(aux->a1 == NULL)printf("ERROR: a1 es nulo\n");
+    showAtomo_svg(buf,aux->a1);
+    showCOD_svg(buf,aux->COD_OP);
+    if(aux->f2 != NULL)show_svg(buf,aux->f2); //Existe formula derecha
+    else if(aux->a2 != NULL)showAtomo_svg(buf,aux->a2); //No existe formula derecha
+  }
+  sprintf(buf+strlen(buf),")");
+
+  while(aux->sig != NULL){
+		aux = aux->sig;
+
+    if(aux->not == NEGADO)sprintf(buf+strlen(buf),"%s",SVG_SIMBOLO_NOT);
+    sprintf(buf+strlen(buf),"(");
+    if(aux->f1 != NULL) { //Existe formula izquierda
+      show_svg(buf,aux->f1);
+      showCOD_svg(buf,aux->COD_OP);
+      if(aux->f2 != NULL)show_svg(buf,aux->f2); //Existe formula derecha
+      else if(aux->a2 != NULL)showAtomo_svg(buf,aux->a2); //No existe formula derecha
+    }
+    else { //No existe formula izquierda
+      if(aux->a1 == NULL)printf("ERROR: a1 es nulo\n");
+      showAtomo_svg(buf,aux->a1);
+      showCOD_svg(buf,aux->COD_OP);
+      if(aux->f2 != NULL)show_svg(buf,aux->f2); //Existe formula derecha
+      else if(aux->a2 != NULL)showAtomo_svg(buf,aux->a2); //No existe formula derecha
+    }
+    sprintf(buf+strlen(buf),")");
+  }
+
+  return buf;
 }
 
 //FIN Funciones IMPRIMIR

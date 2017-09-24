@@ -42,8 +42,7 @@ Formula NegarFormula(Formula f);
 Formula Unir(Formula f1,int operador,Formula f2);
 Formula Concatenar(Formula f1,Formula f2);
 void ResolverTableaux(Formula oracion);
-char* show_ascii(char* buf, Formula f);
-void show(Formula f);
+char* show_svg(char* buf, Formula f);
 void LiberarAtomo(Atomo a);
 
 #endif

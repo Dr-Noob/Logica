@@ -21,11 +21,19 @@ static const char* NOMBRE_ARCHIVO = "sol.svg";
 
 static const char* SIMBOLO_ABIERTO = "&#10004;";
 static const char* SIMBOLO_CERRADO = "&#10008;";
-static const char* SIMBOLO_AND = " &#8743; ";
-static const char* SIMBOLO_OR = " &#8744; ";
-static const char* SIMBOLO_IMP = " &#8594; ";
-static const char* SIMBOLO_DIMP = " &#8596; ";
-static const char* SIMBOLO_NOT = "&#172;";
+
+static const char* SVG_SIMBOLO_AND = " &#8743; ";
+static const char* SVG_SIMBOLO_OR = " &#8744; ";
+static const char* SVG_SIMBOLO_IMP = " &#8594; ";
+static const char* SVG_SIMBOLO_DIMP = " &#8596; ";
+static const char* SVG_SIMBOLO_NOT = "&#172;";
+
+static const char* ASCII_SIMBOLO_AND = " ^ ";
+static const char* ASCII_SIMBOLO_OR = " v ";
+static const char* ASCII_SIMBOLO_IMP = " -> ";
+static const char* ASCII_SIMBOLO_DIMP = " <-> ";
+static const char* ASCII_SIMBOLO_NOT = "~";
+
 static const float PIXELES_POR_CARACTER = 7.2025;
 
 void showTableauxSVG(Tableaux t, FILE *fich);
