@@ -8,7 +8,7 @@
 #define RESET "\x1b[0m"
 
 int yylex (void);
-void yyerror (char *s);
+void yyerror (FILE *fich, const char *msg);
 extern int yylineno;
 /*Para debug*/
 //#define YYDEBUG 1
@@ -21,7 +21,7 @@ extern int yylineno;
 	Formula formula;
 }
 
-
+%parse-param {FILE *fich}
 %token LPAREN RPAREN AND OR NOT IMP DIMP COMA END_OF_FILE
 %token <a> ATOM
 
@@ -38,7 +38,7 @@ extern int yylineno;
 oracion : e END_OF_FILE
 		{
 			printf(GREEN "La expresion se ha reconocido correctamente\n" RESET);
-			ResolverTableaux($1);
+			ResolverTableaux($1,fich);
 			return 0;
 		};
 
@@ -89,7 +89,7 @@ d: n
 
 n: NOT n
 		{
-			$$= NegarFormula($2);
+			$$ = NegarFormula($2);
 		}
 	| g
 		{
@@ -108,6 +108,6 @@ g: LPAREN e RPAREN
 
 %%
 
-void yyerror(char* s) {
+void yyerror (FILE *fich, const char *msg) {
 	printf(RED "ERROR: Error sintactico. Por favor, revisa la formula\n" RESET);
 }

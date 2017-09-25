@@ -216,8 +216,8 @@ SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int nivel,Nodo n
 
   if(t->ti != NULL && t->td != NULL)AjustarHijos(s,nivel,nodos);
 
-	char *buffer = malloc(sizeof(char)*MAX_CHARR);
-	memset(buffer,0,sizeof(sizeof(char)*MAX_CHARR));
+	char *buffer = malloc(sizeof(char)*MAX_CHAR);
+	memset(buffer,0,sizeof(char)*MAX_CHAR);
 	s->formula = show_svg(buffer,t->f);
 	int caracteres = nCaracteres(buffer);
 	s->centro = (caracteres/2)*PIXELES_POR_CARACTER;

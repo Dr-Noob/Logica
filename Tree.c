@@ -50,17 +50,17 @@ asciinode * build_ascii_tree_recursive(Tree * t) {
 
   if (t == NULL) return NULL;
 
-  node = malloc(sizeof(asciinode));
+  node = malloc(sizeof(struct asciinode_struct));
   node->color = t->color;
   node->left = build_ascii_tree_recursive(t->left);
   node->right = build_ascii_tree_recursive(t->right);
-	node->label = malloc(sizeof(char)*MAX_CHARR);
-	memset(node->label,0,sizeof(char)*MAX_CHARR);
-	
+  node->label = malloc(sizeof(char)*MAX_CHAR);
+	memset(node->label,0,sizeof(char)*MAX_CHAR);
+
   if (node->left != NULL)node->left->parent_dir = -1;
   if (node->right != NULL)node->right->parent_dir = 1;
 
-  sprintf(node->label, "%s", t->element);
+  strcpy(node->label,t->element);
   node->lablen = strlen(node->label);
 
   return node;
@@ -79,6 +79,7 @@ void free_ascii_tree(asciinode *node) {
   if (node == NULL) return;
   free_ascii_tree(node->left);
   free_ascii_tree(node->right);
+  free(node->label);
   free(node);
 }
 

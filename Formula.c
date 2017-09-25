@@ -437,8 +437,8 @@ char* show_svg(char* buf, Formula f) {
 
 //Funcion recursiva que devuelve el 'tree' correspondiende al tableaux 't'
 Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
-  char *buffer = malloc(sizeof(char)*MAX_CHARR);
-  memset(buffer,0,sizeof(char)*MAX_CHARR);
+  char *buffer = malloc(sizeof(char)*MAX_CHAR);
+  memset(buffer,0,sizeof(char)*MAX_CHAR);
   tree = malloc (sizeof (struct Tree));
   memset(tree,0,sizeof (struct Tree));
   tree->element = show_ascii(buffer,t->f);
@@ -867,30 +867,40 @@ void dobleImpNegado(Tableaux t,int busqueda) {
 }
 //FIN_Funciones para resolver beta formulas
 
-int MAX_CHARR;
+int MAX_CHAR;
 
-int LongitudCaracteres(Formula f) {
-	Formula tmp = f;
-	int len = ;
-	
-	while(tmp->sig != NULL) {
-		if(SoloTieneUnAtomo(tmp))f++;
-		else f+=3;
-		tmp = tmp->sig;
-	}
-	
-	return len;
+int LongitudCaracteres(FILE *fichero) {
+  int c;
+  int count = 0;
+
+  while(c != EOF && c != '\n') {
+    c = fgetc(fichero);
+    count++;
+  }
+
+  return count;
 }
 
-void ResolverTableaux(Formula oracion) {
-  MAX_CHARR=LongitudCaracteres(oracion)*3;
-  printf("Tiene %d\n",LongitudCaracteres(oracion));
+void ResolverTableaux(Formula oracion, FILE* fichero) {
+  rewind(fichero);
+  MAX_CHAR = LongitudCaracteres(fichero)*4;
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
-  printf("Solucion: \n\n\n");
-  showTableauxTree(t);
+  printf("\n");
 
-  printf("\n\n\n");
+  //Comprobar que el arbol va a caber en la terminal
+  //Si se ha especificado, aumentar MAX_HEIGHT en Tree.h(hacer como con MAX_CHAR)
+  if(MAX_CHAR > DIRTY_OUTPUT_CHARS) {
+    printf("El arbol es demasiado grande para dibujarlo por la salida estandar\n");
+    printf("Si aun asi quieres dibujarlo, especificalo en el fichero\n");
+  }
+  else {
+    printf("Solucion: \n\n\n");
+    showTableauxTree(t);
+    printf("\n\n");
+  }
+  printf("\n");
+
   if(TableauxCerrado(t))printf(RED "El tableaux esta cerrado\n" RESET "La expresion inicial es insatisfacible\n");
   else printf(GREEN "El tableaux esta abierto\n" RESET "La expresion inicial es satisfacible\n");
 

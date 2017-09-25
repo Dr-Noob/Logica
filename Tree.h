@@ -12,7 +12,9 @@
 #define GREEN "\x1b[32;1m"
 #define RESET "\x1b[0m"
 
-extern int MAX_CHARR;
+#define DIRTY_OUTPUT_CHARS 45
+
+extern int MAX_CHAR;
 
 typedef struct Tree Tree;
 typedef struct asciinode_struct asciinode;
