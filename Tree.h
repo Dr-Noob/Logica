@@ -2,7 +2,6 @@
 #define __Tree__
 
 #define MAX_HEIGHT 1000
-#define MAX_CHAR 200
 #define INFINITY (1<<20)
 
 #define COLOR_DEFAULT   0
@@ -12,6 +11,8 @@
 #define RED "\x1b[31;1m"
 #define GREEN "\x1b[32;1m"
 #define RESET "\x1b[0m"
+
+extern int MAX_CHARR;
 
 typedef struct Tree Tree;
 typedef struct asciinode_struct asciinode;
@@ -33,7 +34,7 @@ struct asciinode_struct {
 
   //-1=I am left, 0=I am root, 1=right
   int parent_dir;
-  char label[MAX_CHAR];
+  char *label;
   int color;
 };
 

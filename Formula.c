@@ -437,8 +437,8 @@ char* show_svg(char* buf, Formula f) {
 
 //Funcion recursiva que devuelve el 'tree' correspondiende al tableaux 't'
 Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
-  char *buffer = malloc(sizeof(char)*MAX_CHAR);
-  memset(buffer,0,sizeof(char)*MAX_CHAR);
+  char *buffer = malloc(sizeof(char)*MAX_CHARR);
+  memset(buffer,0,sizeof(char)*MAX_CHARR);
   tree = malloc (sizeof (struct Tree));
   memset(tree,0,sizeof (struct Tree));
   tree->element = show_ascii(buffer,t->f);
@@ -867,7 +867,24 @@ void dobleImpNegado(Tableaux t,int busqueda) {
 }
 //FIN_Funciones para resolver beta formulas
 
+int MAX_CHARR;
+
+int LongitudCaracteres(Formula f) {
+	Formula tmp = f;
+	int len = ;
+	
+	while(tmp->sig != NULL) {
+		if(SoloTieneUnAtomo(tmp))f++;
+		else f+=3;
+		tmp = tmp->sig;
+	}
+	
+	return len;
+}
+
 void ResolverTableaux(Formula oracion) {
+  MAX_CHARR=LongitudCaracteres(oracion)*3;
+  printf("Tiene %d\n",LongitudCaracteres(oracion));
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
   printf("Solucion: \n\n\n");

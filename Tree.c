@@ -54,7 +54,9 @@ asciinode * build_ascii_tree_recursive(Tree * t) {
   node->color = t->color;
   node->left = build_ascii_tree_recursive(t->left);
   node->right = build_ascii_tree_recursive(t->right);
-
+	node->label = malloc(sizeof(char)*MAX_CHARR);
+	memset(node->label,0,sizeof(char)*MAX_CHARR);
+	
   if (node->left != NULL)node->left->parent_dir = -1;
   if (node->right != NULL)node->right->parent_dir = 1;
 
