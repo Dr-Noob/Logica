@@ -877,13 +877,13 @@ int MAX_CHAR;
 int MAX_NIVELES;
 
 int LongitudCaracteres(FILE *fichero) {
-  int c;
+  int c = 0;
   int count = 0;
 
-  while(c != EOF && c != '\n') {
+  do {
     c = fgetc(fichero);
     count++;
-  }
+  } while(c != EOF && c != '\n');
 
   return count;
 }
@@ -947,4 +947,5 @@ void ResolverTableaux(Formula oracion, FILE* fichero) {
 	}
 
   LiberarTableaux(t);
+  LiberarTableauxInfo(tinf);
 }
