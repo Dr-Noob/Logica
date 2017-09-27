@@ -29,6 +29,9 @@ typedef struct FormulaRep *Formula;
 struct TableauxRep;
 typedef struct TableauxRep *Tableaux;
 
+struct TableauxInfo;
+typedef struct TableauxInfo *TableauxInfo;
+
 struct TableauxRep {
   Formula f;
   Tableaux ti; //Tableaux izquierdo

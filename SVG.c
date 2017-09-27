@@ -9,7 +9,7 @@ struct SVG {
 struct SVG_data {
 	int x;
 	int y;
-	float xmax;
+	int xmax;
 	int color;
 	float centro;
 	char* formula;
@@ -233,13 +233,10 @@ SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int nivel,Nodo n
 		s->x = offset;
 		offset += INCX;
 	}
-	else if (t->td != NULL) {
-		//s->x = s->hi->x + (s->hd->x - s->hi->x)/2;
-		s->x = (s->hi->x + s->hd->xmax-caracteres*PIXELES_POR_CARACTER)/2;
-	}
+	else if (t->td != NULL)s->x = (s->hi->x + s->hd->xmax-caracteres*PIXELES_POR_CARACTER)/2;
 	else s->x = s->hi->x+(s->hi->centro-s->centro);
 
-  s->xmax = s->x+caracteres*PIXELES_POR_CARACTER;
+  s->xmax = s->x+caracteres*(int)PIXELES_POR_CARACTER;
 	return s;
 }
 

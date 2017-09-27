@@ -12,11 +12,13 @@ typedef struct NodoRep *Nodo;
 typedef struct PuntoRep *Punto;
 
 #define ALTURA_CARACTER 15
-#define MAX_NIVELES 50
 #define INCY 140 //Incremento y
-#define INCX 100 //Incremento x
+#define INCX 300 //Incremento x
 #define YI 50 //y inicial
 #define XI 50 //x inicial
+
+extern int MAX_NIVELES;
+
 static const char* NOMBRE_ARCHIVO = "sol.svg";
 
 static const char* SIMBOLO_ABIERTO = "&#10004;";

@@ -16,6 +16,11 @@ struct FormulaRep {
   struct FormulaRep *sig; //Siguiente formula
 };
 
+struct TableauxInfo {
+  int nodos;
+  int niveles;
+};
+
 Formula CrearFormula(Atomo a) {
 	Formula f = malloc(sizeof(struct FormulaRep));
   memset(f,0,sizeof(struct FormulaRep));
@@ -867,7 +872,9 @@ void dobleImpNegado(Tableaux t,int busqueda) {
 }
 //FIN_Funciones para resolver beta formulas
 
+//Declaracion de variables globales para tamano de los arrays
 int MAX_CHAR;
+int MAX_NIVELES;
 
 int LongitudCaracteres(FILE *fichero) {
   int c;
@@ -881,16 +888,42 @@ int LongitudCaracteres(FILE *fichero) {
   return count;
 }
 
+TableauxInfo CrearTableauxInfo() {
+  TableauxInfo tinf = malloc(sizeof(struct TableauxInfo));
+  memset(tinf,0,sizeof(struct TableauxInfo));
+  return tinf;
+}
+
+void LiberarTableauxInfo(TableauxInfo tinf) {
+  free(tinf);
+}
+
+void CalcularTableauxInfoRecursivo(Tableaux t, TableauxInfo tinf, int nivel) {
+  tinf->nodos++;
+  if(nivel > tinf->niveles)tinf->niveles = nivel;
+  if(t->ti != NULL)CalcularTableauxInfoRecursivo(t->ti,tinf,nivel+1);
+  if(t->td != NULL)CalcularTableauxInfoRecursivo(t->td,tinf,nivel+1);
+}
+
+TableauxInfo CalcularTableauxInfo(Tableaux t) {
+  TableauxInfo tinf = CrearTableauxInfo();
+  tinf->nodos = 1;
+  if(t->ti != NULL)CalcularTableauxInfoRecursivo(t->ti,tinf,2);
+  if(t->td != NULL)CalcularTableauxInfoRecursivo(t->td,tinf,2);
+  return tinf;
+}
+
 void ResolverTableaux(Formula oracion, FILE* fichero) {
   rewind(fichero);
   MAX_CHAR = LongitudCaracteres(fichero)*4;
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
-  printf("\n");
+  TableauxInfo tinf = CalcularTableauxInfo(t);
+  MAX_NIVELES = tinf->niveles;
 
   //Comprobar que el arbol va a caber en la terminal
   //Si se ha especificado, aumentar MAX_HEIGHT en Tree.h(hacer como con MAX_CHAR)
-  if(MAX_CHAR > DIRTY_OUTPUT_CHARS) {
+  if(tinf->nodos > DIRTY_OUTPUT_NODES) {
     printf("El arbol es demasiado grande para dibujarlo por la salida estandar\n");
     printf("Si aun asi quieres dibujarlo, especificalo en el fichero\n");
   }

@@ -12,7 +12,7 @@
 #define GREEN "\x1b[32;1m"
 #define RESET "\x1b[0m"
 
-#define DIRTY_OUTPUT_CHARS 45
+#define DIRTY_OUTPUT_NODES 30
 
 extern int MAX_CHAR;
 

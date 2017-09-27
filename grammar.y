@@ -109,5 +109,5 @@ g: LPAREN e RPAREN
 %%
 
 void yyerror (FILE *fich, const char *msg) {
-	printf(RED "ERROR: Error sintactico. Por favor, revisa la formula\n" RESET);
+	printf(RED "ERROR: Error semantico. Por favor, revisa la formula\n" RESET);
 }
