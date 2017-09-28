@@ -22,9 +22,10 @@ struct NodoRep {
 	Nodo sig;
 };
 
-struct PuntoRep {
-	int x;
-	int y;
+struct CoordenadasRep {
+	int xmax;
+	int ymax;
+	int xmin;
 };
 
 int offset = XI;
@@ -48,26 +49,29 @@ void LiberarNodo(Nodo n) {
 	free(n);
 }
 
-Punto MaxMinRecursivo(SVG_data *s, Punto p) {
-		if(s->hi != NULL)MaxMinRecursivo(s->hi,p);
-		if(s->hd != NULL)MaxMinRecursivo(s->hd,p);
+Coordenadas MaxMinRecursivo(SVG_data *s, Coordenadas c,SVG_data ** nodos,int i) {
+		nodos[i] = s;
+		i++;
+		if(s->hi != NULL)MaxMinRecursivo(s->hi,c,nodos,i);
+		if(s->hd != NULL)MaxMinRecursivo(s->hd,c,nodos,i);
 
-		if((int)s->xmax > p->x)p->x = (int)s->xmax;
-		if(s->y > p->y)p->y = s->y;
-		return p;
+		if(s->xmax > c->xmax)c->xmax = s->xmax;
+		if(s->y > c->ymax)c->ymax = s->y;
+		if(s->x < XI || s->x < c->xmin)c->xmin = s->x;
+		return c;
 }
 
-Punto MaxMin(SVG_data *s) {
-		Punto p = malloc(sizeof(Punto));
-		memset(p,0,sizeof(Punto));
-		p->x = 0;
-		p->y = 0;
-		p = MaxMinRecursivo(s,p);
-		return p;
+Coordenadas MaxMin(SVG_data *s,SVG_data ** nodos) {
+		int i = 0;
+		Coordenadas c = malloc(sizeof(struct CoordenadasRep));
+		memset(c,0,sizeof(struct CoordenadasRep));
+		c->xmin = XI;
+		c = MaxMinRecursivo(s,c,nodos,i);
+		return c;
 }
 
-void LiberarPunto(Punto p) {
-	free(p);
+void LiberarCoordenadas(Coordenadas c) {
+	free(c);
 }
 
 
@@ -103,14 +107,28 @@ void print_svg_recursivo(SVG_data *s,FILE *fich) {
 	}
 }
 
-void print_svg(SVG *s, FILE *fich) {
-	Punto p = MaxMin(s->data);
+//Correccion del arbol en el caso de que se mueva a la izquierda al haber
+//continuamente ramas verticales con distinto tamano(a and a and a and ...)
+void AjustarDerecha(Coordenadas c, SVG_data ** nodos,int nNodos) {
+	int dif = XI - c->xmin;
+	if(c->xmin < XI) {
+		for(int i=0;i<nNodos;i++) {
+			nodos[i]->x += dif;
+			nodos[i]->xmax += dif;
+		}
+		c->xmax += dif;
+	}
+}
+
+void print_svg(SVG *s, FILE *fich, SVG_data ** nodos, int nNodos) {
+	Coordenadas c = MaxMin(s->data,nodos);
+	AjustarDerecha(c,nodos,nNodos);
 	fprintf(fich,"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n");
-	fprintf(fich,"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"%d\" height=\"%d\">\n",p->x + XI,p->y + (int)PIXELES_POR_CARACTER + YI);
-	fprintf(fich,"<rect width=\"%d\" height=\"%d\" fill=\"white\">\n</rect>\n",p->x + XI,p->y + (int)PIXELES_POR_CARACTER + YI);
+	fprintf(fich,"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"%d\" height=\"%d\">\n",c->xmax + XI,c->ymax + (int)PIXELES_POR_CARACTER + YI);
+	fprintf(fich,"<rect width=\"%d\" height=\"%d\" fill=\"white\">\n</rect>\n",c->xmax + XI,c->ymax + (int)PIXELES_POR_CARACTER + YI);
 	print_svg_recursivo(s->data,fich);
 	fprintf(fich,"</svg>\n");
-	LiberarPunto(p);
+	LiberarCoordenadas(c);
 }
 
 // FIN Funciones para imprimir
@@ -249,8 +267,13 @@ SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t)  {
   return s;
 }
 
-void showTableauxSVG(Tableaux t, FILE *fich) {
+void showTableauxSVG(Tableaux t, FILE *fich, int nNodos) {
 	SVG *s = CrearSVGDesdeTableaux(s,t);
-	print_svg(s,fich);
+	SVG_data ** nodos = malloc(sizeof(struct SVG_data*)+sizeof(struct SVG_data*)*nNodos);
+	memset(nodos,0,sizeof(struct SVG_data*)*nNodos);
+
+	print_svg(s,fich,nodos,nNodos);
+
 	LiberarSVG(s);
+	free(nodos);
 }

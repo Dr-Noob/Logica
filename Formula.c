@@ -2,7 +2,7 @@
 #include "SVG.h"
 
 struct AtomoRep {
-  char id; //Identificador
+  char id; //Identifica#include <locale.h>dor
   int not; //NEGADO-> el atomo va negado, SIN_NEGAR-> no va negado
 };
 
@@ -942,7 +942,7 @@ void ResolverTableaux(Formula oracion, FILE* fichero) {
 		printf(RED "ERROR: El archivo %s no ha podido abrirse\n" RESET, NOMBRE_ARCHIVO);
 		printf(RED "No se genera el SVG" RESET);
 	} else {
-		showTableauxSVG(t,fich);
+		showTableauxSVG(t,fich,tinf->nodos);
     fclose(fich);
 	}
 

@@ -10,7 +10,7 @@
 typedef struct SVG_data SVG_data;
 typedef struct SVG SVG;
 typedef struct NodoRep *Nodo;
-typedef struct PuntoRep *Punto;
+typedef struct CoordenadasRep *Coordenadas;
 
 #define ALTURA_CARACTER 15
 #define INCY 140 //Incremento y
@@ -39,6 +39,6 @@ static const char* ASCII_SIMBOLO_NOT = "~";
 
 static const float PIXELES_POR_CARACTER = 7.2025;
 
-void showTableauxSVG(Tableaux t, FILE *fich);
+void showTableauxSVG(Tableaux t, FILE *fich, int nNodos);
 
 #endif

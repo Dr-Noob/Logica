@@ -1,9 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-#define RED "\x1b[31;1m"
-#define RESET "\x1b[0m"
+#include "Global.h"
 
 extern char *yytext;
 extern int  yyleng;
