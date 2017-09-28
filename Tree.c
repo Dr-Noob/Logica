@@ -213,6 +213,6 @@ void print_ascii_tree(Tree * t) {
 	  printf("\n");
   }
 
-  if (proot->height >= MAX_HEIGHT)printf("(This tree is taller than %d, and may be drawn incorrectly.)\n", MAX_HEIGHT);
+  if (proot->height >= MAX_HEIGHT)printMsg(MESSAGE_ARBOL_MUY_GRANDE,MAX_HEIGHT);
   free_ascii_tree(proot);
 }

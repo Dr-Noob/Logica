@@ -11,14 +11,15 @@ extern int yylex();
 
 int main( int argc, char* argv[] ) {
 	int yyret = 0;
+	getLang();
 	if (argc != 2) {
-		printf(RED "ERROR: Tableaux necesita al menos un argumento(el archivo donde se encuentra la formula)\n" RESET);
+		printMsgRed(MESSAGE_ARGS_MAIN);
 		return 1;
 	}
 	char* nombre = argv[1];
 	FILE *fich = fopen(nombre,"r");
 	if (fich==NULL) {
-		printf(RED "ERROR: El archivo %s no ha podido abrirse\n" RESET, nombre);
+		printMsgRed(MESSAGE_ABRIR_ARCHIVO_FALLIDO, nombre);
 		return 1;
 	}
 	yyin = fich;

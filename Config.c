@@ -47,7 +47,7 @@ Match Groups(Match m,char* source,char* groupText, regmatch_t* pmatch) {
   groupText[pmatch[2].rm_eo] = 0;
 
   if(strlen(groupText+pmatch[2].rm_so) > MAX_CHARS) {
-    printf("ERROR: Specified a token larger than %d(%s)\n",MAX_CHARS,source);
+    printMsgRed(MESSAGE_TOKEN_DEMASIADO_LARGO,MAX_CHARS,source);
     freeMatch(m);
     return NULL;
   }
@@ -86,7 +86,7 @@ Match getMatch(char* source, regex_t regexs[N_WORDS]) {
   if (!reti) return Groups(m,source,groupText,pmatch);
   else if (reti != REG_NOMATCH) { //regex match failed
     regerror(reti, &regexs[0], msgbuf, sizeof(msgbuf));
-    fprintf(stderr, "Regex match failed: %s\n", msgbuf);
+    printMsgRed(MESSAGE_REGEX_MATCH_FALLIDO,msgbuf);
     freeMatch(m);
     return NULL;
   }
@@ -96,7 +96,7 @@ Match getMatch(char* source, regex_t regexs[N_WORDS]) {
   if (!reti) return Groups(m,source,groupText,pmatch);
   else if (reti != REG_NOMATCH) {
     regerror(reti, &regexs[1], msgbuf, sizeof(msgbuf));
-    fprintf(stderr, "Regex match failed: %s\n", msgbuf);
+    printMsgRed(MESSAGE_REGEX_MATCH_FALLIDO,msgbuf);
     freeMatch(m);
     return NULL;
   }
@@ -106,7 +106,7 @@ Match getMatch(char* source, regex_t regexs[N_WORDS]) {
   if (!reti) return Groups(m,source,groupText,pmatch);
   else if (reti != REG_NOMATCH) {
     regerror(reti, &regexs[2], msgbuf, sizeof(msgbuf));
-    fprintf(stderr, "Regex match failed: %s\n", msgbuf);
+    printMsgRed(MESSAGE_REGEX_MATCH_FALLIDO,msgbuf);
     freeMatch(m);
     return NULL;
   }
@@ -116,7 +116,7 @@ Match getMatch(char* source, regex_t regexs[N_WORDS]) {
   if (!reti) return Groups(m,source,groupText,pmatch);
   else if (reti != REG_NOMATCH) {
     regerror(reti, &regexs[3], msgbuf, sizeof(msgbuf));
-    fprintf(stderr, "Regex match failed: %s\n", msgbuf);
+    printMsgRed(MESSAGE_REGEX_MATCH_FALLIDO,msgbuf);
     freeMatch(m);
     return NULL;
   }
@@ -126,12 +126,12 @@ Match getMatch(char* source, regex_t regexs[N_WORDS]) {
   if (!reti) return Groups(m,source,groupText,pmatch);
   else if (reti != REG_NOMATCH) {
     regerror(reti, &regexs[4], msgbuf, sizeof(msgbuf));
-    fprintf(stderr, "Regex match failed: %s\n", msgbuf);
+    printMsgRed(MESSAGE_REGEX_MATCH_FALLIDO,msgbuf);
     freeMatch(m);
     return NULL;
   }
 
-  printf("ERROR: La linea '%s' es incorrecta\n",source);
+  printf(MESSAGE_LINEA_INCORRECTA,source);
   freeMatch(m);
   return NULL;
 }
@@ -150,31 +150,31 @@ TablaTokens GenerarTabla(FILE *fich) {
 
   ret = regcomp(&regexs[0], "^(and)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
-      fprintf(stderr, "Could not compile and regex\n");
+      printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return NULL;
   }
 
   ret = regcomp(&regexs[1], "^(or)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
-      fprintf(stderr, "Could not compile or regex\n");
+      printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return NULL;
   }
 
   ret = regcomp(&regexs[2], "^(not)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
-      fprintf(stderr, "Could not compile not regex\n");
+      printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return NULL;
   }
 
   ret = regcomp(&regexs[3], "^(imp)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
-      fprintf(stderr, "Could not compile imp regex\n");
+      printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return NULL;
   }
 
   ret = regcomp(&regexs[4], "^(dimp)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
-      fprintf(stderr, "Could not compile dimp regex\n");
+      printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return NULL;
   }
 
@@ -200,7 +200,7 @@ TablaTokens GenerarTabla(FILE *fich) {
     while(i < N_WORDS) {
       if(strcmp(m->id,WORDS[i]) == 0) {
         if(tokenSet[i]) {
-          printf("ERROR: El token '%s' ya habia sido especificado como '%s'\n",WORDS[i],t->tokens[i]);
+          printMsgRed(MESSAGE_TOKEN_YA_ESPECIFICADO,WORDS[i],t->tokens[i]);
           LiberarTodo(regexs,line,t,m);
           return NULL;
         }
@@ -216,58 +216,6 @@ TablaTokens GenerarTabla(FILE *fich) {
       LiberarTodo(regexs,line,t,m);
       return NULL;
     }
-    /*
-    if(strcmp(m->id,WORDS[0]) == 0) {
-      if(tokenSet[0]) {
-        printf("ERROR: El token '%s' ya habia sido especificado como '%s'\n",WORDS[0],t->and);
-        LiberarTodo(regexs,line,t,m);
-        return NULL;
-      }
-      tokenSet[0] = BOOLEAN_TRUE;
-      strcpy(t->and,m->string);
-    }
-    else if(strcmp(m->id,WORDS[1]) == 0) {
-      if(tokenSet[1]) {
-        printf("ERROR: El token '%s' ya habia sido especificado como '%s'\n",WORDS[1],t->or);
-        LiberarTodo(regexs,line,t,m);
-        return NULL;
-      }
-      tokenSet[1] = BOOLEAN_TRUE;
-      strcpy(t->or,m->string);
-    }
-    else if(strcmp(m->id,WORDS[2]) == 0) {
-      if(tokenSet[2]) {
-        printf("ERROR: El token '%s' ya habia sido especificado como '%s'\n",WORDS[2],t->not);
-        LiberarTodo(regexs,line,t,m);
-        return NULL;
-      }
-      tokenSet[2] = BOOLEAN_TRUE;
-      strcpy(t->not,m->string);
-    }
-    else if(strcmp(m->id,WORDS[3]) == 0) {
-      if(tokenSet[3]) {
-        printf("ERROR: El token '%s' ya habia sido especificado como '%s'\n",WORDS[3],t->imp);
-        LiberarTodo(regexs,line,t,m);
-        return NULL;
-      }
-      tokenSet[3] = BOOLEAN_TRUE;
-      strcpy(t->imp,m->string);
-    }
-    else if(strcmp(m->id,WORDS[4]) == 0) {
-      if(tokenSet[4]) {
-        printf("ERROR: El token '%s' ya habia sido especificado como '%s'\n",WORDS[4],t->dimp);
-        LiberarTodo(regexs,line,t,m);
-        return NULL;
-      }
-      tokenSet[4] = BOOLEAN_TRUE;
-      strcpy(t->dimp,m->string);
-    }
-    else {
-      printf("ERROR\n");
-      LiberarTodo(regexs,line,t,m);
-      return NULL;
-    }
-    */
 
     freeMatch(m);
     read = getline(&line,&len,fich);
@@ -279,7 +227,7 @@ TablaTokens GenerarTabla(FILE *fich) {
 
   for(int i=0;i<N_WORDS;i++) { //Solo devolver la tabla si esta rellenada entera
     if(!tokenSet[i]) {
-      printf("ERROR: El token '%s' no ha sido especificado\n",WORDS[i]);
+      printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO,WORDS[i]);
       freeTablaTokens(t);
       return NULL;
     }

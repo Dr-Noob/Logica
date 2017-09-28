@@ -923,24 +923,27 @@ void ResolverTableaux(Formula oracion, FILE* fichero) {
 
   //Comprobar que el arbol va a caber en la terminal
   //Si se ha especificado, aumentar MAX_HEIGHT en Tree.h(hacer como con MAX_CHAR)
-  if(tinf->nodos > DIRTY_OUTPUT_NODES) {
-    printf("El arbol es demasiado grande para dibujarlo por la salida estandar\n");
-    printf("Si aun asi quieres dibujarlo, especificalo en el fichero\n");
-  }
+  if(tinf->nodos > DIRTY_OUTPUT_NODES) printMsg(MESSAGE_ARBOL_DEMASIADO_GRANDE);
   else {
-    printf("Solucion: \n\n\n");
+    printMsg(MESSAGE_SOLUCION);
     showTableauxTree(t);
     printf("\n\n");
   }
   printf("\n");
 
-  if(TableauxCerrado(t))printf(RED "El tableaux esta cerrado\n" RESET "La expresion inicial es insatisfacible\n");
-  else printf(GREEN "El tableaux esta abierto\n" RESET "La expresion inicial es satisfacible\n");
+  if(TableauxCerrado(t)) {
+    printMsgRed(MESSAGE_TABLEAUX_CERRADO);
+    printMsg(MESSAGE_TABLEAUX_INSTATISFACIBLE);
+  }
+  else {
+    printMsgGreen(MESSAGE_TABLEAUX_ABIERTO);
+    printMsg(MESSAGE_TABLEAUX_STATISFACIBLE);
+  }
 
   FILE *fich = fopen(NOMBRE_ARCHIVO,"w+");
   if (fich==NULL) {
-		printf(RED "ERROR: El archivo %s no ha podido abrirse\n" RESET, NOMBRE_ARCHIVO);
-		printf(RED "No se genera el SVG" RESET);
+		printMsgRed(MESSAGE_ABRIR_ARCHIVO_FALLIDO,NOMBRE_ARCHIVO);
+		printMsgRed(MESSAGE_NO_SVG);
 	} else {
 		showTableauxSVG(t,fich,tinf->nodos);
     fclose(fich);
