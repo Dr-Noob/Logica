@@ -11,7 +11,7 @@ void getLang() {
     LANG = ESP_LANG;
   }
   else {
-    if (strstr(tmp, ESP_LANG_STR) != NULL) {
+    if (strstr(tmp, ESP_LANG_STR1) != NULL || strstr(tmp, ESP_LANG_STR2) != NULL) {
         LANG = ESP_LANG;
     }
     else LANG = OTHER_LANG;
@@ -35,9 +35,7 @@ void printMsgRed(const char *fmt[2], ...) {
   va_start(args, fmt[0]);
   vsnprintf(buffer, sizeof(buffer), fmt[0], args);
   va_end(args);
-  fprintf(stderr,RED);
-  fprintf(stderr,buffer);
-  fprintf(stderr,RESET);
+  fprintf(stderr,RED "%s" RESET,buffer);
 }
 
 void printMsgGreen(const char *fmt[2], ...) {
@@ -47,7 +45,5 @@ void printMsgGreen(const char *fmt[2], ...) {
   va_start(args, fmt[0]);
   vsnprintf(buffer, sizeof(buffer), fmt[0], args);
   va_end(args);
-  fprintf(stderr,GREEN);
-  fprintf(stderr,buffer);
-  fprintf(stderr,RESET);
+  fprintf(stderr,GREEN "%s" RESET,buffer);
 }

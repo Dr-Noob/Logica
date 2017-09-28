@@ -10,7 +10,8 @@
 #define ESP_LANG              0
 #define OTHER_LANG            1
 
-static const char* ESP_LANG_STR = "es";
+static const char* ESP_LANG_STR1 = "es"; //Unix LANG
+static const char* ESP_LANG_STR2 = "Spanish"; //Windows
 extern int LANG;
 
 #ifdef _WIN32
