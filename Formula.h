@@ -1,11 +1,11 @@
 #ifndef __Formula__
 #define __Formula__
 
-#include "Tree.h"
-#include "Bool.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "Global.h"
+#include "Tree.h"
 
 #define VACIO         2
 #define CERRADO       3

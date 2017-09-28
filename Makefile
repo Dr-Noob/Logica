@@ -1,4 +1,4 @@
-tableaux : main.c lex.yy.c grammar.tab.c Formula.c Formula.h Tree.c Tree.h SVG.c SVG.h Makefile
+tableaux : main.c lex.yy.c grammar.tab.c Formula.c Formula.h Tree.c Tree.h SVG.c SVG.h Makefile Global.h
 	gcc main.c lex.yy.c grammar.tab.c Formula.c Tree.c SVG.c -lfl -fstack-protector-all -o tableaux -g
 
 lex.yy.c : lex.l

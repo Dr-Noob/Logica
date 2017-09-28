@@ -1,1 +1,1 @@
-o dimp not (r and s) or o, a dimp not (r or not b),(a and b) dimp (not s or b)
+o dimp not (r and s) or o, a dimp not (r or not b)

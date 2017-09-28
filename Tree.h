@@ -1,16 +1,13 @@
 #ifndef __Tree__
 #define __Tree__
 
+#include "Global.h"
 #define MAX_HEIGHT 1000
 #define INFINITY (1<<20)
 
 #define COLOR_DEFAULT   0
 #define COLOR_GREEN     1
 #define COLOR_RED       2
-
-#define RED "\x1b[31;1m"
-#define GREEN "\x1b[32;1m"
-#define RESET "\x1b[0m"
 
 #define DIRTY_OUTPUT_NODES 30
 

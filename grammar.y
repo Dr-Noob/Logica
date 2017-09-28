@@ -2,11 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "Formula.h"
-
-#define RED "\x1b[31;1m"
-#define GREEN "\x1b[32;1m"
-#define RESET "\x1b[0m"
-
+#include "Global.h"
 int yylex (void);
 void yyerror (FILE *fich, const char *msg);
 extern int yylineno;

@@ -1,10 +1,11 @@
 #ifndef __SVG__
 #define __SVG__
 
-#include "Formula.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "Global.h"
+#include "Formula.h"
 
 typedef struct SVG_data SVG_data;
 typedef struct SVG SVG;
