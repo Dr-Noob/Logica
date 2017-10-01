@@ -1,1 +1,9 @@
+or = ord
+and = and
+not = not
+dimp = dimp
+imp = imp
+
+
+
 o dimp not (r and s) or o, a dimp not (r or not b)

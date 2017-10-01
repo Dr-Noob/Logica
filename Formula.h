@@ -47,5 +47,6 @@ Formula Concatenar(Formula f1,Formula f2);
 void ResolverTableaux(Formula oracion, FILE* fich);
 char* show_svg(char* buf, Formula f);
 void LiberarAtomo(Atomo a);
+int lineas(FILE *fich);
 
 #endif

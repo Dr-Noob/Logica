@@ -913,8 +913,34 @@ TableauxInfo CalcularTableauxInfo(Tableaux t) {
   return tinf;
 }
 
+int lineas(FILE *fich) {
+  int ch = 0;
+  int count = 0;
+  int charsOnCurrentLine = 0;
+
+  while ((ch = fgetc(fich)) != EOF) {
+    if (ch == '\n') {
+        count++;
+        charsOnCurrentLine = 0;
+    } else {
+        charsOnCurrentLine++;
+    }
+  }
+  if (charsOnCurrentLine > 0)count++;
+  rewind(fich);
+  return count;
+}
+
 void ResolverTableaux(Formula oracion, FILE* fichero) {
+  //Dejar el puntero de fichero en la ultima linea
   rewind(fichero);
+  int i = 0;
+  int nlineas = lineas(fichero);
+  while(i < nlineas-1) {
+    if(fgetc(fichero) == '\n')i++;
+  }
+
+  //Calcular informacion y resolver
   MAX_CHAR = LongitudCaracteres(fichero)*4;
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);

@@ -1,7 +1,11 @@
 #include "Config.h"
 
+TablaTokens t;
+int nlineas;
+
 struct TablaTokens {
   char* tokens[N_WORDS];
+  int status;
 };
 
 struct Match {
@@ -10,17 +14,17 @@ struct Match {
 };
 
 TablaTokens CrearTablaTokens() {
-  TablaTokens t = malloc(sizeof(struct TablaTokens));
+  t = malloc(sizeof(struct TablaTokens));
 
   for(int i=0;i<N_WORDS;i++) {
     t->tokens[i] = malloc(sizeof(char)*MAX_CHARS);
     memset(t->tokens[i],0,sizeof(char)*MAX_CHARS);
   }
-
+  t->status = STATUS_CORRECTO;
   return t;
 }
 
-void print_TablaTokens(TablaTokens t) {
+void print_TablaTokens() {
     printf("and='%s'\n",t->tokens[0]);
     printf("or='%s'\n",t->tokens[1]);
     printf("not='%s'\n",t->tokens[2]);
@@ -28,7 +32,7 @@ void print_TablaTokens(TablaTokens t) {
     printf("dimp='%s'\n",t->tokens[4]);
 }
 
-void freeTablaTokens(TablaTokens t) {
+void freeTablaTokens() {
   if(t == NULL){ printf("Me piden liberar t que es nulo\n"); return; }
   for(int i=0;i<N_WORDS;i++) free(t->tokens[i]);
   free(t);
@@ -131,19 +135,23 @@ Match getMatch(char* source, regex_t regexs[N_WORDS]) {
     return NULL;
   }
 
-  printf(MESSAGE_LINEA_INCORRECTA,source);
+  printMsgRed(MESSAGE_LINEA_INCORRECTA,source);
   freeMatch(m);
   return NULL;
 }
 
-void LiberarTodo(regex_t regexs[N_WORDS],char* line,TablaTokens t,Match m) {
+void LiberarTodo(regex_t regexs[N_WORDS],char* line,Match m) {
   for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
   if(line)free(line);
-  freeTablaTokens(t);
   freeMatch(m);
 }
 
-TablaTokens GenerarTabla(FILE *fich) {
+void GenerarTabla(FILE *fich) {
+  nlineas = lineas(fich);
+  if(nlineas < 2) { //Analizar si hay al menos dos lineas
+    t->status = STATUS_VACIO;
+    return;
+  }
   int ret = 0;
 
   regex_t regexs[N_WORDS];
@@ -151,49 +159,58 @@ TablaTokens GenerarTabla(FILE *fich) {
   ret = regcomp(&regexs[0], "^(and)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
-      return NULL;
+      return;
   }
 
   ret = regcomp(&regexs[1], "^(or)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
-      return NULL;
+      return;
   }
 
   ret = regcomp(&regexs[2], "^(not)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
-      return NULL;
+      return;
   }
 
   ret = regcomp(&regexs[3], "^(imp)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
-      return NULL;
+      return;
   }
 
   ret = regcomp(&regexs[4], "^(dimp)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
-      return NULL;
+      return;
   }
 
-  TablaTokens t = CrearTablaTokens();
+  t = CrearTablaTokens();
   Match m = NULL;
   char* line = NULL;
   int tokenSet[N_WORDS];
   int i = 0;
+  int lineasleidas = 1;
   memset(tokenSet,BOOLEAN_FALSE,N_WORDS*sizeof(int));
   size_t len = 0;
   ssize_t read = getline(&line,&len,fich);
-  while(read != -1 && LineaVacia(line))read = getline(&line,&len,fich);
+  while(read != -1 && LineaVacia(line) && lineasleidas+1<nlineas) {
+    read = getline(&line,&len,fich);
+    lineasleidas++;
+  }
 
-  while(read != -1) {
+  while(read != -1 && lineasleidas+1<nlineas) {
     m = getMatch(line,regexs);
+    lineasleidas++;
 
     if(m == NULL) {
-      LiberarTodo(regexs,line,t,m);
-      return NULL;
+      for(int i=0;i<N_WORDS;i++) { //Reportar error de un token no especificado. Si todos lo estan, liberarlo todo
+        if(!tokenSet[i]) printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO,WORDS[i]);
+      }
+      LiberarTodo(regexs,line,m);
+      t->status = STATUS_INCORRECTO;
+      return;
     }
 
     i = 0;
@@ -201,8 +218,9 @@ TablaTokens GenerarTabla(FILE *fich) {
       if(strcmp(m->id,WORDS[i]) == 0) {
         if(tokenSet[i]) {
           printMsgRed(MESSAGE_TOKEN_YA_ESPECIFICADO,WORDS[i],t->tokens[i]);
-          LiberarTodo(regexs,line,t,m);
-          return NULL;
+          LiberarTodo(regexs,line,m);
+          t->status = STATUS_INCORRECTO;
+          return;
         }
         tokenSet[i] = BOOLEAN_TRUE;
         strcpy(t->tokens[i],m->string);
@@ -213,24 +231,103 @@ TablaTokens GenerarTabla(FILE *fich) {
 
     if(i == N_WORDS) {
       printf("ERROR\n");
-      LiberarTodo(regexs,line,t,m);
-      return NULL;
+      LiberarTodo(regexs,line,m);
+      t->status = STATUS_INCORRECTO;
+      return;
     }
 
     freeMatch(m);
     read = getline(&line,&len,fich);
-    while(read != -1 && LineaVacia(line))read = getline(&line,&len,fich);
+    while(read != -1 && LineaVacia(line) && lineasleidas+1<nlineas) {
+      read = getline(&line,&len,fich);
+      lineasleidas++;
+    }
+  }
+
+  if(!LineaVacia(line)) { //Solo analizar la penultima linea si no es vacia
+    m = getMatch(line,regexs);
+    if(m == NULL) {
+      for(int i=0;i<N_WORDS;i++) { //Reportar error de un token no especificado. Si todos lo estan, liberarlo todo
+        if(!tokenSet[i]) printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO,WORDS[i]);
+      }
+      LiberarTodo(regexs,line,m);
+      t->status = STATUS_INCORRECTO;
+      return;
+    }
+
+    i = 0;
+    while(i < N_WORDS) {
+      if(strcmp(m->id,WORDS[i]) == 0) {
+        if(tokenSet[i]) {
+          printMsgRed(MESSAGE_TOKEN_YA_ESPECIFICADO,WORDS[i],t->tokens[i]);
+          LiberarTodo(regexs,line,m);
+          t->status = STATUS_INCORRECTO;
+          return;
+        }
+        tokenSet[i] = BOOLEAN_TRUE;
+        strcpy(t->tokens[i],m->string);
+        i = N_WORDS+1;
+      }
+      i++;
+    }
+
+    if(i == N_WORDS) {
+      printf("ERROR\n");
+      LiberarTodo(regexs,line,m);
+      t->status = STATUS_INCORRECTO;
+      return;
+    }
+
+    freeMatch(m);
   }
 
   for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
   if(line)free(line);
 
-  for(int i=0;i<N_WORDS;i++) { //Solo devolver la tabla si esta rellenada entera
+  for(int i=0;i<N_WORDS;i++) { //Si la tabla no esta rellenada entera, liberarla, porque es invalida
     if(!tokenSet[i]) {
       printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO,WORDS[i]);
-      freeTablaTokens(t);
-      return NULL;
+      t->status = STATUS_INCORRECTO;
+      return;
     }
   }
-  return t;
+}
+
+int getCodigoDesdeIndice(int indice) {
+    switch (indice) {
+      case 0:
+        return AND;
+      case 1:
+        return OR;
+      case 2:
+        return NOT;
+      case 3:
+        return IMP;
+      case 4:
+        return DIMP;
+    }
+}
+
+int TablaCorrecta() {
+  if(t->status == STATUS_CORRECTO)return BOOLEAN_TRUE;
+  else return BOOLEAN_FALSE;
+}
+
+int getCodigoToken(char* token) {
+  //printf("getCodigoToken recibe %s\n",token);
+  if(t->status == STATUS_VACIO) { //No tener en cuenta la tabla
+    if(strcmp(token,WORDS[0]) == 0)return AND;
+    else if(strcmp(token,WORDS[1]) == 0)return OR;
+    else if(strcmp(token,WORDS[2]) == 0)return NOT;
+    else if(strcmp(token,WORDS[3]) == 0)return IMP;
+    else if(strcmp(token,WORDS[4]) == 0)return DIMP;
+    return -1;
+  }
+  else {
+    for(int i=0;i<N_WORDS;i++) {
+      if(strcmp(t->tokens[i],token) == 0)return getCodigoDesdeIndice(i);
+    }
+    printf("ERROR: No se ha especificado el token \"%s\" en el fichero de configuracion\n",token);
+    return -1;
+  }
 }
