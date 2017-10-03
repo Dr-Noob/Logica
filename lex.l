@@ -15,6 +15,7 @@ int error(int linea, int columna,char* yytext);
 letra  [a-z]
 
 %option yylineno
+%option noyywrap
 
 %%
 	/*Descartar*/
