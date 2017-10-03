@@ -314,7 +314,6 @@ int TablaCorrecta() {
 }
 
 int getCodigoToken(char* token) {
-  //printf("getCodigoToken recibe %s\n",token);
   if(t->status == STATUS_VACIO) { //No tener en cuenta la tabla
     if(strcmp(token,WORDS[0]) == 0)return AND;
     else if(strcmp(token,WORDS[1]) == 0)return OR;
@@ -327,7 +326,7 @@ int getCodigoToken(char* token) {
     for(int i=0;i<N_WORDS;i++) {
       if(strcmp(t->tokens[i],token) == 0)return getCodigoDesdeIndice(i);
     }
-    printf("ERROR: No se ha especificado el token \"%s\" en el fichero de configuracion\n",token);
+    printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO_INCORRECTO,token);
     return -1;
   }
 }

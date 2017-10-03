@@ -1,4 +1,4 @@
-or = ord
+or = or
 and = and
 not = not
 dimp = dimp
@@ -6,4 +6,4 @@ imp = imp
 
 
 
-o dimp not (r and s) or o, a dimp not (r or not b)
+o dimp not (r adnd s) or o, a dimp not (r or not b)

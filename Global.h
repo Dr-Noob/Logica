@@ -55,6 +55,12 @@ static const char* MESSAGE_ARBOL_MUY_GRANDE[2] = { "WARNING: El arbol es mas alt
 //MAIN//
 static const char* MESSAGE_ARGS_MAIN[2] = { "ERROR: Tableaux necesita al menos un argumento(el archivo donde se encuentra la formula)\n", "ERROR: Tableaux needs at least one argument(the file where it is the formula)\n" };
 
+//GRAMATICA//
+static const char* MESSAGE_EXPRESION_CORRECTA[2] = { "La expresion se ha reconocido correctamente\n", "Expression was recognised successfully\n" };
+static const char* MESSAGE_ERROR_SEMANTICO[2] = { "ERROR: Error semantico(%d-%d) Por favor, revisa la formula\n", "ERROR: Semantic error(%d-%d) Please, check the formula\n\n" };
+
+//CONFIG
+static const char* MESSAGE_TOKEN_NO_ESPECIFICADO_INCORRECTO[2] = { "ERROR: El token '%s' no ha sido especificado en el fichero de configuracion o no es correcto\n", "ERROR: Token '%s' was not specified in the configuration file or it is not correct\n" };
 
 //FIN_MENSAJES
 
