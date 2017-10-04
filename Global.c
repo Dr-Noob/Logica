@@ -25,7 +25,7 @@ void printMsg(const char *fmt[2], ...) {
   va_start(args, fmt[0]);
   vsnprintf(buffer, sizeof(buffer), fmt[0], args);
   va_end(args);
-  fprintf(stdout,buffer);
+  fprintf(stdout,"%s",buffer);
 }
 
 void printMsgRed(const char *fmt[2], ...) {

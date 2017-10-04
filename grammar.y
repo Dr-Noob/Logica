@@ -17,7 +17,6 @@ extern int yylineno;
 	Formula formula;
 }
 
-%locations
 %parse-param {FILE *fich}
 %token LPAREN RPAREN AND OR NOT IMP DIMP COMA END_OF_FILE
 %token <a> ATOM
@@ -38,16 +37,11 @@ oracion : e END_OF_FILE
 			ResolverTableaux($1,fich);
 			return 0;
 		};
-	| error END_OF_FILE
-		{
-			printMsgRed(MESSAGE_ERROR_SEMANTICO,@1.first_column,@1.last_column);
-			YYABORT;
-		};
 
 e: e COMA z
 		{
 			$$=Concatenar($1,$3);
-		};
+		}
 	| z
 		{
 			$$=$1;
@@ -111,5 +105,5 @@ g: LPAREN e RPAREN
 %%
 
 void yyerror (FILE *fich, const char *msg) {
-	//printf(RED "ERROR: Error semantico. Por favor, revisa la formula\n" RESET);
+	printf(RED "ERROR: Error semantico. Por favor, revisa la formula\n" RESET);
 }

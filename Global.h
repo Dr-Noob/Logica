@@ -32,7 +32,7 @@ extern int LANG;
 //MENSAJES
 
 //CONFIG//
-static const char* MESSAGE_TOKEN_DEMASIADO_LARGO[2] =  { "ERROR: Token especificado mas de %d veces(%s)\n", "ERROR: Specified a token larger than %d(%s)\n" };
+static const char* MESSAGE_TOKEN_DEMASIADO_LARGO[2] =  { "ERROR: Se ha especificado un token de mas de %d caracteres(%s)\n", "ERROR: Specified a token larger than %d characters(%s)\n" };
 static const char* MESSAGE_REGEX_MATCH_FALLIDO[2] = { "ERROR: Regex match fallido\n", "ERROR: Regex match failed\n" };
 static const char* MESSAGE_LINEA_INCORRECTA[2] = { "ERROR: La linea '%s' es incorrecta\n", "ERROR: Line '%s' is invalid\n" };
 static const char* MESSAGE_FALLO_COMPILAR_REGEX[2] = { "ERROR: Fallo al compilar la expresion regular\n", "ERROR: Failed to compile regex\n" };

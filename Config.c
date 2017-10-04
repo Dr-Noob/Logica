@@ -39,7 +39,7 @@ void freeTablaTokens() {
 }
 
 void freeMatch(Match m) {
-  if(m == NULL){ printf("Me piden liberar m que es nulo\n"); return; }
+  //if(m == NULL){ printf("Me piden liberar m que es nulo\n"); return; }
   free(m->id);
   free(m->string);
   free(m);
@@ -148,6 +148,7 @@ void LiberarTodo(regex_t regexs[N_WORDS],char* line,Match m) {
 
 void GenerarTabla(FILE *fich) {
   nlineas = lineas(fich);
+  t = CrearTablaTokens();
   if(nlineas < 2) { //Analizar si hay al menos dos lineas
     t->status = STATUS_VACIO;
     return;
@@ -186,7 +187,6 @@ void GenerarTabla(FILE *fich) {
       return;
   }
 
-  t = CrearTablaTokens();
   Match m = NULL;
   char* line = NULL;
   int tokenSet[N_WORDS];
@@ -250,7 +250,9 @@ void GenerarTabla(FILE *fich) {
       for(int i=0;i<N_WORDS;i++) { //Reportar error de un token no especificado. Si todos lo estan, liberarlo todo
         if(!tokenSet[i]) printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO,WORDS[i]);
       }
-      LiberarTodo(regexs,line,m);
+      //LiberarTodo(m,line,regexs);
+      for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
+			if(line)free(line);
       t->status = STATUS_INCORRECTO;
       return;
     }
@@ -309,7 +311,7 @@ int getCodigoDesdeIndice(int indice) {
 }
 
 int TablaCorrecta() {
-  if(t->status == STATUS_CORRECTO)return BOOLEAN_TRUE;
+  if(t->status == STATUS_CORRECTO || t->status == STATUS_VACIO)return BOOLEAN_TRUE;
   else return BOOLEAN_FALSE;
 }
 
@@ -320,13 +322,14 @@ int getCodigoToken(char* token) {
     else if(strcmp(token,WORDS[2]) == 0)return NOT;
     else if(strcmp(token,WORDS[3]) == 0)return IMP;
     else if(strcmp(token,WORDS[4]) == 0)return DIMP;
-    return -1;
+		printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO_INCORRECTO,token);
+    return 0;
   }
   else {
     for(int i=0;i<N_WORDS;i++) {
       if(strcmp(t->tokens[i],token) == 0)return getCodigoDesdeIndice(i);
     }
     printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO_INCORRECTO,token);
-    return -1;
+    return 0;
   }
 }
