@@ -1,2 +1,6 @@
-and = aswssssssssssssssssssssssssssssssssssssssssss
-o dimp not (r and s) or o, a dimp not (r or not b)
+and = and
+or = or
+not = not
+dimp = ñ
+imp = imp
+o ñ not (r and s) or o, a ñ not (r or not b)

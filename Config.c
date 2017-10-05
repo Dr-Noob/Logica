@@ -157,31 +157,31 @@ void GenerarTabla(FILE *fich) {
 
   regex_t regexs[N_WORDS];
 
-  ret = regcomp(&regexs[0], "^(and)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
+  ret = regcomp(&regexs[0], "^(and)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
 
-  ret = regcomp(&regexs[1], "^(or)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
+  ret = regcomp(&regexs[1], "^(or)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
 
-  ret = regcomp(&regexs[2], "^(not)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
+  ret = regcomp(&regexs[2], "^(not)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
 
-  ret = regcomp(&regexs[3], "^(imp)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
+  ret = regcomp(&regexs[3], "^(imp)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
 
-  ret = regcomp(&regexs[4], "^(dimp)[ \t]*=[ \t]*([ -~]+)[ \t]*", REG_EXTENDED);
+  ret = regcomp(&regexs[4], "^(dimp)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
@@ -205,10 +205,9 @@ void GenerarTabla(FILE *fich) {
     lineasleidas++;
 
     if(m == NULL) {
-      for(int i=0;i<N_WORDS;i++) { //Reportar error de un token no especificado. Si todos lo estan, liberarlo todo
-        if(!tokenSet[i]) printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO,WORDS[i]);
-      }
-      LiberarTodo(regexs,line,m);
+      //LiberarTodo(regexs,line,m);
+      for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
+			if(line)free(line);
       t->status = STATUS_INCORRECTO;
       return;
     }
@@ -247,10 +246,7 @@ void GenerarTabla(FILE *fich) {
   if(!LineaVacia(line)) { //Solo analizar la penultima linea si no es vacia
     m = getMatch(line,regexs);
     if(m == NULL) {
-      for(int i=0;i<N_WORDS;i++) { //Reportar error de un token no especificado. Si todos lo estan, liberarlo todo
-        if(!tokenSet[i]) printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO,WORDS[i]);
-      }
-      //LiberarTodo(m,line,regexs);
+      //LiberarTodo(regexs,line,m);
       for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
 			if(line)free(line);
       t->status = STATUS_INCORRECTO;
