@@ -11,12 +11,15 @@
 
 #define MAX_CHARS 10
 #define N_WORDS 5
+#define N_OPTIONS 3
 
 #define STATUS_CORRECTO       0
 #define STATUS_INCORRECTO     1
 #define STATUS_VACIO          2
 
+#define BISON_TOKEN_ERROR	-1
 static const char* WORDS[] = { "and", "or", "not", "imp", "dimp" };
+static const char* OPTIONS[] = { "svg", "stdout", "svg_name" };
 
 struct TablaTokens;
 typedef struct TablaTokens* TablaTokens;

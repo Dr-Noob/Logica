@@ -5,6 +5,7 @@ int nlineas;
 
 struct TablaTokens {
   char* tokens[N_WORDS];
+  char* options[N_OPTIONS];
   int status;
 };
 
@@ -20,6 +21,10 @@ TablaTokens CrearTablaTokens() {
     t->tokens[i] = malloc(sizeof(char)*MAX_CHARS);
     memset(t->tokens[i],0,sizeof(char)*MAX_CHARS);
   }
+  for(int i=0;i<N_OPTIONS;i++) {
+    t->options[i] = malloc(sizeof(char)*MAX_CHARS);
+    memset(t->options[i],0,sizeof(char)*MAX_CHARS);
+  }
   t->status = STATUS_CORRECTO;
   return t;
 }
@@ -33,8 +38,9 @@ void print_TablaTokens() {
 }
 
 void freeTablaTokens() {
-  if(t == NULL){ printf("Me piden liberar t que es nulo\n"); return; }
+  //if(t == NULL){ printf("Me piden liberar t que es nulo\n"); return; }
   for(int i=0;i<N_WORDS;i++) free(t->tokens[i]);
+  for(int i=0;i<N_OPTIONS;i++) free(t->options[i]);
   free(t);
 }
 
@@ -61,6 +67,7 @@ Match Groups(Match m,char* source,char* groupText, regmatch_t* pmatch) {
 
   strcpy(groupText, source);
   groupText[pmatch[1].rm_eo] = 0;
+  
   strcpy(m->id,groupText+pmatch[1].rm_so);
 
   return m;
@@ -71,7 +78,7 @@ int LineaVacia(char* linea) {
     else return BOOLEAN_FALSE;
 }
 
-Match getMatch(char* source, regex_t regexs[N_WORDS]) {
+Match getMatch(char* source, regex_t regexs[N_WORDS], regex_t options[N_WORDS]) {
   char msgbuf[100];
   int MAX_GROUPS = 3;
   int reti = 0;
@@ -134,14 +141,45 @@ Match getMatch(char* source, regex_t regexs[N_WORDS]) {
     freeMatch(m);
     return NULL;
   }
+  
+  /* SVG */
+  reti = regexec(&options[0], source, MAX_GROUPS, pmatch, 0);
+  if (!reti) return Groups(m,source,groupText,pmatch);
+  else if (reti != REG_NOMATCH) {
+    regerror(reti, &options[0], msgbuf, sizeof(msgbuf));
+    printMsgRed(MESSAGE_REGEX_MATCH_FALLIDO,msgbuf);
+    freeMatch(m);
+    return NULL;
+  }
+  
+  /* STDOUT */
+  reti = regexec(&options[1], source, MAX_GROUPS, pmatch, 0);
+  if (!reti) return Groups(m,source,groupText,pmatch);
+  else if (reti != REG_NOMATCH) {
+    regerror(reti, &options[1], msgbuf, sizeof(msgbuf));
+    printMsgRed(MESSAGE_REGEX_MATCH_FALLIDO,msgbuf);
+    freeMatch(m);
+    return NULL;
+  }
+  
+  /* SVG_NAME */
+  reti = regexec(&options[2], source, MAX_GROUPS, pmatch, 0);
+  if (!reti) return Groups(m,source,groupText,pmatch);
+  else if (reti != REG_NOMATCH) {
+    regerror(reti, &options[2], msgbuf, sizeof(msgbuf));
+    printMsgRed(MESSAGE_REGEX_MATCH_FALLIDO,msgbuf);
+    freeMatch(m);
+    return NULL;
+  }
 
   printMsgRed(MESSAGE_LINEA_INCORRECTA,source);
   freeMatch(m);
   return NULL;
 }
 
-void LiberarTodo(regex_t regexs[N_WORDS],char* line,Match m) {
+void LiberarTodo(regex_t regexs[N_WORDS], regex_t options[N_OPTIONS], char* line,Match m) {
   for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
+  for(int i=0;i<N_OPTIONS;i++)regfree(&options[i]);
   if(line)free(line);
   freeMatch(m);
 }
@@ -156,6 +194,7 @@ void GenerarTabla(FILE *fich) {
   int ret = 0;
 
   regex_t regexs[N_WORDS];
+	regex_t options[N_OPTIONS];
 
   ret = regcomp(&regexs[0], "^(and)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
   if (ret) {
@@ -186,6 +225,24 @@ void GenerarTabla(FILE *fich) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
+  
+  ret = regcomp(&options[0], "^(svg)[ \t]*=[ \t]*(yes|no)[ \t]*", REG_EXTENDED);
+  if (ret) {
+      printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
+      return;
+  }
+  
+  ret = regcomp(&options[1], "^(stdout)[ \t]*=[ \t]*(yes|no)[ \t]*", REG_EXTENDED);
+  if (ret) {
+      printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
+      return;
+  }
+  
+  ret = regcomp(&options[2], "^(svg_name)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
+  if (ret) {
+      printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
+      return;
+  }
 
   Match m = NULL;
   char* line = NULL;
@@ -201,12 +258,13 @@ void GenerarTabla(FILE *fich) {
   }
 
   while(read != -1 && lineasleidas+1<nlineas) {
-    m = getMatch(line,regexs);
+    m = getMatch(line,regexs,options);
     lineasleidas++;
 
     if(m == NULL) {
       //LiberarTodo(regexs,line,m);
       for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
+      for(int i=0;i<N_OPTIONS;i++)regfree(&options[i]);
 			if(line)free(line);
       t->status = STATUS_INCORRECTO;
       return;
@@ -217,7 +275,7 @@ void GenerarTabla(FILE *fich) {
       if(strcmp(m->id,WORDS[i]) == 0) {
         if(tokenSet[i]) {
           printMsgRed(MESSAGE_TOKEN_YA_ESPECIFICADO,WORDS[i],t->tokens[i]);
-          LiberarTodo(regexs,line,m);
+          LiberarTodo(regexs,options,line,m);
           t->status = STATUS_INCORRECTO;
           return;
         }
@@ -230,7 +288,7 @@ void GenerarTabla(FILE *fich) {
 
     if(i == N_WORDS) {
       printf("ERROR\n");
-      LiberarTodo(regexs,line,m);
+      LiberarTodo(regexs,options,line,m);
       t->status = STATUS_INCORRECTO;
       return;
     }
@@ -244,10 +302,11 @@ void GenerarTabla(FILE *fich) {
   }
 
   if(!LineaVacia(line)) { //Solo analizar la penultima linea si no es vacia
-    m = getMatch(line,regexs);
+    m = getMatch(line,regexs,options);
     if(m == NULL) {
       //LiberarTodo(regexs,line,m);
       for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
+      for(int i=0;i<N_OPTIONS;i++)regfree(&options[i]);
 			if(line)free(line);
       t->status = STATUS_INCORRECTO;
       return;
@@ -258,7 +317,7 @@ void GenerarTabla(FILE *fich) {
       if(strcmp(m->id,WORDS[i]) == 0) {
         if(tokenSet[i]) {
           printMsgRed(MESSAGE_TOKEN_YA_ESPECIFICADO,WORDS[i],t->tokens[i]);
-          LiberarTodo(regexs,line,m);
+          LiberarTodo(regexs,options,line,m);
           t->status = STATUS_INCORRECTO;
           return;
         }
@@ -271,7 +330,7 @@ void GenerarTabla(FILE *fich) {
 
     if(i == N_WORDS) {
       printf("ERROR\n");
-      LiberarTodo(regexs,line,m);
+      LiberarTodo(regexs,options,line,m);
       t->status = STATUS_INCORRECTO;
       return;
     }
@@ -280,6 +339,7 @@ void GenerarTabla(FILE *fich) {
   }
 
   for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
+  for(int i=0;i<N_OPTIONS;i++)regfree(&options[i]);
   if(line)free(line);
 
   for(int i=0;i<N_WORDS;i++) { //Si la tabla no esta rellenada entera, liberarla, porque es invalida
@@ -318,14 +378,12 @@ int getCodigoToken(char* token) {
     else if(strcmp(token,WORDS[2]) == 0)return NOT;
     else if(strcmp(token,WORDS[3]) == 0)return IMP;
     else if(strcmp(token,WORDS[4]) == 0)return DIMP;
-		printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO_INCORRECTO,token);
-    return 0;
   }
   else {
     for(int i=0;i<N_WORDS;i++) {
       if(strcmp(t->tokens[i],token) == 0)return getCodigoDesdeIndice(i);
     }
-    printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO_INCORRECTO,token);
-    return 0;
   }
+  printMsgRed(MESSAGE_TOKEN_NO_ESPECIFICADO_INCORRECTO,token);
+  return BISON_TOKEN_ERROR;
 }
