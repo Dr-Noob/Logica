@@ -17,6 +17,10 @@
 #define STATUS_INCORRECTO     1
 #define STATUS_VACIO          2
 
+#define OPTION_SVG_INDEX      0
+#define OPTION_STDOUT_INDEX   1
+#define OPTION_SVG_NAME_INDEX 2
+
 #define BISON_TOKEN_ERROR	-1
 static const char* WORDS[] = { "and", "or", "not", "imp", "dimp" };
 static const char* OPTIONS[] = { "svg", "stdout", "svg_name" };
@@ -35,5 +39,6 @@ void freeTablaTokens();
 void print_TablaTokens();
 int getCodigoToken(char* token);
 int TablaCorrecta();
+int mostrarTree();
 
 #endif

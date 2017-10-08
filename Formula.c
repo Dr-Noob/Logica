@@ -1,5 +1,6 @@
 #include "Formula.h"
 #include "SVG.h"
+#include "Config.h"
 
 struct AtomoRep {
   char id; //Identifica#include <locale.h>dor
@@ -949,11 +950,21 @@ void ResolverTableaux(Formula oracion, FILE* fichero) {
 
   //Comprobar que el arbol va a caber en la terminal
   //Si se ha especificado, aumentar MAX_HEIGHT en Tree.h(hacer como con MAX_CHAR)
-  if(tinf->nodos > DIRTY_OUTPUT_NODES) printMsg(MESSAGE_ARBOL_DEMASIADO_GRANDE);
-  else {
-    printMsg(MESSAGE_SOLUCION);
-    showTableauxTree(t);
-    printf("\n\n");
+  int ret = mostrarTree();
+  if(ret == -1) { //El usuario no ha especificado el campo
+    if(tinf->nodos > DIRTY_OUTPUT_NODES) printMsg(MESSAGE_ARBOL_DEMASIADO_GRANDE);
+    else {
+      printMsg(MESSAGE_SOLUCION);
+      showTableauxTree(t);
+      printf("\n\n");
+    }
+  }
+  else { //El usuario ha especificado el campo
+    if(ret == BOOLEAN_TRUE) {
+      printMsg(MESSAGE_SOLUCION);
+      showTableauxTree(t);
+      printf("\n\n");
+    }
   }
   printf("\n");
 

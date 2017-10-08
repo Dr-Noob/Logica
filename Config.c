@@ -35,6 +35,9 @@ void print_TablaTokens() {
     printf("not='%s'\n",t->tokens[2]);
     printf("imp='%s'\n",t->tokens[3]);
     printf("dimp='%s'\n",t->tokens[4]);
+    printf("svg='%s'\n",t->options[0]);
+    printf("stdout='%s'\n",t->options[1]);
+    printf("svg_name='%s'\n",t->options[2]);
 }
 
 void freeTablaTokens() {
@@ -67,7 +70,7 @@ Match Groups(Match m,char* source,char* groupText, regmatch_t* pmatch) {
 
   strcpy(groupText, source);
   groupText[pmatch[1].rm_eo] = 0;
-  
+
   strcpy(m->id,groupText+pmatch[1].rm_so);
 
   return m;
@@ -141,7 +144,7 @@ Match getMatch(char* source, regex_t regexs[N_WORDS], regex_t options[N_WORDS]) 
     freeMatch(m);
     return NULL;
   }
-  
+
   /* SVG */
   reti = regexec(&options[0], source, MAX_GROUPS, pmatch, 0);
   if (!reti) return Groups(m,source,groupText,pmatch);
@@ -151,7 +154,7 @@ Match getMatch(char* source, regex_t regexs[N_WORDS], regex_t options[N_WORDS]) 
     freeMatch(m);
     return NULL;
   }
-  
+
   /* STDOUT */
   reti = regexec(&options[1], source, MAX_GROUPS, pmatch, 0);
   if (!reti) return Groups(m,source,groupText,pmatch);
@@ -161,7 +164,7 @@ Match getMatch(char* source, regex_t regexs[N_WORDS], regex_t options[N_WORDS]) 
     freeMatch(m);
     return NULL;
   }
-  
+
   /* SVG_NAME */
   reti = regexec(&options[2], source, MAX_GROUPS, pmatch, 0);
   if (!reti) return Groups(m,source,groupText,pmatch);
@@ -196,49 +199,49 @@ void GenerarTabla(FILE *fich) {
   regex_t regexs[N_WORDS];
 	regex_t options[N_OPTIONS];
 
-  ret = regcomp(&regexs[0], "^(and)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
+  ret = regcomp(&regexs[0], "^(and)[ \t]*=[ \t]*([!-~]+)[ \t]*$", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
 
-  ret = regcomp(&regexs[1], "^(or)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
+  ret = regcomp(&regexs[1], "^(or)[ \t]*=[ \t]*([!-~]+)[ \t]*$", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
 
-  ret = regcomp(&regexs[2], "^(not)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
+  ret = regcomp(&regexs[2], "^(not)[ \t]*=[ \t]*([!-~]+)[ \t]*$", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
 
-  ret = regcomp(&regexs[3], "^(imp)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
+  ret = regcomp(&regexs[3], "^(imp)[ \t]*=[ \t]*([!-~]+)[ \t]*$", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
 
-  ret = regcomp(&regexs[4], "^(dimp)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
+  ret = regcomp(&regexs[4], "^(dimp)[ \t]*=[ \t]*([!-~]+)[ \t]*$", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
-  
-  ret = regcomp(&options[0], "^(svg)[ \t]*=[ \t]*(yes|no)[ \t]*", REG_EXTENDED);
+
+  ret = regcomp(&options[0], "^(svg)[ \t]*=[ \t]*(yes|no)[ \t]*$", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
-  
-  ret = regcomp(&options[1], "^(stdout)[ \t]*=[ \t]*(yes|no)[ \t]*", REG_EXTENDED);
+
+  ret = regcomp(&options[1], "^(stdout)[ \t]*=[ \t]*(yes|no)[ \t]*$", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
   }
-  
-  ret = regcomp(&options[2], "^(svg_name)[ \t]*=[ \t]*([!-~]+)[ \t]*", REG_EXTENDED);
+
+  ret = regcomp(&options[2], "^(svg_name)[ \t]*=[ \t]*([!-~]+)[ \t]*$", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
       return;
@@ -247,9 +250,11 @@ void GenerarTabla(FILE *fich) {
   Match m = NULL;
   char* line = NULL;
   int tokenSet[N_WORDS];
+  int optionSet[N_OPTIONS];
   int i = 0;
   int lineasleidas = 1;
   memset(tokenSet,BOOLEAN_FALSE,N_WORDS*sizeof(int));
+  memset(optionSet,BOOLEAN_FALSE,N_OPTIONS*sizeof(int));
   size_t len = 0;
   ssize_t read = getline(&line,&len,fich);
   while(read != -1 && LineaVacia(line) && lineasleidas+1<nlineas) {
@@ -271,8 +276,9 @@ void GenerarTabla(FILE *fich) {
     }
 
     i = 0;
-    while(i < N_WORDS) {
-      if(strcmp(m->id,WORDS[i]) == 0) {
+    while(i < N_WORDS+N_OPTIONS) {
+
+      if(i < N_WORDS && strcmp(m->id,WORDS[i]) == 0) {
         if(tokenSet[i]) {
           printMsgRed(MESSAGE_TOKEN_YA_ESPECIFICADO,WORDS[i],t->tokens[i]);
           LiberarTodo(regexs,options,line,m);
@@ -281,12 +287,25 @@ void GenerarTabla(FILE *fich) {
         }
         tokenSet[i] = BOOLEAN_TRUE;
         strcpy(t->tokens[i],m->string);
-        i = N_WORDS+1;
+        i = N_WORDS+N_OPTIONS; //Salir del bucle
       }
+
+      if(i < N_OPTIONS && strcmp(m->id,OPTIONS[i]) == 0) {
+        if(optionSet[i]) {
+          printMsgRed(MESSAGE_CONFIG_YA_ESPECIFICADO,OPTIONS[i],t->options[i]);
+          LiberarTodo(regexs,options,line,m);
+          t->status = STATUS_INCORRECTO;
+          return;
+        }
+        optionSet[i] = BOOLEAN_TRUE;
+        strcpy(t->options[i],m->string);
+        i = N_WORDS+N_OPTIONS;
+      }
+
       i++;
     }
 
-    if(i == N_WORDS) {
+    if(i == N_WORDS+N_OPTIONS) {
       printf("ERROR\n");
       LiberarTodo(regexs,options,line,m);
       t->status = STATUS_INCORRECTO;
@@ -313,8 +332,9 @@ void GenerarTabla(FILE *fich) {
     }
 
     i = 0;
-    while(i < N_WORDS) {
-      if(strcmp(m->id,WORDS[i]) == 0) {
+    while(i < N_WORDS+N_OPTIONS) {
+
+      if(i < N_WORDS && strcmp(m->id,WORDS[i]) == 0) {
         if(tokenSet[i]) {
           printMsgRed(MESSAGE_TOKEN_YA_ESPECIFICADO,WORDS[i],t->tokens[i]);
           LiberarTodo(regexs,options,line,m);
@@ -323,12 +343,25 @@ void GenerarTabla(FILE *fich) {
         }
         tokenSet[i] = BOOLEAN_TRUE;
         strcpy(t->tokens[i],m->string);
-        i = N_WORDS+1;
+        i = N_WORDS+N_OPTIONS; //Salir del bucle
       }
+
+      if(i < N_OPTIONS && strcmp(m->id,OPTIONS[i]) == 0) {
+        if(optionSet[i]) {
+          printMsgRed(MESSAGE_CONFIG_YA_ESPECIFICADO,OPTIONS[i],t->options[i]);
+          LiberarTodo(regexs,options,line,m);
+          t->status = STATUS_INCORRECTO;
+          return;
+        }
+        optionSet[i] = BOOLEAN_TRUE;
+        strcpy(t->options[i],m->string);
+        i = N_WORDS+N_OPTIONS;
+      }
+
       i++;
     }
 
-    if(i == N_WORDS) {
+    if(i == N_WORDS+N_OPTIONS) {
       printf("ERROR\n");
       LiberarTodo(regexs,options,line,m);
       t->status = STATUS_INCORRECTO;
@@ -349,6 +382,7 @@ void GenerarTabla(FILE *fich) {
       return;
     }
   }
+  print_TablaTokens();
 }
 
 int getCodigoDesdeIndice(int indice) {
@@ -369,6 +403,14 @@ int getCodigoDesdeIndice(int indice) {
 int TablaCorrecta() {
   if(t->status == STATUS_CORRECTO || t->status == STATUS_VACIO)return BOOLEAN_TRUE;
   else return BOOLEAN_FALSE;
+}
+
+int mostrarTree() {
+    if(t->options[OPTION_STDOUT_INDEX] != NULL) {
+      if(strcmp(t->options[OPTION_STDOUT_INDEX],"yes") == 0)return BOOLEAN_TRUE;
+      return BOOLEAN_FALSE;
+    }
+    return -1;
 }
 
 int getCodigoToken(char* token) {

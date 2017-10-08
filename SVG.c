@@ -49,9 +49,9 @@ void LiberarNodo(Nodo n) {
 	free(n);
 }
 
-Coordenadas MaxMinRecursivo(SVG_data *s, Coordenadas c,SVG_data ** nodos,int i) {
-		nodos[i] = s;
-		i++;
+Coordenadas MaxMinRecursivo(SVG_data *s, Coordenadas c,SVG_data ** nodos,int* i) {
+		nodos[*i] = s;
+		*i += 1;
 		if(s->hi != NULL)MaxMinRecursivo(s->hi,c,nodos,i);
 		if(s->hd != NULL)MaxMinRecursivo(s->hd,c,nodos,i);
 
@@ -62,11 +62,14 @@ Coordenadas MaxMinRecursivo(SVG_data *s, Coordenadas c,SVG_data ** nodos,int i) 
 }
 
 Coordenadas MaxMin(SVG_data *s,SVG_data ** nodos) {
-		int i = 0;
+		int* i = malloc(sizeof(int));
+		memset(i,0,sizeof(int));
 		Coordenadas c = malloc(sizeof(struct CoordenadasRep));
 		memset(c,0,sizeof(struct CoordenadasRep));
+
 		c->xmin = XI;
 		c = MaxMinRecursivo(s,c,nodos,i);
+		free(i);
 		return c;
 }
 
@@ -270,7 +273,7 @@ SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t)  {
 void showTableauxSVG(Tableaux t, FILE *fich, int nNodos) {
 	SVG *s = CrearSVGDesdeTableaux(s,t);
 	SVG_data ** nodos = malloc(sizeof(struct SVG_data*)+sizeof(struct SVG_data*)*nNodos);
-	memset(nodos,0,sizeof(struct SVG_data*)*nNodos);
+	memset(nodos,0,sizeof(struct SVG_data*)+sizeof(struct SVG_data*)*nNodos);
 
 	print_svg(s,fich,nodos,nNodos);
 

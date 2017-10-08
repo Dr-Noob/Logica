@@ -2,8 +2,8 @@ and = and
 or = or
 not = not
 svg = yes
-stdout = nope
+stdout = yes
 svg_name = fich.sol
-dimp = <->
+dimp = dimp
 imp = imp
-o dimp not (r and s) or o, a ñ not (r or not b)
+o dimp not (r and s) or o, a and not (r or not b)
