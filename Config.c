@@ -413,6 +413,24 @@ int mostrarTree() {
     return -1;
 }
 
+int mostrarSVG() {
+	if(t->options[OPTION_SVG_INDEX] != NULL) {
+    if(strcmp(t->options[OPTION_SVG_INDEX],"yes") == 0)return BOOLEAN_TRUE;
+    return BOOLEAN_FALSE;
+  }
+  return -1;
+}
+
+char* nombreSVG() {
+	char* nombre = malloc(sizeof(char)*MAX_CHARS);
+	memset(nombre,0,sizeof(char)*MAX_CHARS);
+	
+	if(t->options[OPTION_SVG_NAME_INDEX] != NULL) strcpy(nombre,t->options[OPTION_SVG_NAME_INDEX]);
+  else strcpy(nombre,NOMBRE_DEFECTO_SVG);
+  
+  return nombre;
+}
+
 int getCodigoToken(char* token) {
   if(t->status == STATUS_VACIO) { //No tener en cuenta la tabla
     if(strcmp(token,WORDS[0]) == 0)return AND;

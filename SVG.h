@@ -20,8 +20,6 @@ typedef struct CoordenadasRep *Coordenadas;
 
 extern int MAX_NIVELES;
 
-static const char* NOMBRE_ARCHIVO = "sol.svg";
-
 static const char* SIMBOLO_ABIERTO = "&#10004;";
 static const char* SIMBOLO_CERRADO = "&#10008;";
 

@@ -25,6 +25,8 @@
 static const char* WORDS[] = { "and", "or", "not", "imp", "dimp" };
 static const char* OPTIONS[] = { "svg", "stdout", "svg_name" };
 
+static const char* NOMBRE_DEFECTO_SVG = "sol.svg";
+
 struct TablaTokens;
 typedef struct TablaTokens* TablaTokens;
 
@@ -39,6 +41,9 @@ void freeTablaTokens();
 void print_TablaTokens();
 int getCodigoToken(char* token);
 int TablaCorrecta();
+
 int mostrarTree();
+int mostrarSVG();
+char* nombreSVG();
 
 #endif

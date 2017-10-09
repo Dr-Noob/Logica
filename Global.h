@@ -48,7 +48,7 @@ static const char* MESSAGE_TABLEAUX_CERRADO[2] = { "El tableaux esta cerrado\n" 
 static const char* MESSAGE_TABLEAUX_INSTATISFACIBLE[2] = { "La expresion inicial es insatisfacible\n" , "The initial expression is unsatisfactory\n" };
 static const char* MESSAGE_TABLEAUX_ABIERTO[2] = { "El tableaux esta abierto\n" , "The tableaux is open\n" };
 static const char* MESSAGE_TABLEAUX_STATISFACIBLE[2] = { "La expresion inicial es satisfacible\n" , "The initial expression is satisfactory\n" };
-static const char* MESSAGE_ABRIR_ARCHIVO_FALLIDO[2] = { "ERROR: El archivo %s no ha podido abrirse\n", "ERROR: File %s could not be opened\n" };
+static const char* MESSAGE_ABRIR_ARCHIVO_FALLIDO[2] = { "ERROR: El archivo '%s' no ha podido abrirse\n", "ERROR: File '%s' could not be opened\n" };
 static const char* MESSAGE_NO_SVG[2] = { "No se genera el SVG\n" , "SVG will not be generated\n" };
 
 //TREE//

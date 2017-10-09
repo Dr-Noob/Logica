@@ -3,7 +3,7 @@ or = or
 not = not
 svg = yes
 stdout = yes
-svg_name = fich.sol
+svg_name = tableaux
 dimp = dimp
 imp = imp
 o dimp not (r and s) or o, a and not (r or not b)
