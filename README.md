@@ -57,9 +57,9 @@ A partir de la fórmula inicial, el programa mostrará una salida(un árbol en c
 
 Si el programa considera que el árbol generado cabe en la terminal en un tamaño razonable, lo imprimirá, en caso contrario, no lo hará(excepto si se ha usado una opción de configuración que fuerze a hacerlo)
 
-* Fichero `SVG`
+* Fichero SVG
 
-Se genera siempre(excepto si se ha usado una opción de configuración que fuerze a no hacerlo)un fichero `SVG` donde se encuentra el árbol dibujado. Dicho fichero puede visualizarse con cualquier navegador, o mediante un visor de imágenes
+Se genera siempre(excepto si se ha usado una opción de configuración que fuerze a no hacerlo)un fichero SVG donde se encuentra el árbol dibujado. Dicho fichero puede visualizarse con cualquier navegador, o mediante un visor de imágenes
 
 ### Como escribir expresiones
 
@@ -67,7 +67,7 @@ En el fichero de configuración hay que escribir la expresión lógica(en la úl
 
 * Expresiones comunes a ambas
 
-Los atomos deben especificarse mediante cualquier letra, siempre y cuando sea solo una(en minúscula). El separador permite separar la expresión en distintas fórmulas, mientras que los paréntesis permiten modificar el orden y la asociatividad. Además, hay tres operadores que no se pueden modificar, cuya sintaxis se detalla:
+Los atomos deben especificarse mediante cualquier letra, siempre y cuando sea solo una(en minúscula). El separador permite separar la expresión en distintas fórmulas, mientras que los paréntesis permiten modificar el orden y la asociatividad. Dichos operadores, cuya sintaxis se detalla, no pueden modificarse:
 
 | Operador          | Sintaxis  |
 |:-----------------:|:---------:|
@@ -83,7 +83,7 @@ Para especificar los operadores de forma persoanlizada, es necesario seguir el s
 OPERADOR = operador_personalizado
 ```
 
-Por ejemplo, si quisieramos cambiar el operador AND sería:
+Por ejemplo, si quisieramos cambiar el operador AND, sería:
 
 ```
 and = ^
@@ -112,9 +112,7 @@ dimp = <->
 a ^ ~(b | c <-> a)
 ```
 
-Es decir, la última línea es la fórmula en sí, mientras que lo de arriba es la especificación de los operadores. 
-
-Estos siempre deberán escribirse así pues no pueden modificarse. 
+Es decir, la última línea es la fórmula en sí, mientras que lo de arriba es la especificación de los operadores. Estos siempre deberán escribirse así pues no pueden modificarse. 
 
 * Expresiones predeterminadas
 
@@ -140,9 +138,9 @@ Es posible especificar otras opciones de configuración, como son:
 
 | Opción          | Sintaxis  |
 |:-----------------:|:---------:|
-| stdout=(yes|no)   | Mediante `yes` se le dice al programa que siempre muestre el árbol resultado
+| stdout=(yes\|no)   | Mediante `yes` se le dice al programa que siempre muestre el árbol resultado
 por la salida estándar(por terminal) mientras que `no` fuerza a no mostrar el árbol  |
-| svg=(yes|no)      | Igual que la opción `stdout`, pero para el fichero `SVG` |
+| svg=(yes\|no)      | Igual que la opción `stdout`, pero para el fichero `SVG` |
 | svg_name=nombre   | Especifica el nombre del fichero `SVG` generado |
 
 ### Haciendo pruebas
