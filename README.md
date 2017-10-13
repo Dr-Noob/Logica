@@ -112,7 +112,7 @@ dimp = <->
 a ^ ~(b | c <-> a)
 ```
 
-Es decir, la última línea es la fórmula en sí, mientras que lo de arriba es la especificación de los operadores. Estos siempre deberán escribirse así pues no pueden modificarse. 
+Es decir, la última línea es la fórmula en sí, mientras que lo de arriba es la especificación de los operadores. Estos siempre deberán escribirse así pues no pueden modificarse(Los espacios que hay entre líneas no afectan en nada al funcionamiento)
 
 * Expresiones predeterminadas
 
@@ -138,9 +138,24 @@ Es posible especificar otras opciones de configuración, como son:
 
 | Opción          | Sintaxis  |
 |:-----------------:|:---------:|
-| stdout=(yes\|no)   | Mediante `yes` se le dice al programa que siempre muestre el árbol resultado por la salida estándar(por terminal) mientras que `no` fuerza a no mostrar el árbol  |
-| svg=(yes\|no)      | Igual que la opción `stdout`, pero para el fichero `SVG` |
-| svg_name=nombre   | Especifica el nombre del fichero `SVG` generado |
+| stdout=(yes\|no)   | Mediante `yes` se le dice al programa que siempre muestre el árbol resultado por la salida estándar(por terminal) mientras que `no` fuerza a no mostrar el árbol(por defecto, `yes`  |
+| svg=(yes\|no)      | Igual que la opción `stdout`, pero para el fichero `SVG`(por defecto `yes`) |
+| svg_name=nombre   | Especifica el nombre del fichero `SVG` generado (por defecto `sol.svg` |
+
+Entonces, un fichero de configuración completo, con todas las opciones, sería uno como el siguiente:
+```
+and = ^
+or = |
+not = ~
+imp = ->
+dimp = <->
+
+stdout=no
+svg=yes
+svg_name=salida.svg
+
+a ^ ~(b | c <-> a)
+```
 
 ### Haciendo pruebas
 
