@@ -138,14 +138,13 @@ Es posible especificar otras opciones de configuración, como son:
 
 | Opción          | Sintaxis  |
 |:-----------------:|:---------:|
-| stdout=(yes\|no)   | Mediante `yes` se le dice al programa que siempre muestre el árbol resultado
-por la salida estándar(por terminal) mientras que `no` fuerza a no mostrar el árbol  |
+| stdout=(yes\|no)   | Mediante `yes` se le dice al programa que siempre muestre el árbol resultado por la salida estándar(por terminal) mientras que `no` fuerza a no mostrar el árbol  |
 | svg=(yes\|no)      | Igual que la opción `stdout`, pero para el fichero `SVG` |
 | svg_name=nombre   | Especifica el nombre del fichero `SVG` generado |
 
 ### Haciendo pruebas
 
-Para compilar el proyecto es necesario tener ciertas cosas instaladas, como se detalla [unas cuantas secciones más abajo](https://github.com/Dr-Noob/Logica/README#L285) Para descargar el proyecto, puedes hacerlo desde la propia página web, o mediante git, con:
+Para compilar el proyecto es necesario tener ciertas cosas instaladas, como se detalla unas cuantas secciones más abajo, en `Compilado con`. Para descargar el proyecto, puedes hacerlo desde la propia página web, o mediante git, con:
 
 ```
 git clone https://github.com/Dr-Noob/Logica
