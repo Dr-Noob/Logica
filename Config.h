@@ -24,6 +24,7 @@
 #define MAX_GROUPS 3
 
 #define BISON_TOKEN_ERROR	-1
+
 static const char* WORDS[] = { "and", "or", "not", "imp", "dimp" };
 static const char* OPTIONS[] = { "svg", "stdout", "svg_name" };
 

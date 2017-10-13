@@ -61,8 +61,8 @@ static const char* MESSAGE_ARGS_MAIN[2] = { "ERROR: Tableaux necesita al menos u
 
 //GRAMATICA//
 static const char* MESSAGE_EXPRESION_CORRECTA[2] = { "La expresion se ha reconocido correctamente\n", "Expression was recognised successfully\n" };
-//static const char* MESSAGE_ERROR_SEMANTICO[2] = { "ERROR: Error semantico(%d-%d) Por favor, revisa la formula\n", "ERROR: Semantic error(%d-%d) Please, check the formula\n\n" };
-static const char* MESSAGE_ERROR_SEMANTICO[2] = { "ERROR: Error semantico. Por favor, revisa la formula\n", "ERROR: Semantic error. Please, check the formula\n" };
+static const char* MESSAGE_ERROR_SEMANTICO[2] = { "ERROR: Error semantico(%d-%d) Por favor, revisa la formula\n", "ERROR: Semantic error(%d-%d) Please, check the formula\n" };
+//static const char* MESSAGE_ERROR_SEMANTICO[2] = { "ERROR: Error semantico. Por favor, revisa la formula\n", "ERROR: Semantic error. Please, check the formula\n" };
 
 //FIN_MENSAJES
 
