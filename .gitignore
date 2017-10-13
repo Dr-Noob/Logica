@@ -1,9 +1,6 @@
 *.yy.c
 *.tab.h
 *.tab.c
+*.svg
 tableaux
 prueba
-otro
-config
-sol.svg
-Comp/

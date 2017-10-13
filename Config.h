@@ -9,7 +9,7 @@
 #include "Formula.h"
 #include "grammar.tab.h"
 
-#define MAX_CHARS 10
+#define MAX_CHARS 15
 #define N_WORDS 5
 #define N_OPTIONS 3
 
@@ -20,6 +20,8 @@
 #define OPTION_SVG_INDEX      0
 #define OPTION_STDOUT_INDEX   1
 #define OPTION_SVG_NAME_INDEX 2
+
+#define MAX_GROUPS 3
 
 #define BISON_TOKEN_ERROR	-1
 static const char* WORDS[] = { "and", "or", "not", "imp", "dimp" };

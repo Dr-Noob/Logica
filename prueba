@@ -1,9 +1,11 @@
-and = and
-or = or
-not = not
-svg = yes
+and = ^
+or = V
+not = ~
+dimp = <->
+imp = ->
+
 stdout = yes
-svg_name = tableaux
-dimp = dimp
-imp = imp
-o dimp not (r and s) or o, a and not (r or not b)
+svg = yes
+svg_name = sal2.svg
+
+o <-> ~(r -> s) V o, a -> ~(r V ~b)

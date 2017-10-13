@@ -36,10 +36,12 @@ static const char* MESSAGE_TOKEN_DEMASIADO_LARGO[2] =  { "ERROR: Se ha especific
 static const char* MESSAGE_REGEX_MATCH_FALLIDO[2] = { "ERROR: Regex match fallido\n", "ERROR: Regex match failed\n" };
 static const char* MESSAGE_LINEA_INCORRECTA[2] = { "ERROR: La linea '%s' es incorrecta\n", "ERROR: Line '%s' is invalid\n" };
 static const char* MESSAGE_FALLO_COMPILAR_REGEX[2] = { "ERROR: Fallo al compilar la expresion regular\n", "ERROR: Failed to compile regex\n" };
+static const char* MESSAGE_TOKEN_ESPECIAL[2] = { "ERROR: Se ha utilizado el token especial '%s'(los token especiales son '(',')',',' y cualquier letra(una sola letra minuscula))\n", "ERROR: Special token '%s' was used(special tokens are '(',')',',' and any word(single lower case word))\n" };
 static const char* MESSAGE_TOKEN_YA_ESPECIFICADO[2] = { "ERROR: El token '%s' ya habia sido especificado como '%s'\n", "ERROR: Token '%s' was already specified as '%s'\n" };
 static const char* MESSAGE_TOKEN_NO_ESPECIFICADO[2] = { "ERROR: El token '%s' no ha sido especificado\n", "ERROR: Token '%s' was not specified\n" };
-static const char* MESSAGE_TOKEN_NO_ESPECIFICADO_INCORRECTO[2] = { "ERROR: El token '%s' no ha sido especificado en el fichero de configuracion o no es correcto\n", "ERROR: Token '%s' was not specified in the configuration file or it is not correct\n" };
+static const char* MESSAGE_TOKEN_NO_ESPECIFICADO_INCORRECTO[2] = { "ERROR: La formula contiene el token '%s', que no ha sido especificado en el fichero de configuracion o no es correcto\n", "ERROR: Formula contains token '%s', which was not specified in the configuration file or it is not correct\n" };
 static const char* MESSAGE_CONFIG_YA_ESPECIFICADO[2] = { "ERROR: La opcion '%s' ya habia sido especificada como '%s'\n", "ERROR: Option '%s' was already specified as '%s'\n" };
+static const char* MESSAGE_TOKEN_YA_UTILIZADO_COMO_OPERADOR[2] = { "ERROR: El token '%s' ya habia sido utilizado en otro operador anteriormente\n", "ERROR: Token '%s' was already used in other operator before\n" };
 
 //FORMULA//
 static const char* MESSAGE_ARBOL_DEMASIADO_GRANDE[2] =  { "El arbol es demasiado grande para dibujarlo por la salida estandar\nSi aun asi quieres dibujarlo, especificalo en el fichero de configuracion\n", "The tree is too big to draw it by standart output\nIf you still want to draw it, specify it on the config file\n" };
@@ -59,7 +61,8 @@ static const char* MESSAGE_ARGS_MAIN[2] = { "ERROR: Tableaux necesita al menos u
 
 //GRAMATICA//
 static const char* MESSAGE_EXPRESION_CORRECTA[2] = { "La expresion se ha reconocido correctamente\n", "Expression was recognised successfully\n" };
-static const char* MESSAGE_ERROR_SEMANTICO[2] = { "ERROR: Error semantico(%d-%d) Por favor, revisa la formula\n", "ERROR: Semantic error(%d-%d) Please, check the formula\n\n" };
+//static const char* MESSAGE_ERROR_SEMANTICO[2] = { "ERROR: Error semantico(%d-%d) Por favor, revisa la formula\n", "ERROR: Semantic error(%d-%d) Please, check the formula\n\n" };
+static const char* MESSAGE_ERROR_SEMANTICO[2] = { "ERROR: Error semantico. Por favor, revisa la formula\n", "ERROR: Semantic error. Please, check the formula\n" };
 
 //FIN_MENSAJES
 

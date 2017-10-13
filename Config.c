@@ -83,7 +83,6 @@ int LineaVacia(char* linea) {
 
 Match getMatch(char* source, regex_t regexs[N_WORDS], regex_t options[N_WORDS]) {
   char msgbuf[100];
-  int MAX_GROUPS = 3;
   int reti = 0;
   int len = strlen(source);
   source[len-1]=0;
@@ -180,11 +179,23 @@ Match getMatch(char* source, regex_t regexs[N_WORDS], regex_t options[N_WORDS]) 
   return NULL;
 }
 
+int tokenYaUtilizado(char* tokens[N_WORDS], char* nuevoToken) {
+    for(int i=0;i<N_WORDS;i++) {
+      if(strcmp(tokens[i],nuevoToken) == 0)return BOOLEAN_TRUE;
+    }
+    return BOOLEAN_FALSE;
+}
+
 void LiberarTodo(regex_t regexs[N_WORDS], regex_t options[N_OPTIONS], char* line,Match m) {
   for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
   for(int i=0;i<N_OPTIONS;i++)regfree(&options[i]);
   if(line)free(line);
   freeMatch(m);
+}
+
+void LiberarERs(regex_t regexs[N_WORDS], regex_t options[N_OPTIONS]) {
+  for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
+  for(int i=0;i<N_OPTIONS;i++)regfree(&options[i]);
 }
 
 void GenerarTabla(FILE *fich) {
@@ -194,11 +205,15 @@ void GenerarTabla(FILE *fich) {
     t->status = STATUS_VACIO;
     return;
   }
+
+  //Preparar las expresiones regulares
   int ret = 0;
 
   regex_t regexs[N_WORDS];
 	regex_t options[N_OPTIONS];
+  regex_t invalid;
 
+  ret = regcomp(&invalid, "^[a-z(),]$", REG_EXTENDED);
   ret = regcomp(&regexs[0], "^(and)[ \t]*=[ \t]*([!-~]+)[ \t]*$", REG_EXTENDED);
   if (ret) {
       printMsgRed(MESSAGE_FALLO_COMPILAR_REGEX);
@@ -247,12 +262,14 @@ void GenerarTabla(FILE *fich) {
       return;
   }
 
+  //Leer el fichero por lineas e ir analizandolo
   Match m = NULL;
   char* line = NULL;
   int tokenSet[N_WORDS];
   int optionSet[N_OPTIONS];
   int i = 0;
   int lineasleidas = 1;
+  regmatch_t pmatch[MAX_GROUPS];
   memset(tokenSet,BOOLEAN_FALSE,N_WORDS*sizeof(int));
   memset(optionSet,BOOLEAN_FALSE,N_OPTIONS*sizeof(int));
   size_t len = 0;
@@ -266,18 +283,30 @@ void GenerarTabla(FILE *fich) {
     m = getMatch(line,regexs,options);
     lineasleidas++;
 
+    //Si getMatch fallo, terminar
     if(m == NULL) {
-      //LiberarTodo(regexs,line,m);
-      for(int i=0;i<N_WORDS;i++)regfree(&regexs[i]);
-      for(int i=0;i<N_OPTIONS;i++)regfree(&options[i]);
+      LiberarERs(regexs,options);
 			if(line)free(line);
       t->status = STATUS_INCORRECTO;
       return;
     }
 
+    //Comprobar que lo que hay a la derecha del igual no puede
+    //confundirse con otra cosa(un atomo, '(' ')' o ',' )
+    i = regexec(&invalid, m->string, MAX_GROUPS, pmatch, 0);
+    if(!i) {
+      printMsgRed(MESSAGE_TOKEN_ESPECIAL,m->string);
+      LiberarTodo(regexs,options,line,m);
+      t->status = STATUS_INCORRECTO;
+      return;
+    }
+
     i = 0;
+
+    //Buscar cual es
     while(i < N_WORDS+N_OPTIONS) {
 
+      //Ver si es un token
       if(i < N_WORDS && strcmp(m->id,WORDS[i]) == 0) {
         if(tokenSet[i]) {
           printMsgRed(MESSAGE_TOKEN_YA_ESPECIFICADO,WORDS[i],t->tokens[i]);
@@ -285,18 +314,31 @@ void GenerarTabla(FILE *fich) {
           t->status = STATUS_INCORRECTO;
           return;
         }
+
         tokenSet[i] = BOOLEAN_TRUE;
+
+        //Ver que el mismo token no se ha utilizado como operador
+        //mas de una vez
+        if(tokenYaUtilizado(t->tokens,m->string)) {
+          printMsgRed(MESSAGE_TOKEN_YA_UTILIZADO_COMO_OPERADOR,m->string);
+          LiberarTodo(regexs,options,line,m);
+          t->status = STATUS_INCORRECTO;
+          return;
+        }
+
         strcpy(t->tokens[i],m->string);
         i = N_WORDS+N_OPTIONS; //Salir del bucle
       }
 
-      if(i < N_OPTIONS && strcmp(m->id,OPTIONS[i]) == 0) {
+      //Ver si es una opcion
+      else if(i < N_OPTIONS && strcmp(m->id,OPTIONS[i]) == 0) {
         if(optionSet[i]) {
           printMsgRed(MESSAGE_CONFIG_YA_ESPECIFICADO,OPTIONS[i],t->options[i]);
           LiberarTodo(regexs,options,line,m);
           t->status = STATUS_INCORRECTO;
           return;
         }
+
         optionSet[i] = BOOLEAN_TRUE;
         strcpy(t->options[i],m->string);
         i = N_WORDS+N_OPTIONS;
@@ -382,7 +424,7 @@ void GenerarTabla(FILE *fich) {
       return;
     }
   }
-  print_TablaTokens();
+
 }
 
 int getCodigoDesdeIndice(int indice) {
@@ -424,10 +466,10 @@ int mostrarSVG() {
 char* nombreSVG() {
 	char* nombre = malloc(sizeof(char)*MAX_CHARS);
 	memset(nombre,0,sizeof(char)*MAX_CHARS);
-	
+
 	if(t->options[OPTION_SVG_NAME_INDEX] != NULL) strcpy(nombre,t->options[OPTION_SVG_NAME_INDEX]);
   else strcpy(nombre,NOMBRE_DEFECTO_SVG);
-  
+
   return nombre;
 }
 
