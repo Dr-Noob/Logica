@@ -452,7 +452,7 @@ int mostrarTree() {
       if(strcmp(t->options[OPTION_STDOUT_INDEX],"yes") == 0)return BOOLEAN_TRUE;
       return BOOLEAN_FALSE;
     }
-    return -1;
+    return BOOLEAN_FALSE;
 }
 
 int mostrarSVG() {
