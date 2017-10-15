@@ -1,9 +1,8 @@
 %{
 #include <stdio.h>
 #include <string.h>
-#include "common/Global.h"
-#include "Controlador.h"
 #include "Formula.h"
+#include "Global.h"
 int yylex (void);
 void yyerror (FILE *fich, const char *msg);
 extern int yylineno;
@@ -18,7 +17,6 @@ extern int yylineno;
 	Formula formula;
 }
 
-%locations
 %parse-param {FILE *fich}
 %token LPAREN RPAREN AND OR NOT IMP DIMP COMA END_OF_FILE
 %token <a> ATOM
@@ -35,20 +33,15 @@ extern int yylineno;
 
 oracion : e END_OF_FILE
 		{
-			printMsgGreen(MESSAGE_EXPRESION_CORRECTA);
+			printf(GREEN "La expresion se ha reconocido correctamente\n" RESET);
 			ResolverTableaux($1,fich);
 			return 0;
-		}
-	| error END_OF_FILE
-		{
-			printMsgRed(MESSAGE_ERROR_SEMANTICO,@1.first_column,@1.last_column);
-			YYABORT;
 		};
 
 e: e COMA z
 		{
 			$$=Concatenar($1,$3);
-		}
+		};
 	| z
 		{
 			$$=$1;
@@ -112,5 +105,5 @@ g: LPAREN e RPAREN
 %%
 
 void yyerror (FILE *fich, const char *msg) {
-	//printMsgRed(MESSAGE_ERROR_SEMANTICO);
+	printf(RED "ERROR: Error semantico. Por favor, revisa la formula\n" RESET);
 }

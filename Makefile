@@ -1,26 +1,45 @@
 TARGET=tableaux
-CFLAGS=-g -fstack-protector-all -Wall -Wno-unused -Werror -o $(TARGET) -I $(DIR)
+CFLAGS=-g -fstack-protector-all -Wall -Wno-unused -Werror -o $(TARGET) -I $(DIR_COMMON)
 CC=gcc
 
-DIR=src/common
-MAIN=$(DIR)/main.c
-FORMULA=$(DIR)/Formula.c $(DIR)/Formula.h
-TREE=$(DIR)/Tree.c $(DIR)/Tree.h
-SVG=$(DIR)/SVG.c $(DIR)/SVG.h
-GLOBAL=$(DIR)/Global.c $(DIR)/Global.h
-CONFIG=$(DIR)/Config.c $(DIR)/Config.h
+DIR_COMMON=src/common
+DIR_UNIX=src/unix
+DIR_WINDOWS=src/windows
 
-$(TARGET): $(MAIN) flex bison $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG)
-	$(CC) $(MAIN) lex.yy.c grammar.tab.c $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(CFLAGS)
+TREE=$(DIR_COMMON)/Tree.c $(DIR_COMMON)/Tree.h
+SVG=$(DIR_COMMON)/SVG.c $(DIR_COMMON)/SVG.h
+GLOBAL=$(DIR_COMMON)/Global.c $(DIR_COMMON)/Global.h
+FORMULA=$(DIR_COMMON)/Formula.c $(DIR_COMMON)/Formula.h
+BISON=$(DIR_COMMON)/grammar.y
+H_CONTROLADOR=$(DIR_COMMON)/Controlador.h
 
-flex: $(DIR)/lex.l
-	flex -o $(DIR)/lex.yy.c $(DIR)/lex.l
+ifeq ($(OS),Windows_NT)
+	MAIN=$(DIR_WINDOWS)/main.c
+	FLEX=$(DIR_WINDOWS)/lex.l
+	CONTROLADOR=$(DIR_WINDOWS)/Controlador.c
+else
+	MAIN=$(DIR_UNIX)/main.c
+	CONFIG=$(DIR_UNIX)/Config.c $(DIR_UNIX)/Config.h
+	FLEX=$(DIR_UNIX)/lex.l
+	CONTROLADOR=$(DIR_UNIX)/Controlador.c
+endif
 
-bison: $(DIR)/grammar.y
-	bison -d $(DIR)/grammar.y -o $(DIR)/grammar.tab.c
+MAIN=$(DIR_WINDOWS)/main.c
+FLEX=$(DIR_WINDOWS)/lex.l
+CONTROLADOR=$(DIR_WINDOWS)/Controlador.c
+CONFIG=
+
+$(TARGET): $(MAIN) flex bison $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(H_CONTROLADOR) $(CONTROLADOR)
+	$(CC) $(MAIN) src/lex.yy.c src/grammar.tab.c $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(CONTROLADOR) $(CFLAGS)
+
+flex: $(FLEX)
+	flex -o src/lex.yy.c $(FLEX)
+
+bison: $(BISON)
+	bison -o src/grammar.tab.c -d $(BISON)
 
 clean:
-	@rm -rf $(DIR)/lex.yy.c $(DIR)/grammar.tab.h $(DIR)/grammar.tab.c $(TARGET)
+	@rm -rf src/lex.yy.c src/grammar.tab.h src/grammar.tab.c $(TARGET)
 
 run:
 	./tableaux prueba
@@ -28,4 +47,4 @@ run:
 fast:
 	make && make run
 
-.PHONY: clean
+.PHONY: clean flex bison run fast

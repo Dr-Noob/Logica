@@ -1,6 +1,6 @@
 %{
-#include "Formula.h"
-#include "Config.h"
+#include "unix/Formula.h"
+#include "unix/Config.h"
 #include "grammar.tab.h"
 #include <stdlib.h>
 #include <string.h>

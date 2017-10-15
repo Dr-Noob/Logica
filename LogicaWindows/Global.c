@@ -1,4 +1,6 @@
 #include "Global.h"
+#include <stdarg.h>
+#include <stdio.h>
 
 int LANG;
 
@@ -23,7 +25,7 @@ void printMsg(const char *fmt[2], ...) {
   va_start(args, fmt[0]);
   vsnprintf(buffer, sizeof(buffer), fmt[0], args);
   va_end(args);
-  fprintf(stdout,"%s",buffer);
+  fprintf(stdout,buffer);
 }
 
 void printMsgRed(const char *fmt[2], ...) {
@@ -44,16 +46,4 @@ void printMsgGreen(const char *fmt[2], ...) {
   vsnprintf(buffer, sizeof(buffer), fmt[0], args);
   va_end(args);
   fprintf(stderr,GREEN "%s" RESET,buffer);
-}
-
-int LongitudCaracteres(FILE *fichero) {
-  int c = 0;
-  int count = 0;
-
-  do {
-    c = fgetc(fichero);
-    count++;
-  } while(c != EOF && c != '\n');
-
-  return count;
 }

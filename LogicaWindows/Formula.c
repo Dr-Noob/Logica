@@ -87,7 +87,7 @@ Atomo ExtraerAtomo(Formula f) {
 }
 
 int SoloTieneUnAtomo(Formula f) {
-  return(f->f1 == NULL && ((f->a1 != NULL) ^ (f->a2 != NULL)) && f->f2 == NULL);
+  return(f->f1 == NULL && (f->a1 != NULL ^ f->a2 != NULL) && f->f2 == NULL);
 }
 
 int EsAlfaFormula(Formula f) {
@@ -441,7 +441,7 @@ char* show_svg(char* buf, Formula f) {
 //FIN Funciones IMPRIMIR
 
 //Funcion recursiva que devuelve el 'tree' correspondiende al tableaux 't'
-Tree *CrearArbolDesdeTableauxRecursivo(Tree *tree, Tableaux t) {
+Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
   char *buffer = malloc(sizeof(char)*MAX_CHAR);
   memset(buffer,0,sizeof(char)*MAX_CHAR);
   tree = malloc (sizeof (struct Tree));
@@ -451,14 +451,9 @@ Tree *CrearArbolDesdeTableauxRecursivo(Tree *tree, Tableaux t) {
     if(t->etiqueta == CERRADO)tree->color = COLOR_RED;
     else tree->color = COLOR_GREEN;
   }
-  if(t->ti != NULL)tree->left = CrearArbolDesdeTableauxRecursivo(tree->left,t->ti);
-  if(t->td != NULL)tree->right = CrearArbolDesdeTableauxRecursivo(tree->right,t->td);
+  if(t->ti != NULL)tree->left = CrearArbolDesdeTableaux(tree->left,t->ti);
+  if(t->td != NULL)tree->right = CrearArbolDesdeTableaux(tree->right,t->td);
   return tree;
-}
-
-Tree *CrearArbolDesdeTableaux(Tableaux t) {
-  Tree* tree = NULL;
-  return CrearArbolDesdeTableauxRecursivo(tree, t);
 }
 
 int TableauxCerrado(Tableaux t) {
@@ -478,7 +473,7 @@ int TableauxCerrado(Tableaux t) {
 
 //Imprime el Tableaux en forma de arbol
 void showTableauxTree(Tableaux t) {
-  Tree *arbol = CrearArbolDesdeTableaux(t);
+  Tree *arbol = CrearArbolDesdeTableaux(arbol,t);
   print_ascii_tree(arbol);
   freeTree(arbol);
 }
@@ -613,9 +608,9 @@ void Resolver(Tableaux t) {
 
 //Funciones para resolver alfa formulas
 void and(Tableaux t,int busqueda) {
-  Formula aux = NULL;
-  Formula izquierda = NULL;
-  Formula derecha = NULL;
+  Formula aux;
+  Formula izquierda;
+  Formula derecha;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -639,9 +634,9 @@ void and(Tableaux t,int busqueda) {
 }
 
 void orNegado(Tableaux t,int busqueda) {
-  Formula aux = NULL;
-  Formula izquierda = NULL;
-  Formula derecha = NULL;
+  Formula aux;
+  Formula izquierda;
+  Formula derecha;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -665,9 +660,9 @@ void orNegado(Tableaux t,int busqueda) {
 }
 
 void impNegado(Tableaux t,int busqueda) {
-  Formula aux = NULL;
-  Formula izquierda = NULL;
-  Formula derecha = NULL;
+  Formula aux;
+  Formula izquierda;
+  Formula derecha;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -691,9 +686,9 @@ void impNegado(Tableaux t,int busqueda) {
 }
 
 void dobleImp(Tableaux t,int busqueda) {
-  Formula aux = NULL;
-  Formula izquierda = NULL;
-  Formula derecha = NULL;
+  Formula aux;
+  Formula izquierda;
+  Formula derecha;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -719,9 +714,9 @@ void dobleImp(Tableaux t,int busqueda) {
 
 //Funciones para resolver beta formulas
 void andNegado(Tableaux t,int busqueda) {
-  Formula aux = NULL;
-  Formula izquierda = NULL;
-  Formula derecha = NULL;
+  Formula aux;
+  Formula izquierda;
+  Formula derecha;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -757,9 +752,9 @@ void andNegado(Tableaux t,int busqueda) {
 }
 
 void or(Tableaux t,int busqueda) {
-  Formula aux = NULL;
-  Formula izquierda = NULL;
-  Formula derecha = NULL;
+  Formula aux;
+  Formula izquierda;
+  Formula derecha;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -795,9 +790,9 @@ void or(Tableaux t,int busqueda) {
 }
 
 void imp(Tableaux t,int busqueda) {
-  Formula aux = NULL;
-  Formula izquierda = NULL;
-  Formula derecha = NULL;
+  Formula aux;
+  Formula izquierda;
+  Formula derecha;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -835,9 +830,9 @@ void imp(Tableaux t,int busqueda) {
 }
 
 void dobleImpNegado(Tableaux t,int busqueda) {
-  Formula aux = NULL;
-  Formula izquierda = NULL;
-  Formula derecha = NULL;
+  Formula aux;
+  Formula izquierda;
+  Formula derecha;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -881,12 +876,16 @@ void dobleImpNegado(Tableaux t,int busqueda) {
 int MAX_CHAR;
 int MAX_NIVELES;
 
-int nNodos(TableauxInfo tinf) {
-  return tinf->nodos;
-}
+int LongitudCaracteres(FILE *fichero) {
+  int c = 0;
+  int count = 0;
 
-int nNiveles(TableauxInfo tinf) {
-  return tinf->niveles;
+  do {
+    c = fgetc(fichero);
+    count++;
+  } while(c != EOF && c != '\n');
+
+  return count;
 }
 
 TableauxInfo CrearTableauxInfo() {
@@ -914,20 +913,42 @@ TableauxInfo CalcularTableauxInfo(Tableaux t) {
   return tinf;
 }
 
-int lineas(FILE *fich) {
-  int ch = 0;
-  int count = 0;
-  int charsOnCurrentLine = 0;
+void ResolverTableaux(Formula oracion, FILE* fichero) {
+  rewind(fichero);
+  MAX_CHAR = LongitudCaracteres(fichero)*4;
+  Tableaux t = CrearTableaux(oracion);
+  Resolver(t);
+  TableauxInfo tinf = CalcularTableauxInfo(t);
+  MAX_NIVELES = tinf->niveles;
 
-  while ((ch = fgetc(fich)) != EOF) {
-    if (ch == '\n') {
-        count++;
-        charsOnCurrentLine = 0;
-    } else {
-        charsOnCurrentLine++;
-    }
+  //Comprobar que el arbol va a caber en la terminal
+  //Si se ha especificado, aumentar MAX_HEIGHT en Tree.h(hacer como con MAX_CHAR)
+  if(tinf->nodos > DIRTY_OUTPUT_NODES) printMsg(MESSAGE_ARBOL_DEMASIADO_GRANDE);
+  else {
+    printMsg(MESSAGE_SOLUCION);
+    showTableauxTree(t);
+    printf("\n\n");
   }
-  if (charsOnCurrentLine > 0)count++;
-  rewind(fich);
-  return count;
+  printf("\n");
+
+  if(TableauxCerrado(t)) {
+    printMsgRed(MESSAGE_TABLEAUX_CERRADO);
+    printMsg(MESSAGE_TABLEAUX_INSTATISFACIBLE);
+  }
+  else {
+    printMsgGreen(MESSAGE_TABLEAUX_ABIERTO);
+    printMsg(MESSAGE_TABLEAUX_STATISFACIBLE);
+  }
+
+  FILE *fich = fopen(NOMBRE_ARCHIVO,"w+");
+  if (fich==NULL) {
+		printMsgRed(MESSAGE_ABRIR_ARCHIVO_FALLIDO,NOMBRE_ARCHIVO);
+		printMsgRed(MESSAGE_NO_SVG);
+	} else {
+		showTableauxSVG(t,fich,tinf->nodos);
+    fclose(fich);
+	}
+
+  LiberarTableaux(t);
+  LiberarTableauxInfo(tinf);
 }

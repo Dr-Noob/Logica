@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Global.h"
+#include "../common/Global.h"
 #include "Formula.h"
-#include "grammar.tab.h"
+#include "../grammar.tab.h"
 
 #define MAX_CHARS 15
 #define N_WORDS 5
@@ -27,8 +27,6 @@
 
 static const char* WORDS[] = { "and", "or", "not", "imp", "dimp" };
 static const char* OPTIONS[] = { "svg", "stdout", "svg_name" };
-
-static const char* NOMBRE_DEFECTO_SVG = "sol.svg";
 
 struct TablaTokens;
 typedef struct TablaTokens* TablaTokens;

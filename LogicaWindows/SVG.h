@@ -20,6 +20,8 @@ typedef struct CoordenadasRep *Coordenadas;
 
 extern int MAX_NIVELES;
 
+static const char* NOMBRE_ARCHIVO = "sol.svg";
+
 static const char* SIMBOLO_ABIERTO = "&#10004;";
 static const char* SIMBOLO_CERRADO = "&#10008;";
 
@@ -36,8 +38,6 @@ static const char* ASCII_SIMBOLO_DIMP = " <-> ";
 static const char* ASCII_SIMBOLO_NOT = "~";
 
 static const float PIXELES_POR_CARACTER = 7.2025;
-
-static const char* NOMBRE_DEFECTO_SVG = "sol.svg";
 
 void showTableauxSVG(Tableaux t, FILE *fich, int nNodos);
 
