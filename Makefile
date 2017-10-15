@@ -1,15 +1,31 @@
-tableaux : main.c lex.yy.c grammar.tab.c Formula.c Formula.h Tree.c Tree.h SVG.c SVG.h Makefile Global.c Global.h Config.c Config.h
-	gcc main.c lex.yy.c grammar.tab.c Global.c Formula.c Tree.c SVG.c Config.c -fstack-protector-all -o tableaux -g
+TARGET=tableaux
+CFLAGS=-g -fstack-protector-all -o $(TARGET) -I $(DIR)
+CC=gcc
 
-lex.yy.c : lex.l
-	flex -o lex.yy.c lex.l
+DIR=src/common
+MAIN=$(DIR)/main.c
+FORMULA=$(DIR)/Formula.c $(DIR)/Formula.h
+TREE=$(DIR)/Tree.c $(DIR)/Tree.h
+SVG=$(DIR)/SVG.c $(DIR)/SVG.h
+GLOBAL=$(DIR)/Global.c $(DIR)/Global.h
+CONFIG=$(DIR)/Config.c $(DIR)/Config.h
 
-grammar.tab.c : grammar.y
-	bison -d grammar.y
+$(TARGET): $(MAIN) flex bison $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG)
+	$(CC) $(MAIN) lex.yy.c grammar.tab.c $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(CFLAGS)
 
-clean :
-	@rm -f lex.yy.c grammar.tab.h grammar.tab.c
+flex: $(DIR)/lex.l
+	flex -o $(DIR)/lex.yy.c $(DIR)/lex.l
+
+bison: $(DIR)/grammar.y
+	bison -d $(DIR)/grammar.y -o $(DIR)/grammar.tab.c
+
+clean:
+	@rm -rf $(DIR)/lex.yy.c $(DIR)/grammar.tab.h $(DIR)/grammar.tab.c $(TARGET)
+
 run:
 	./tableaux prueba
+
 fast:
 	make && make run
+
+.PHONY: clean

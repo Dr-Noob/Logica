@@ -1,11 +1,1 @@
-and = ^
-or = V
-not = ~
-dimp = <->
-imp = ->
-
-stdout = yes
-svg = yes
-svg_name = sal2.svg
-
-o <-> ~(r -> s) V o, a -> ~(r V ~b)
+p imp q,q imp p and r,p imp (p imp q) imp r
