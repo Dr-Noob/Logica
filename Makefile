@@ -1,5 +1,5 @@
 TARGET=tableaux
-CFLAGS=-g -fstack-protector-all -o $(TARGET) -I $(DIR)
+CFLAGS=-g -fstack-protector-all -Wall -Wno-unused -Werror -o $(TARGET) -I $(DIR)
 CC=gcc
 
 DIR=src/common

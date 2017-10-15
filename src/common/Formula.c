@@ -88,7 +88,7 @@ Atomo ExtraerAtomo(Formula f) {
 }
 
 int SoloTieneUnAtomo(Formula f) {
-  return(f->f1 == NULL && (f->a1 != NULL ^ f->a2 != NULL) && f->f2 == NULL);
+  return(f->f1 == NULL && ((f->a1 != NULL) ^ (f->a2 != NULL)) && f->f2 == NULL);
 }
 
 int EsAlfaFormula(Formula f) {
@@ -442,7 +442,7 @@ char* show_svg(char* buf, Formula f) {
 //FIN Funciones IMPRIMIR
 
 //Funcion recursiva que devuelve el 'tree' correspondiende al tableaux 't'
-Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
+Tree *CrearArbolDesdeTableauxRecursivo(Tree *tree, Tableaux t) {
   char *buffer = malloc(sizeof(char)*MAX_CHAR);
   memset(buffer,0,sizeof(char)*MAX_CHAR);
   tree = malloc (sizeof (struct Tree));
@@ -452,9 +452,14 @@ Tree *CrearArbolDesdeTableaux(Tree *tree, Tableaux t) {
     if(t->etiqueta == CERRADO)tree->color = COLOR_RED;
     else tree->color = COLOR_GREEN;
   }
-  if(t->ti != NULL)tree->left = CrearArbolDesdeTableaux(tree->left,t->ti);
-  if(t->td != NULL)tree->right = CrearArbolDesdeTableaux(tree->right,t->td);
+  if(t->ti != NULL)tree->left = CrearArbolDesdeTableauxRecursivo(tree->left,t->ti);
+  if(t->td != NULL)tree->right = CrearArbolDesdeTableauxRecursivo(tree->right,t->td);
   return tree;
+}
+
+Tree *CrearArbolDesdeTableaux(Tableaux t) {
+  Tree* tree = NULL;
+  return CrearArbolDesdeTableauxRecursivo(tree, t);
 }
 
 int TableauxCerrado(Tableaux t) {
@@ -474,7 +479,7 @@ int TableauxCerrado(Tableaux t) {
 
 //Imprime el Tableaux en forma de arbol
 void showTableauxTree(Tableaux t) {
-  Tree *arbol = CrearArbolDesdeTableaux(arbol,t);
+  Tree *arbol = CrearArbolDesdeTableaux(t);
   print_ascii_tree(arbol);
   freeTree(arbol);
 }
@@ -609,9 +614,9 @@ void Resolver(Tableaux t) {
 
 //Funciones para resolver alfa formulas
 void and(Tableaux t,int busqueda) {
-  Formula aux;
-  Formula izquierda;
-  Formula derecha;
+  Formula aux = NULL;
+  Formula izquierda = NULL;
+  Formula derecha = NULL;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -635,9 +640,9 @@ void and(Tableaux t,int busqueda) {
 }
 
 void orNegado(Tableaux t,int busqueda) {
-  Formula aux;
-  Formula izquierda;
-  Formula derecha;
+  Formula aux = NULL;
+  Formula izquierda = NULL;
+  Formula derecha = NULL;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -661,9 +666,9 @@ void orNegado(Tableaux t,int busqueda) {
 }
 
 void impNegado(Tableaux t,int busqueda) {
-  Formula aux;
-  Formula izquierda;
-  Formula derecha;
+  Formula aux = NULL;
+  Formula izquierda = NULL;
+  Formula derecha = NULL;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -687,9 +692,9 @@ void impNegado(Tableaux t,int busqueda) {
 }
 
 void dobleImp(Tableaux t,int busqueda) {
-  Formula aux;
-  Formula izquierda;
-  Formula derecha;
+  Formula aux = NULL;
+  Formula izquierda = NULL;
+  Formula derecha = NULL;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -715,9 +720,9 @@ void dobleImp(Tableaux t,int busqueda) {
 
 //Funciones para resolver beta formulas
 void andNegado(Tableaux t,int busqueda) {
-  Formula aux;
-  Formula izquierda;
-  Formula derecha;
+  Formula aux = NULL;
+  Formula izquierda = NULL;
+  Formula derecha = NULL;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -753,9 +758,9 @@ void andNegado(Tableaux t,int busqueda) {
 }
 
 void or(Tableaux t,int busqueda) {
-  Formula aux;
-  Formula izquierda;
-  Formula derecha;
+  Formula aux = NULL;
+  Formula izquierda = NULL;
+  Formula derecha = NULL;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -791,9 +796,9 @@ void or(Tableaux t,int busqueda) {
 }
 
 void imp(Tableaux t,int busqueda) {
-  Formula aux;
-  Formula izquierda;
-  Formula derecha;
+  Formula aux = NULL;
+  Formula izquierda = NULL;
+  Formula derecha = NULL;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {
@@ -831,9 +836,9 @@ void imp(Tableaux t,int busqueda) {
 }
 
 void dobleImpNegado(Tableaux t,int busqueda) {
-  Formula aux;
-  Formula izquierda;
-  Formula derecha;
+  Formula aux = NULL;
+  Formula izquierda = NULL;
+  Formula derecha = NULL;
 
   t->ti = CrearTableaux(CopiarFormula(t->f));
   if(busqueda == 0) {

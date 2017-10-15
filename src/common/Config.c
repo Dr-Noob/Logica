@@ -427,6 +427,7 @@ void GenerarTabla(FILE *fich) {
 
 }
 
+//Lo que esta devolviendo es realmente los tokens de bison
 int getCodigoDesdeIndice(int indice) {
     switch (indice) {
       case 0:
@@ -440,6 +441,7 @@ int getCodigoDesdeIndice(int indice) {
       case 4:
         return DIMP;
     }
+    return BISON_TOKEN_ERROR;
 }
 
 int TablaCorrecta() {

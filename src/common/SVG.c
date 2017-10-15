@@ -261,7 +261,8 @@ SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int nivel,Nodo n
 	return s;
 }
 
-SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t)  {
+SVG *CrearSVGDesdeTableaux(Tableaux t)  {
+	SVG *s = NULL;
 	int nivel = 0;
 	s = malloc(sizeof(struct SVG));
 	memset(s,0,sizeof(struct SVG));
@@ -271,7 +272,7 @@ SVG *CrearSVGDesdeTableaux(SVG *s, Tableaux t)  {
 }
 
 void showTableauxSVG(Tableaux t, FILE *fich, int nNodos) {
-	SVG *s = CrearSVGDesdeTableaux(s,t);
+	SVG *s = CrearSVGDesdeTableaux(t);
 	SVG_data ** nodos = malloc(sizeof(struct SVG_data*)+sizeof(struct SVG_data*)*nNodos);
 	memset(nodos,0,sizeof(struct SVG_data*)+sizeof(struct SVG_data*)*nNodos);
 
