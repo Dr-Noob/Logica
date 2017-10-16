@@ -5,8 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../common/Global.h"
+#include "Global.h"
 #include "Formula.h"
+#include "SVG.h"
 #include "../grammar.tab.h"
 
 #define MAX_CHARS 15

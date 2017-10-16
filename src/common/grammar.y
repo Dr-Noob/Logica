@@ -1,9 +1,9 @@
 %{
 #include <stdio.h>
 #include <string.h>
-#include "common/Global.h"
-#include "Controlador.h"
 #include "Formula.h"
+#include "Global.h"
+#include "Controlador.h"
 int yylex (void);
 void yyerror (FILE *fich, const char *msg);
 extern int yylineno;

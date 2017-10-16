@@ -24,11 +24,6 @@ else
 	CONTROLADOR=$(DIR_UNIX)/Controlador.c
 endif
 
-MAIN=$(DIR_WINDOWS)/main.c
-FLEX=$(DIR_WINDOWS)/lex.l
-CONTROLADOR=$(DIR_WINDOWS)/Controlador.c
-CONFIG=
-
 $(TARGET): $(MAIN) flex bison $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(H_CONTROLADOR) $(CONTROLADOR)
 	$(CC) $(MAIN) src/lex.yy.c src/grammar.tab.c $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(CONTROLADOR) $(CFLAGS)
 

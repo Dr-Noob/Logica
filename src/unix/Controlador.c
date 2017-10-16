@@ -1,5 +1,5 @@
-#include "Config.h"
 #include "Controlador.h"
+#include "Config.h"
 
 void ResolverTableaux(Formula oracion, FILE* fichero) {
   //Dejar el puntero de fichero en la ultima linea
