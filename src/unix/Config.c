@@ -450,26 +450,20 @@ int TablaCorrecta() {
 }
 
 int mostrarTree() {
-    if(t->options[OPTION_STDOUT_INDEX] != NULL) {
-      if(strcmp(t->options[OPTION_STDOUT_INDEX],"yes") == 0)return BOOLEAN_TRUE;
-      return BOOLEAN_FALSE;
-    }
-    return BOOLEAN_FALSE;
+  if(t->options[OPTION_STDOUT_INDEX][0] != 0 && strcmp(t->options[OPTION_STDOUT_INDEX],"yes") == 0)return BOOLEAN_TRUE;
+  return BOOLEAN_FALSE;
 }
 
 int mostrarSVG() {
-	if(t->options[OPTION_SVG_INDEX] != NULL) {
-    if(strcmp(t->options[OPTION_SVG_INDEX],"yes") == 0)return BOOLEAN_TRUE;
-    return BOOLEAN_FALSE;
-  }
-  return -1;
+	if(t->options[OPTION_SVG_INDEX][0] != 0 && strcmp(t->options[OPTION_SVG_INDEX],"no") == 0) return BOOLEAN_FALSE;
+  return BOOLEAN_TRUE;
 }
 
 char* nombreSVG() {
 	char* nombre = malloc(sizeof(char)*MAX_CHARS);
 	memset(nombre,0,sizeof(char)*MAX_CHARS);
 
-	if(t->options[OPTION_SVG_NAME_INDEX] != NULL) strcpy(nombre,t->options[OPTION_SVG_NAME_INDEX]);
+	if(t->options[OPTION_SVG_NAME_INDEX][0] != 0) strcpy(nombre,t->options[OPTION_SVG_NAME_INDEX]);
   else strcpy(nombre,NOMBRE_DEFECTO_SVG);
 
   return nombre;

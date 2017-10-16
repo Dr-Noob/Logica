@@ -49,8 +49,7 @@ void ResolverTableaux(Formula oracion, FILE* fichero) {
     printMsg(MESSAGE_TABLEAUX_STATISFACIBLE);
   }
 
-	ret = mostrarSVG();
-	if(ret == -1 || ret == BOOLEAN_TRUE) {
+	if(mostrarSVG()) {
 		char* nombre_archivo = nombreSVG();
 		fich_svg = fopen(nombre_archivo,"w+");
 		if (fich_svg==NULL) {
