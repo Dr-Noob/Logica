@@ -1,7 +1,3 @@
-TARGET=tableaux
-CFLAGS=-g -fstack-protector-all -Wall -Wno-unused -Werror -o $(TARGET) -I $(DIR_COMMON)
-CC=gcc
-
 DIR_COMMON=src/common
 DIR_UNIX=src/unix
 DIR_WINDOWS=src/windows
@@ -17,12 +13,18 @@ ifeq ($(OS),Windows_NT)
 	MAIN=$(DIR_WINDOWS)/main.c
 	FLEX=$(DIR_WINDOWS)/lex.l
 	CONTROLADOR=$(DIR_WINDOWS)/Controlador.c
+	PLATFORM_FLAG=WINDOWS
 else
 	MAIN=$(DIR_UNIX)/main.c
 	CONFIG=$(DIR_UNIX)/Config.c $(DIR_UNIX)/Config.h
 	FLEX=$(DIR_UNIX)/lex.l
 	CONTROLADOR=$(DIR_UNIX)/Controlador.c
+	PLATFORM_FLAG=UNIX
 endif
+
+TARGET=tableaux
+CFLAGS=-g -fstack-protector-all -Wall -Wno-unused -Werror -o $(TARGET) -I $(DIR_COMMON) -D $(PLATFORM_FLAG)
+CC=gcc
 
 $(TARGET): $(MAIN) flex bison $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(H_CONTROLADOR) $(CONTROLADOR)
 	$(CC) $(MAIN) src/lex.yy.c src/grammar.tab.c $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(CONTROLADOR) $(CFLAGS)

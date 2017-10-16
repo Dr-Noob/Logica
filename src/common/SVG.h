@@ -7,6 +7,12 @@
 #include "Global.h"
 #include "Formula.h"
 
+#ifdef WINDOWS
+#include "../windows/Fuente.h"
+#else
+#include "../unix/Fuente.h"
+#endif
+
 typedef struct SVG_data SVG_data;
 typedef struct SVG SVG;
 typedef struct NodoRep *Nodo;

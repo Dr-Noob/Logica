@@ -87,15 +87,15 @@ void print_linea(int x1,int y1,int x2,int y2,FILE *fich) {
 void print_svg_recursivo(SVG_data *s,FILE *fich) {
 	//printf("width=%f porque xmax=%f y x=%d\n",s->xmax-(float)s->x,s->xmax,s->x);
 	//fprintf(fich,"<rect x=\"%d\" y=\"%d\" width=\"%f\" height=\"%d\" style=\"fill:none;stroke-width:1;stroke:rgb(0,0,0)\" />\n",s->x,s->y,s->xmax-(float)s->x,10);
-	if(s->color == COLOR_DEFAULT)fprintf(fich,"<text x=\"%d\" y=\"%d\" style=\"fill:black;font-family:monospace\">%s</text>\n",s->x,s->y,s->formula);
+	if(s->color == COLOR_DEFAULT)fprintf(fich,"<text x=\"%d\" y=\"%d\" style=\"fill:black;font-family:%s\">%s</text>\n",s->x,s->y,FUENTE,s->formula);
     else {
       if(s->color == COLOR_RED) {
-      	fprintf(fich,"<text x=\"%d\" y=\"%d\" style=\"fill:red;font-family:monospace\">%s</text>\n",s->x,s->y,s->formula);
-      	fprintf(fich,"<text x=\"%f\" y=\"%d\" style=\"fill:red;font-family:monospace\">%s</text>\n",(double)s->x+s->centro,s->y+ALTURA_CARACTER,SIMBOLO_CERRADO);
+      	fprintf(fich,"<text x=\"%d\" y=\"%d\" style=\"fill:red;font-family:%s\">%s</text>\n",s->x,s->y,FUENTE,s->formula);
+      	fprintf(fich,"<text x=\"%f\" y=\"%d\" style=\"fill:red;font-family:%s\">%s</text>\n",(double)s->x+s->centro,s->y+ALTURA_CARACTER,FUENTE,SIMBOLO_CERRADO);
       }
       else {
-      	fprintf(fich,"<text x=\"%d\" y=\"%d\" style=\"fill:green;font-family:monospace\">%s</text>\n",s->x,s->y,s->formula);
-      	fprintf(fich,"<text x=\"%f\" y=\"%d\" style=\"fill:green;font-family:monospace\">%s</text>\n",(double)s->x+s->centro,s->y+ALTURA_CARACTER,SIMBOLO_ABIERTO);
+      	fprintf(fich,"<text x=\"%d\" y=\"%d\" style=\"fill:green;font-family:%s\">%s</text>\n",s->x,s->y,FUENTE,s->formula);
+      	fprintf(fich,"<text x=\"%f\" y=\"%d\" style=\"fill:green;font-family:%s\">%s</text>\n",(double)s->x+s->centro,s->y+ALTURA_CARACTER,FUENTE,SIMBOLO_ABIERTO);
       }
   }
 
