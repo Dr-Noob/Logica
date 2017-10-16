@@ -57,3 +57,21 @@ int LongitudCaracteres(FILE *fichero) {
 
   return count;
 }
+
+int lineas(FILE *fich) {
+  int ch = 0;
+  int count = 0;
+  int charsOnCurrentLine = 0;
+
+  while ((ch = fgetc(fich)) != EOF) {
+    if (ch == '\n') {
+        count++;
+        charsOnCurrentLine = 0;
+    } else {
+        charsOnCurrentLine++;
+    }
+  }
+  if (charsOnCurrentLine > 0)count++;
+  rewind(fich);
+  return count;
+}

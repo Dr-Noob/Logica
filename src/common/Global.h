@@ -71,6 +71,8 @@ void printMsg(const char *fmt[2], ...);
 void printMsgRed(const char *fmt[2], ...);
 void printMsgGreen(const char *fmt[2], ...);
 void getLang();
+
 int LongitudCaracteres(FILE *fichero);
+int lineas(FILE *fich);
 
 #endif

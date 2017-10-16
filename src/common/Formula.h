@@ -41,22 +41,22 @@ struct TableauxRep {
 
 Formula CrearFormula(Atomo a);
 Atomo CrearAtomo(char _id,int _not);
+TableauxInfo CrearTableauxInfo();
+Tableaux CrearTableaux(Formula inicial);
+TableauxInfo CrearTableauxInfo(Tableaux t);
+
 Formula NegarFormula(Formula f);
 Formula Unir(Formula f1,int operador,Formula f2);
 Formula Concatenar(Formula f1,Formula f2);
-void ResolverTableaux(Formula oracion, FILE* fich);
 char* show_svg(char* buf, Formula f);
-void LiberarAtomo(Atomo a);
-int lineas(FILE *fich);
-TableauxInfo CrearTableauxInfo();
 int nNodos(TableauxInfo tinf);
 int nNiveles(TableauxInfo tinf);
 int TableauxCerrado(Tableaux t);
+void Resolver(Tableaux t);
+void showTableauxTree(Tableaux t);
+
 void LiberarTableauxInfo(TableauxInfo tinf);
 void LiberarTableaux(Tableaux t);
-Tableaux CrearTableaux(Formula inicial);
-void Resolver(Tableaux t);
-TableauxInfo CalcularTableauxInfo(Tableaux t);
-void showTableauxTree(Tableaux t);
+void LiberarAtomo(Atomo a);
 
 #endif

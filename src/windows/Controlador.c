@@ -5,7 +5,7 @@ void ResolverTableaux(Formula oracion, FILE* fichero) {
   MAX_CHAR = LongitudCaracteres(fichero)*4;
   Tableaux t = CrearTableaux(oracion);
   Resolver(t);
-  TableauxInfo tinf = CalcularTableauxInfo(t);
+  TableauxInfo tinf = CrearTableauxInfo(t);
   int nodos = nNodos(tinf);
   MAX_NIVELES = nNiveles(tinf);
 

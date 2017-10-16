@@ -23,7 +23,7 @@ else
 endif
 
 TARGET=tableaux
-CFLAGS=-g -fstack-protector-all -Wall -Wno-unused -Werror -o $(TARGET) -I $(DIR_COMMON) -D $(PLATFORM_FLAG)
+CFLAGS=-g -fstack-protector-all -Wall -pedantic -Wno-unused -Werror -o $(TARGET) -I $(DIR_COMMON) -D $(PLATFORM_FLAG)
 CC=gcc
 
 $(TARGET): $(MAIN) flex bison $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(H_CONTROLADOR) $(CONTROLADOR)

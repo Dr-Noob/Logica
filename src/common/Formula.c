@@ -889,45 +889,22 @@ int nNiveles(TableauxInfo tinf) {
   return tinf->niveles;
 }
 
-TableauxInfo CrearTableauxInfo() {
-  TableauxInfo tinf = malloc(sizeof(struct TableauxInfo));
-  memset(tinf,0,sizeof(struct TableauxInfo));
-  return tinf;
-}
-
 void LiberarTableauxInfo(TableauxInfo tinf) {
   free(tinf);
 }
 
-void CalcularTableauxInfoRecursivo(Tableaux t, TableauxInfo tinf, int nivel) {
+void CrearTableauxInfoRecursivo(Tableaux t, TableauxInfo tinf, int nivel) {
   tinf->nodos++;
   if(nivel > tinf->niveles)tinf->niveles = nivel;
-  if(t->ti != NULL)CalcularTableauxInfoRecursivo(t->ti,tinf,nivel+1);
-  if(t->td != NULL)CalcularTableauxInfoRecursivo(t->td,tinf,nivel+1);
+  if(t->ti != NULL)CrearTableauxInfoRecursivo(t->ti,tinf,nivel+1);
+  if(t->td != NULL)CrearTableauxInfoRecursivo(t->td,tinf,nivel+1);
 }
 
-TableauxInfo CalcularTableauxInfo(Tableaux t) {
-  TableauxInfo tinf = CrearTableauxInfo();
+TableauxInfo CrearTableauxInfo(Tableaux t) {
+  TableauxInfo tinf = malloc(sizeof(struct TableauxInfo));
+  memset(tinf,0,sizeof(struct TableauxInfo));
   tinf->nodos = 1;
-  if(t->ti != NULL)CalcularTableauxInfoRecursivo(t->ti,tinf,2);
-  if(t->td != NULL)CalcularTableauxInfoRecursivo(t->td,tinf,2);
+  if(t->ti != NULL)CrearTableauxInfoRecursivo(t->ti,tinf,2);
+  if(t->td != NULL)CrearTableauxInfoRecursivo(t->td,tinf,2);
   return tinf;
-}
-
-int lineas(FILE *fich) {
-  int ch = 0;
-  int count = 0;
-  int charsOnCurrentLine = 0;
-
-  while ((ch = fgetc(fich)) != EOF) {
-    if (ch == '\n') {
-        count++;
-        charsOnCurrentLine = 0;
-    } else {
-        charsOnCurrentLine++;
-    }
-  }
-  if (charsOnCurrentLine > 0)count++;
-  rewind(fich);
-  return count;
 }
