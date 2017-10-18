@@ -26,13 +26,13 @@ TARGET=tableaux
 CFLAGS=-g -fstack-protector-all -Wall -pedantic -Wno-unused -Werror -o $(TARGET) -I $(DIR_COMMON) -D $(PLATFORM_FLAG)
 CC=gcc
 
-$(TARGET): $(MAIN) flex bison $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(H_CONTROLADOR) $(CONTROLADOR)
+$(TARGET): $(MAIN) src/lex.yy.c src/grammar.tab.c $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(H_CONTROLADOR) $(CONTROLADOR)
 	$(CC) $(MAIN) src/lex.yy.c src/grammar.tab.c $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(CONTROLADOR) $(CFLAGS)
 
-flex: $(FLEX)
+src/lex.yy.c: $(FLEX)
 	flex -o src/lex.yy.c $(FLEX)
 
-bison: $(BISON)
+src/grammar.tab.c: $(BISON)
 	bison -o src/grammar.tab.c -d $(BISON)
 
 clean:
@@ -44,4 +44,4 @@ run:
 fast:
 	make && make run
 
-.PHONY: clean flex bison run fast
+.PHONY: clean run fast
