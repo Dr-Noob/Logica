@@ -13,7 +13,8 @@ extern TablaTokens t;
 
 int main( int argc, char* argv[] ) {
 	int yyret = 0;
-
+	getLang();
+	
 	if (argc != 2) {
 		printMsgRed(MESSAGE_ARGS_MAIN);
 		return 1;
@@ -31,7 +32,6 @@ int main( int argc, char* argv[] ) {
 		freeTablaTokens();
 		return EXIT_FAILURE;
 	}
-	getLang();
 	yyin = fich;
 	yyret = yyparse(fich);
 	fclose(fich);

@@ -1,1 +1,1 @@
-p imp q,q imp p and r,m and not(r dimp m),p imp (p imp q) imp r,not(p and not m or s dimp a)
+(p d) and (not p or q or and r)
