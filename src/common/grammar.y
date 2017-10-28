@@ -52,6 +52,16 @@ e: e COMA z
 	| z
 		{
 			$$=$1;
+		}
+	| error COMA d
+		{
+			printMsgRed(MESSAGE_ERROR_SEMANTICO,@1.first_column,@1.last_column);
+			YYABORT;
+		}
+	| e COMA error
+		{
+			printMsgRed(MESSAGE_ERROR_SEMANTICO,@3.first_column,@3.last_column);
+			YYABORT;
 		};
 
 z: z DIMP i
@@ -61,6 +71,16 @@ z: z DIMP i
 	| i
 		{
 			$$=$1;
+		}
+ 	| error DIMP d
+		{
+			printMsgRed(MESSAGE_ERROR_SEMANTICO,@1.first_column,@1.last_column);
+			YYABORT;
+		}
+	| z DIMP error
+		{
+			printMsgRed(MESSAGE_ERROR_SEMANTICO,@3.first_column,@3.last_column);
+			YYABORT;
 		};
 
 i: c
@@ -70,6 +90,16 @@ i: c
 	| i IMP c
 		{
 			$$ = Unir($1,COD_IMP,$3);
+		}
+	| error IMP c
+		{
+			printMsgRed(MESSAGE_ERROR_SEMANTICO,@1.first_column,@1.last_column);
+			YYABORT;
+		}
+	| i IMP error
+		{
+			printMsgRed(MESSAGE_ERROR_SEMANTICO,@3.first_column,@3.last_column);
+			YYABORT;
 		};
 
 c: d
@@ -79,6 +109,16 @@ c: d
 	| c OR d
 		{
 			$$ = Unir($1,COD_OR,$3);
+		}
+	| c OR error
+		{
+			printMsgRed(MESSAGE_ERROR_SEMANTICO,@3.first_column,@3.last_column);
+			YYABORT;
+		}
+	| error OR d
+		{
+			printMsgRed(MESSAGE_ERROR_SEMANTICO,@1.first_column,@1.last_column);
+			YYABORT;
 		};
 
 d: n
@@ -88,6 +128,16 @@ d: n
 	| d AND n
 		{
 			$$ = Unir($1,COD_AND,$3);
+		}
+	| d AND error
+		{
+			printMsgRed(MESSAGE_ERROR_SEMANTICO,@3.first_column,@3.last_column);
+			YYABORT;
+		}
+	| error AND n
+		{
+			printMsgRed(MESSAGE_ERROR_SEMANTICO,@1.first_column,@1.last_column);
+			YYABORT;
 		};
 
 n: NOT n
@@ -97,10 +147,21 @@ n: NOT n
 	| g
 		{
 			$$=$1;
+		}
+	| NOT error
+		{
+			printMsgRed(MESSAGE_ERROR_SEMANTICO,@2.first_column,@2.last_column);
+			YYABORT;
 		};
+
 g: LPAREN e RPAREN
 		{
 			$$=$2;
+		}
+  | LPAREN error RPAREN
+		{
+      printMsgRed(MESSAGE_ERROR_SEMANTICO,@2.first_column,@2.last_column);
+			YYABORT;
 		}
 	| ATOM
 		{
