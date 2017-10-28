@@ -24,10 +24,14 @@ endif
 
 TARGET=tableaux
 CFLAGS=-g -fstack-protector-all -Wall -pedantic -Wno-unused -Werror -o $(TARGET) -I $(DIR_COMMON) -D $(PLATFORM_FLAG)
+CFLAGS_RELEASE=-fstack-protector-all -Wall -pedantic -Wno-unused -Werror -o $(TARGET) -I $(DIR_COMMON) -D $(PLATFORM_FLAG) -static -O2
 CC=gcc
 
 $(TARGET): $(MAIN) src/lex.yy.c src/grammar.tab.c $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(H_CONTROLADOR) $(CONTROLADOR)
 	$(CC) $(MAIN) src/lex.yy.c src/grammar.tab.c $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(CONTROLADOR) $(CFLAGS)
+
+release: $(MAIN) src/lex.yy.c src/grammar.tab.c $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(H_CONTROLADOR) $(CONTROLADOR)
+	$(CC) $(MAIN) src/lex.yy.c src/grammar.tab.c $(FORMULA) $(TREE) $(SVG) $(GLOBAL) $(CONFIG) $(CONTROLADOR) $(CFLAGS_RELEASE)
 
 src/lex.yy.c: $(FLEX)
 	flex -o src/lex.yy.c $(FLEX)
@@ -44,4 +48,4 @@ run:
 fast:
 	make && make run
 
-.PHONY: clean run fast
+.PHONY: clean run fast release
