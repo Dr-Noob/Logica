@@ -574,15 +574,12 @@ void Resolver(Tableaux t) {
     }
   }
 
-  //Si ya esta todo resuelto en esta rama o hay una contradiccion, terminar
-  //y marcar el tableaux como corresponda(ABIERTO o CERRADO)
+  //Si la formula esta formada solo por literales,
+  //marcar el tableaux CERRADO si existe un literal y su negado
+  //y en otro caso, marcarlo como ABIERTO
   if(oracion->sig == NULL && SoloTieneUnAtomo(oracion)) {
     if (ContieneContradiccion(t->f))t->etiqueta = CERRADO;
     else t->etiqueta = ABIERTO;
-    return;
-  }
-  if (ContieneContradiccion(t->f)) {
-    t->etiqueta = CERRADO;
     return;
   }
   //Si no lo esta, ramificar
