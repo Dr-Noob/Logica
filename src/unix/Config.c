@@ -459,12 +459,16 @@ int mostrarSVG() {
   return BOOLEAN_TRUE;
 }
 
-char* nombreSVG() {
+char* nombreSVG(char* nombre_fich) {
 	char* nombre = malloc(sizeof(char)*MAX_CHARS);
 	memset(nombre,0,sizeof(char)*MAX_CHARS);
 
 	if(t->options[OPTION_SVG_NAME_INDEX][0] != 0) strcpy(nombre,t->options[OPTION_SVG_NAME_INDEX]);
-  else strcpy(nombre,NOMBRE_DEFECTO_SVG);
+  else {
+    char* nombre_defecto = getNombreDefecto(nombre_fich);
+    strcpy(nombre,nombre_defecto);
+    free(nombre_defecto);
+  }
 
   return nombre;
 }

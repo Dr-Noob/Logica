@@ -6,4 +6,4 @@
 #include "Global.h"
 #include "Tree.h"
 
-void ResolverTableaux(Formula oracion, FILE* fichero);
+void ResolverTableaux(Formula oracion, FILE* fichero, char* nombre_fich);

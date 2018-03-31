@@ -229,6 +229,23 @@ int nCaracteres(char* cadena) {
   return count;
 }
 
+//Devuelve el nombre por defect para el SVG
+// que se calcula a partir del nombre del fichero de entrada
+char* getNombreDefecto(char* nombre_fich) {
+  static const char* STRING_TERMINACION = "-sol.svg";
+  char* nombre = malloc(sizeof(char)*(strlen(nombre_fich)+strlen(STRING_TERMINACION)));
+  strcpy(nombre,nombre_fich);
+
+  //Eliminar extension si tiene
+  char* final = strstr(nombre,".");
+  if(final == NULL)
+    final = nombre+strlen(nombre);
+
+  //A partir de final hay que escribir STRING_TERMINACION
+  strcpy(final,STRING_TERMINACION);
+  return nombre;
+}
+
 SVG_data *CrearSVGDesdeTableauxRecursivo(SVG_data *s,Tableaux t,int nivel,Nodo nodos[MAX_NIVELES]) {
 	s = malloc(sizeof(struct SVG_data));
 	memset(s,0,sizeof(struct SVG_data));

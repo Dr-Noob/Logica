@@ -1,6 +1,6 @@
 #include "Controlador.h"
 
-void ResolverTableaux(Formula oracion, FILE* fichero) {
+void ResolverTableaux(Formula oracion, FILE* fichero, char* nombre_fich) {
   rewind(fichero);
   MAX_CHAR = LongitudCaracteres(fichero)*4;
   Tableaux t = CrearTableaux(oracion);
@@ -28,15 +28,17 @@ void ResolverTableaux(Formula oracion, FILE* fichero) {
     printMsg(MESSAGE_TABLEAUX_STATISFACIBLE);
   }
 
-  FILE *fich = fopen(NOMBRE_DEFECTO_SVG,"w+");
+  char* nombre_defecto = getNombreDefecto(nombre_fich);
+  FILE *fich = fopen(nombre_defecto,"w+");
   if (fich==NULL) {
-		printMsgRed(MESSAGE_ABRIR_ARCHIVO_FALLIDO,NOMBRE_DEFECTO_SVG);
+		printMsgRed(MESSAGE_ABRIR_ARCHIVO_FALLIDO,nombre_defecto);
 		printMsgRed(MESSAGE_NO_SVG);
 	} else {
 		showTableauxSVG(t,fich,nodos);
     fclose(fich);
 	}
 
+  free(nombre_defecto);
   LiberarTableaux(t);
   LiberarTableauxInfo(tinf);
 }

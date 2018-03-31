@@ -43,8 +43,7 @@ static const char* ASCII_SIMBOLO_NOT = "~";
 
 static const float PIXELES_POR_CARACTER = 7.2025;
 
-static const char* NOMBRE_DEFECTO_SVG = "sol.svg";
-
 void showTableauxSVG(Tableaux t, FILE *fich, int nNodos);
+char* getNombreDefecto(char* nombre_fich);
 
 #endif

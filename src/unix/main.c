@@ -6,7 +6,7 @@
 
 extern char *yytext;
 extern int  yyleng;
-extern int yyparse(FILE *fich);
+extern int yyparse(FILE *fich, char* nombre_fich);
 extern FILE *yyin;
 extern int yylex();
 extern TablaTokens t;
@@ -14,7 +14,7 @@ extern TablaTokens t;
 int main( int argc, char* argv[] ) {
 	int yyret = 0;
 	getLang();
-	
+
 	if (argc != 2) {
 		printMsgRed(MESSAGE_ARGS_MAIN);
 		return 1;
@@ -33,7 +33,7 @@ int main( int argc, char* argv[] ) {
 		return EXIT_FAILURE;
 	}
 	yyin = fich;
-	yyret = yyparse(fich);
+	yyret = yyparse(fich,nombre);
 	fclose(fich);
 	freeTablaTokens();
 	return yyret;

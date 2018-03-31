@@ -5,7 +5,7 @@
 
 extern char *yytext;
 extern int  yyleng;
-extern int yyparse(FILE *fich);
+extern int yyparse(FILE *fich, char* nombre_fich);
 extern FILE *yyin;
 extern int yylex();
 
@@ -23,7 +23,7 @@ int main( int argc, char* argv[] ) {
 		return 1;
 	}
 	yyin = fich;
-	yyret = yyparse(fich);
+	yyret = yyparse(fich,nombre);
 	fclose(fich);
 	return yyret;
 }
