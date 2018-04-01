@@ -18,7 +18,7 @@ letra  [a-z]
 
 %%
 	/*Descartar*/
-[ \n\t]+													{ yylloc.last_column += yyleng; }
+[ \n\t\r]+													{ yylloc.last_column += yyleng; }
 
 {letra}														{ POSICION; yylval.a = yytext[0]; return ATOM; }
 "("																{ POSICION; return LPAREN; }
@@ -28,7 +28,7 @@ letra  [a-z]
 ","																{ POSICION; return COMA; }
 
 	/*Operadores										Obtener de fichero de configuracion */
-[^ \t\n(){},]+											{ POSICION; return getCodigoToken(yytext); }
+[^ \t\n\r(){},]+											{ POSICION; return getCodigoToken(yytext); }
 
 	/* EOF */
 <<EOF>>														{ POSICION; return END_OF_FILE; }
