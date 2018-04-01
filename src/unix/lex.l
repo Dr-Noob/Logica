@@ -23,10 +23,12 @@ letra  [a-z]
 {letra}														{ POSICION; yylval.a = yytext[0]; return ATOM; }
 "("																{ POSICION; return LPAREN; }
 ")"																{ POSICION; return RPAREN; }
+"{"																{ POSICION; return LPAREN; }
+"}"																{ POSICION; return RPAREN; }
 ","																{ POSICION; return COMA; }
 
 	/*Operadores										Obtener de fichero de configuracion */
-[^ \t\n(),]+											{ POSICION; return getCodigoToken(yytext); }
+[^ \t\n(){},]+											{ POSICION; return getCodigoToken(yytext); }
 
 	/* EOF */
 <<EOF>>														{ POSICION; return END_OF_FILE; }

@@ -17,6 +17,8 @@ letra  [a-z]
 {letra}														yylval.a = yytext[0]; return ATOM;
 "("																return LPAREN;
 ")"																return RPAREN;
+"{"																return LPAREN;
+"}"																return RPAREN;
 ","																return COMA;
 	/*Operadores*/
 and																return AND;
@@ -29,6 +31,6 @@ dimp															return DIMP;
 <<EOF>>														return END_OF_FILE;
 
 	/*Error*/
-[^a-z,()]+												{ fprintf(stderr, "\x1b[1;31m""ERROR: \"%s\" Caracter/es no reconocido/s""\x1b[0m""\n", yytext); yyterminate(); }
+[^a-z,(){}]+												{ fprintf(stderr, "\x1b[1;31m""ERROR: \"%s\" Caracter/es no reconocido/s""\x1b[0m""\n", yytext); yyterminate(); }
 
 %%
