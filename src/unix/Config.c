@@ -460,17 +460,14 @@ int mostrarSVG() {
 }
 
 char* nombreSVG(char* nombre_fich) {
-	char* nombre = malloc(sizeof(char)*MAX_CHARS);
-	memset(nombre,0,sizeof(char)*MAX_CHARS);
-
-	if(t->options[OPTION_SVG_NAME_INDEX][0] != 0) strcpy(nombre,t->options[OPTION_SVG_NAME_INDEX]);
-  else {
-    char* nombre_defecto = getNombreDefecto(nombre_fich);
-    strcpy(nombre,nombre_defecto);
-    free(nombre_defecto);
+	if(t->options[OPTION_SVG_NAME_INDEX][0] != 0)  {
+    char* nombre = malloc(sizeof(char)*MAX_CHARS);
+  	memset(nombre,0,sizeof(char)*MAX_CHARS);
+    strcpy(nombre,t->options[OPTION_SVG_NAME_INDEX]);
+    return nombre;
   }
-
-  return nombre;
+  else
+    return getNombreDefecto(nombre_fich);
 }
 
 int getCodigoToken(char* token) {
