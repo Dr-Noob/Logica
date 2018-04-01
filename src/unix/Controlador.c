@@ -40,7 +40,8 @@ void ResolverTableaux(Formula oracion, FILE* fichero, char* nombre_fich) {
   }
   printf("\n");
 
-  if(TableauxCerrado(t)) {
+  int tableauxCerrado = TableauxCerrado(t);
+  if(tableauxCerrado) {
     printMsgRed(MESSAGE_TABLEAUX_CERRADO);
     printMsg(MESSAGE_TABLEAUX_INSTATISFACIBLE);
   }
@@ -57,7 +58,7 @@ void ResolverTableaux(Formula oracion, FILE* fichero, char* nombre_fich) {
 			printMsgRed(MESSAGE_NO_SVG);
 			perror(NULL);
 		} else {
-			showTableauxSVG(t,fich_svg,nodos);
+			showTableauxSVG(t,fich_svg,nodos,tableauxCerrado);
 		  fclose(fich_svg);
 		}
 		free(nombre_archivo);

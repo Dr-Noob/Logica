@@ -1,5 +1,8 @@
 #include "SVG.h"
 
+#define MSG_SAT_X 12
+#define MSG_SAT_Y 22
+
 struct SVG {
 	SVG_data* data;
 	int xmax;
@@ -123,12 +126,17 @@ void AjustarDerecha(Coordenadas c, SVG_data ** nodos,int nNodos) {
 	}
 }
 
-void print_svg(SVG *s, FILE *fich, SVG_data ** nodos, int nNodos) {
+void print_svg(SVG *s, FILE *fich, SVG_data ** nodos, int nNodos, int tableauxCerrado) {
 	Coordenadas c = MaxMin(s->data,nodos);
 	AjustarDerecha(c,nodos,nNodos);
 	fprintf(fich,"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n");
 	fprintf(fich,"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"%d\" height=\"%d\">\n",c->xmax + XI,c->ymax + (int)PIXELES_POR_CARACTER + YI);
 	fprintf(fich,"<rect width=\"%d\" height=\"%d\" fill=\"white\">\n</rect>\n",c->xmax + XI,c->ymax + (int)PIXELES_POR_CARACTER + YI);
+	if(tableauxCerrado)
+		fprintf(fich,"<text x=\"%d\" y=\"%d\" style=\"fill:red;font-family:monospace\">INSATISFACIBLE</text>\n",MSG_SAT_X,MSG_SAT_Y);
+	else
+		fprintf(fich,"<text x=\"%d\" y=\"%d\" style=\"fill:green;font-family:monospace\">SATISFACIBLE</text>\n",MSG_SAT_X,MSG_SAT_Y);
+
 	print_svg_recursivo(s->data,fich);
 	fprintf(fich,"</svg>\n");
 	LiberarCoordenadas(c);
@@ -288,12 +296,12 @@ SVG *CrearSVGDesdeTableaux(Tableaux t)  {
   return s;
 }
 
-void showTableauxSVG(Tableaux t, FILE *fich, int nNodos) {
+void showTableauxSVG(Tableaux t, FILE *fich, int nNodos, int tableauxCerrado) {
 	SVG *s = CrearSVGDesdeTableaux(t);
 	SVG_data ** nodos = malloc(sizeof(struct SVG_data*)+sizeof(struct SVG_data*)*nNodos);
 	memset(nodos,0,sizeof(struct SVG_data*)+sizeof(struct SVG_data*)*nNodos);
 
-	print_svg(s,fich,nodos,nNodos);
+	print_svg(s,fich,nodos,nNodos,tableauxCerrado);
 
 	LiberarSVG(s);
 	free(nodos);

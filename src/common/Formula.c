@@ -461,6 +461,9 @@ Tree *CrearArbolDesdeTableaux(Tableaux t) {
   return CrearArbolDesdeTableauxRecursivo(tree, t);
 }
 
+//Necesario porque no es posible saberlo evaluando
+//'t', ya que es un puntero a la raiz, cuya etiqueta
+//estara casi siempre vacia
 int TableauxCerrado(Tableaux t) {
   int tmp;
   if(t->etiqueta == ABIERTO)return BOOLEAN_FALSE;
