@@ -5,7 +5,7 @@
 #include "Global.h"
 #include "Controlador.h"
 int yylex (void);
-void yyerror (FILE *fich, char* nombre_fich, const char *msg);
+void yyerror (FILE *fich, char* path_fich, const char *msg);
 extern int yylineno;
 /*Para debug*/
 //#define YYDEBUG 1
@@ -20,7 +20,7 @@ extern int yylineno;
 
 %locations
 %parse-param {FILE *fich}
-%parse-param {char* nombre_fich}
+%parse-param {char* path_fich}
 %token LPAREN RPAREN AND OR NOT IMP DIMP COMA END_OF_FILE
 %token <a> ATOM
 
@@ -37,7 +37,7 @@ extern int yylineno;
 oracion : e END_OF_FILE
 		{
 			printMsgGreen(MESSAGE_EXPRESION_CORRECTA);
-			ResolverTableaux($1,fich,nombre_fich);
+			ResolverTableaux($1,fich,path_fich);
 			return 0;
 		}
 	| error END_OF_FILE
@@ -173,6 +173,6 @@ g: LPAREN e RPAREN
 
 %%
 
-void yyerror (FILE *fich, char* nombre_fich, const char *msg) {
+void yyerror (FILE *fich, char* path_fich, const char *msg) {
 	//printMsgRed(MESSAGE_ERROR_SEMANTICO);
 }

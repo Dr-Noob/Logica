@@ -1,6 +1,6 @@
 #include "Controlador.h"
 
-void ResolverTableaux(Formula oracion, FILE* fichero, char* nombre_fich) {
+void ResolverTableaux(Formula oracion, FILE* fichero, char* path_fich) {
   rewind(fichero);
   MAX_CHAR = LongitudCaracteres(fichero)*4;
   Tableaux t = CrearTableaux(oracion);
@@ -29,7 +29,7 @@ void ResolverTableaux(Formula oracion, FILE* fichero, char* nombre_fich) {
     printMsg(MESSAGE_TABLEAUX_STATISFACIBLE);
   }
 
-  char* nombre_defecto = getNombreDefecto(nombre_fich);
+  char* nombre_defecto = getNombreDefecto(path_fich);
   FILE *fich = fopen(nombre_defecto,"w+");
   if (fich==NULL) {
 		printMsgRed(MESSAGE_ABRIR_ARCHIVO_FALLIDO,nombre_defecto);

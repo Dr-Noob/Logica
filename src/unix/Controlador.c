@@ -1,7 +1,7 @@
 #include "Controlador.h"
 #include "Config.h"
 
-void ResolverTableaux(Formula oracion, FILE* fichero, char* nombre_fich) {
+void ResolverTableaux(Formula oracion, FILE* fichero, char* path_fich) {
   //Dejar el puntero de fichero en la ultima linea
   rewind(fichero);
   int i = 0;
@@ -51,7 +51,7 @@ void ResolverTableaux(Formula oracion, FILE* fichero, char* nombre_fich) {
   }
 
 	if(mostrarSVG()) {
-		char* nombre_archivo = nombreSVG(nombre_fich);
+		char* nombre_archivo = nombreSVG(path_fich);
 		fich_svg = fopen(nombre_archivo,"w+");
 		if (fich_svg==NULL) {
 			printMsgRed(MESSAGE_ABRIR_ARCHIVO_FALLIDO,nombre_archivo);

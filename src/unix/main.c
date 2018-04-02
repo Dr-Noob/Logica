@@ -6,7 +6,7 @@
 
 extern char *yytext;
 extern int  yyleng;
-extern int yyparse(FILE *fich, char* nombre_fich);
+extern int yyparse(FILE *fich, char* path_fich);
 extern FILE *yyin;
 extern int yylex();
 extern TablaTokens t;

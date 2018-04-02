@@ -46,6 +46,6 @@ int TablaCorrecta();
 
 int mostrarTree();
 int mostrarSVG();
-char* nombreSVG(char* nombre_fich);
+char* nombreSVG(char* path_fich);
 
 #endif

@@ -459,7 +459,7 @@ int mostrarSVG() {
   return BOOLEAN_TRUE;
 }
 
-char* nombreSVG(char* nombre_fich) {
+char* nombreSVG(char* path_fich) {
 	if(t->options[OPTION_SVG_NAME_INDEX][0] != 0)  {
     char* nombre = malloc(sizeof(char)*MAX_CHARS);
   	memset(nombre,0,sizeof(char)*MAX_CHARS);
@@ -467,7 +467,7 @@ char* nombreSVG(char* nombre_fich) {
     return nombre;
   }
   else
-    return getNombreDefecto(nombre_fich);
+    return getNombreDefecto(path_fich);
 }
 
 int getCodigoToken(char* token) {

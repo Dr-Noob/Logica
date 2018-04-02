@@ -44,6 +44,6 @@ static const char* ASCII_SIMBOLO_NOT = "~";
 static const float PIXELES_POR_CARACTER = 7.2025;
 
 void showTableauxSVG(Tableaux t, FILE *fich, int nNodos, int tableauxCerrado);
-char* getNombreDefecto(char* nombre_fich);
+char* getNombreDefecto(char* path_fich);
 
 #endif
