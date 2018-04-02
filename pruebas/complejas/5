@@ -1,0 +1,1 @@
+(p or q) and (p or not q) and (not p or q) and (not p or not r)

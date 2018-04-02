@@ -1,0 +1,1 @@
+(not (p and q) imp (q or r)) imp not p imp ((r and s) imp p)
