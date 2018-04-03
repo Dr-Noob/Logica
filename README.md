@@ -5,10 +5,10 @@ El objetivo de este proyecto es resolver un tableaux semántico de lógica propo
 *__ÍNDICE:__*
 
 1. [Estructura del proyecto](#estructura-del-proyecto)
-2. [Descarga y uso básico](#descarga-y-uso-basico)
+2. [Descarga y uso básico](#descarga-y-uso-básico)
 3. [Nota importante](#nota-importante)
-4. [Cómo escribir expresiones](#como-escribir-expresiones)
-5. [Configuración adicional](#configuracion-adicional)
+4. [Cómo escribir expresiones](#cómo-escribir-expresiones)
+5. [Configuración adicional](#configuración-adicional)
 6. [La salida](#la-salida)
 7. [Compilando](#compilando)
 8. [Ejemplos](#ejemplos)
@@ -58,7 +58,7 @@ El objetivo de este proyecto es resolver un tableaux semántico de lógica propo
 
 ### Descarga y uso básico
 
-Para descargar el software, ve a `releases`(pulsando en la parte de arriba en github, o yendo [aqui](https://github.com/Dr-Noob/Logica/releases)). Si quieres compilarlo tú mismo, puedes echarle un vistazo al apartado de [Haciendo pruebas](#third-example)
+Para descargar el software, ve a `releases`(pulsando en la parte de arriba en github, o yendo [aqui](https://github.com/Dr-Noob/Logica/releases)). Si quieres compilarlo tú mismo, puedes echarle un vistazo al apartado de [Haciendo pruebas](#haciendo-pruebas)
 
 Para ejecutar el programa, es necesario siempre pasarle un fichero cualquiera(fichero de configuración) como parámetro donde se incluya, al menos, una expresión, aunque también puede usarse para escribir operadores personalizados y otras opciones extra de configuración.
 
@@ -68,7 +68,7 @@ Por ejemplo,
 ./tableaux prueba
 ```
 
-donde `prueba` es el fichero en el que está la expresión. Para ver cómo escribir dicha expresión, ve al apartado [Cómo escribir expresiones](#como-escribir-expresiones)
+donde `prueba` es el fichero en el que está la expresión. Para ver cómo escribir dicha expresión, ve al apartado [Cómo escribir expresiones](#cómo-escribir-expresiones)
 
 ### Nota importante
 
